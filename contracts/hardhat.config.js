@@ -2,6 +2,7 @@ require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-deploy");
 require("hardhat-deploy-ethers");
 require("dotenv").config();
+require("./tasks");
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -13,6 +14,7 @@ module.exports = {
         enabled: true,
         runs: 200,
       },
+      viaIR: true,
     },
   },
   // defaultNetwork: "sepolia",
@@ -46,5 +48,6 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+    tasks: "./tasks",
   },
 };

@@ -1,0 +1,19 @@
+{
+  "name": "christmashattt.charizarddd.toketokemon.eth",
+  "description": "Exclusive to Charizard TokenID TokenBountAccounts, the Christmas Charizard Hat is a festive, limited-edition skin. This red and white hat, adorned with holly berries and a fluffy brim, adds holiday flair and uniqueness to your Charizard, enhancing its in-game identity and value.",
+  "attributes": [
+    { "trait_type": "Item", "value": "Christmas Hat" },
+    { "trait_type": "Color", "value": "Red and White" },
+    { "trait_type": "TokenType", "value": "Asset" },
+    { "trait_type": "Feature", "value": "Fluffy White Brim" },
+    { "trait_type": "Decoration", "value": "Holly Berries" },
+    { "trait_type": "Rarity", "value": "Limited Edition" },
+    { "trait_type": "Exclusivity", "value": "Charizard TokenBound Accounts" },
+    {
+      "trait_type": "ENSMetadata",
+      "value": "https://metadata.ens.domains/goerli/0x114D4603199df73e7D157787f8778E21fCd13066/113904885784037177157140937646465269330171278888497996182671390770053767044869"
+    }
+  ],
+  "image": "https://gateway.lighthouse.storage/ipfs/QmS3NSxDpN4XK78ukGWrc58xGxu6Nk9Q6k4rynV1KFYuXD",
+  "Encryptedfile": "https://gateway.lighthouse.storage/ipfs/QmbywkRXHsQeAzL9aa7iUWXLwcUWBk23AkktpG7LAooiob"
+}

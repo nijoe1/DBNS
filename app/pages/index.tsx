@@ -90,7 +90,7 @@ export default function Home() {
               <div className="flex flex-col items-center">
                 <img
                   src="https://gateway.lighthouse.storage/ipfs/QmfUQj2R1kvRZmBDHAfSaGx9rxsD5D1YjaXXdmZpE4JWe"
-                  alt="The Graph"
+                  alt="Filecoin"
                   className="h-16"
                 />
                 <p>Filecoin</p>
@@ -98,7 +98,7 @@ export default function Home() {
               <div className="flex flex-col items-center">
                 <img
                   src="https://gateway.lighthouse.storage/ipfs/QmaNiKXhCt8AhTQ5UH4crr2RyndddsDwo89YicmcDvcrp"
-                  alt="The Graph"
+                  alt="Lighthouse"
                   className="h-16 rounded-full"
                 />
                 <p>Lighthouse</p>
@@ -108,7 +108,7 @@ export default function Home() {
                   src={
                     "https://gateway.lighthouse.storage/ipfs/QmZcWkCKmaJYVAvSij2ZWMfHgLQnVVhnM8c7VdZcMLy8h"
                   }
-                  alt="Chainlink"
+                  alt="Tableland"
                   className="h-16"
                 />
                 <p>Tableland</p>
@@ -116,7 +116,7 @@ export default function Home() {
               <div>
                 <img
                   src="https://gateway.lighthouse.storage/ipfs/QmTKQi64mRGwVjAceJgYQu3Ki599Ckw5qtLj2dpbX7GK7"
-                  alt="The Graph"
+                  alt="PushProtocol"
                   className="h-16"
                 />
                 <p>PushProtocol</p>
@@ -124,7 +124,7 @@ export default function Home() {
               <div>
                 <img
                   src="https://gateway.lighthouse.storage/ipfs/QmVarpFFeqPGPcn5RdRC7S2S45UZ638A3kNiRLSUsiamt"
-                  alt="OpenAI"
+                  alt="Fleek"
                   className="h-16"
                 />
                 <p>Fleek</p>
@@ -132,7 +132,7 @@ export default function Home() {
               <div>
                 <img
                   src="https://gateway.lighthouse.storage/ipfs/QmVSVS65TmPTZUSwueqvvCAJxPaKb41FvdxQ467KPfsLM"
-                  alt="Unlock"
+                  alt="ENS"
                   className="h-16"
                 />
                 <p>ENS</p>

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next export" 
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.1",
@@ -31,7 +32,7 @@
   },
   "devDependencies": {
     "@types/next": "^9.0.0",
-    "@types/node": "^20",
+    "@types/node": "^16",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10",

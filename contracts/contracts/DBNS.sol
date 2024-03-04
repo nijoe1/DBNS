@@ -17,11 +17,9 @@ import {IENS} from "./IENS.sol";
  * IPNS and Push protocol for code and space discussions
  */
 contract DBNS is IENS {
-
     enum Types {
         NULL,
         SUBNODE,
-        INSTANCE,
         CODE
     }
 
@@ -33,9 +31,7 @@ contract DBNS is IENS {
 
     mapping(bytes32 => SpaceInstance) public instances;
 
-    mapping(bytes32 => address) public instanceOwner;
-
-    mapping(bytes32 => uint256) public instanceHatID;
+    mapping(bytes32 => address) public codeOwner;
 
     mapping(bytes32 => Types) public isType;
 
@@ -97,10 +93,11 @@ contract DBNS is IENS {
         string memory _chatID,
         string memory _codeIPNS
     ) external {
-
         uint256 hat = instances[_instance].hatID;
         require(
-            HATS.isAdminOfHat(msg.sender, hat) || HATS.isWearerOfHat(msg.sender, hat) || hat == 0,
+            HATS.isAdminOfHat(msg.sender, hat) ||
+                HATS.isWearerOfHat(msg.sender, hat) ||
+                hat == 0,
             "DBNS: no instance access"
         );
 
@@ -108,7 +105,7 @@ contract DBNS is IENS {
             abi.encodePacked(_instance, _codeIPNS)
         );
 
-        instanceOwner[_newDBInstanceCode] = msg.sender;
+        codeOwner[_newDBInstanceCode] = msg.sender;
         isType[_newDBInstanceCode] = Types.CODE;
 
         InsertInstanceCode(
@@ -124,7 +121,7 @@ contract DBNS is IENS {
     /**
      * @dev Create a new instance under the given node
      * @param _node The parent node
-        * @param _hatID The hatID of the new instance
+     * @param _hatID The hatID of the new instance
      * @param _name The name of the new instance
      * @param _about The about of the new instance
      * @param _img The img of the new instance
@@ -144,10 +141,6 @@ contract DBNS is IENS {
         require(isType[_node] == Types.SUBNODE, "DBNS: Node is not a subnode");
 
         bytes32 _newDBInstance = keccak256(abi.encodePacked(_node, _IPNS));
-
-        instanceHatID[_newDBInstance] = _hatID;
-
-        instanceOwner[_newDBInstance] = msg.sender;
 
         instances[_newDBInstance] = SpaceInstance(_hatID, _price, msg.sender);
 

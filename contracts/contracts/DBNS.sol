@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {SQLHelpers} from "@tableland/evm/contracts/utils/SQLHelpers.sol";
-
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-
-import {IENS} from "./IENS.sol";
+import {CORE} from "./libraries/CORE.sol";
 
 /**
  * @title DBNS
@@ -16,9 +12,12 @@ import {IENS} from "./IENS.sol";
  * ENS system to support a decentralized Namespace of Database spaces
  * IPNS and Push protocol for code and space discussions
  */
-contract DBNS is IENS {
+contract DBNS is CORE {
     enum Types {
-        NULL,
+        PAID_PRIVATE_INSTANCE,
+        OPEN_PRIVATE_INSTANCE,
+        PAID_INSTANCE,
+        OPEN_INSTANCE,
         SUBNODE,
         CODE
     }
@@ -38,8 +37,9 @@ contract DBNS is IENS {
     constructor(
         address _nameWrapper,
         address _publicResolver,
+        address _unlockContract,
         address _hats
-    ) IENS(_nameWrapper, _publicResolver, _hats) {}
+    ) CORE(_nameWrapper, _publicResolver, _unlockContract, _hats) {}
 
     /**
      * @dev Create a new space under the given node
@@ -80,46 +80,6 @@ contract DBNS is IENS {
 
     /**
      * @dev Create a new instance under the given node
-     * @param _instance The parent node
-     * @param _name The name of the new instance
-     * @param _about The about of the new instance
-     * @param _chatID The chatID of the new instance
-     * @param _codeIPNS The IPNS of the new instance
-     */
-    function createInstanceCode(
-        bytes32 _instance,
-        string memory _name,
-        string memory _about,
-        string memory _chatID,
-        string memory _codeIPNS
-    ) external {
-        uint256 hat = instances[_instance].hatID;
-        require(
-            HATS.isAdminOfHat(msg.sender, hat) ||
-                HATS.isWearerOfHat(msg.sender, hat) ||
-                hat == 0,
-            "DBNS: no instance access"
-        );
-
-        bytes32 _newDBInstanceCode = keccak256(
-            abi.encodePacked(_instance, _codeIPNS)
-        );
-
-        codeOwner[_newDBInstanceCode] = msg.sender;
-        isType[_newDBInstanceCode] = Types.CODE;
-
-        InsertInstanceCode(
-            _newDBInstanceCode,
-            _name,
-            _about,
-            _chatID,
-            _codeIPNS,
-            msg.sender
-        );
-    }
-
-    /**
-     * @dev Create a new instance under the given node
      * @param _node The parent node
      * @param _hatID The hatID of the new instance
      * @param _name The name of the new instance
@@ -144,7 +104,21 @@ contract DBNS is IENS {
 
         instances[_newDBInstance] = SpaceInstance(_hatID, _price, msg.sender);
 
+        address _lock;
+        if (price > 0) {
+            isType[_newDBInstance] = Types.PAID_INSTANCE;
+            _lock = createLock(_price, _name, _newDBInstance);
+        } else if (hatID > 0 && price > 0) {
+            isType[_newDBInstance] = Types.PAID_PRIVATE_INSTANCE;
+            _lock = createLock(_price, _name, _newDBInstance);
+        } else if (hatID > 0) {
+            isType[_newDBInstance] = Types.OPEN_PRIVATE_INSTANCE;
+        } else {
+            isType[_newDBInstance] = Types.OPEN_INSTANCE;
+        }
+
         InsertInstance(
+            _lock,
             _newDBInstance,
             _node,
             _hatID,
@@ -158,129 +132,57 @@ contract DBNS is IENS {
         );
     }
 
-    /*
-     * @dev Internal function to insert a new space.
-     * @param {bytes32} DBSpaceID - DBSpace ID.
-     * @param {bytes32} DBSubSpaceOfID - DBSubSpaceOf ID.
-     * @param {string} DBSpaceName - Name of the space.
-     * @param {string} DBSubSpaceOfName - Name of the sub space.
+    /**
+     * @dev Create a new instance under the given node
+     * @param _instance The parent node
+     * @param _name The name of the new instance
+     * @param _about The about of the new instance
+     * @param _chatID The chatID of the new instance
+     * @param _codeIPNS The IPNS of the new instance
      */
+    function createInstanceCode(
+        bytes32 _instance,
+        string memory _name,
+        string memory _about,
+        string memory _chatID,
+        string memory _codeIPNS
+    ) external {
+        if (!hasAccess(_instance, msg.sender)) {
+            revert NoInstanceAccess();
+        }
 
-    function InsertSpace(
-        bytes32 DBSpaceID,
-        bytes32 DBSubSpaceOfID,
-        string memory DBSpaceName,
-        string memory DBSubSpaceOfName
-    ) internal {
-        mutate(
-            tableIDs[0],
-            SQLHelpers.toInsert(
-                DBSPACES_TABLE_PREFIX,
-                tableIDs[0],
-                "DBSpaceID, DBSubSpaceOfID, DBSpaceName, DBSubSpaceOfName",
-                string.concat(
-                    SQLHelpers.quote(bytes32ToString(DBSpaceID)),
-                    ",",
-                    SQLHelpers.quote(bytes32ToString(DBSubSpaceOfID)),
-                    ",",
-                    SQLHelpers.quote(DBSpaceName),
-                    ",",
-                    SQLHelpers.quote(DBSubSpaceOfName)
-                )
-            )
+        bytes32 _newDBInstanceCode = keccak256(
+            abi.encodePacked(_instance, _codeIPNS)
+        );
+
+        codeOwner[_newDBInstanceCode] = msg.sender;
+        isType[_newDBInstanceCode] = Types.CODE;
+
+        InsertInstanceCode(
+            _newDBInstanceCode,
+            _name,
+            _about,
+            _chatID,
+            _codeIPNS,
+            msg.sender
         );
     }
 
-    /*
-     * @dev Internal function to insert a new instance.
-     * @param {bytes32} InstanceID - Instance ID.
-     * @param {bytes32} DBSpaceOfID - DBSpace ID.
-     * @param {string} name - Name of the instance.
-     * @param {string} about - About of the instance.
-     * @param {string} img - Image of the instance.
-     * @param {string} chatID - Chat ID of the instance.
-     * @param {string} IPNS - IPNS of the instance.
-     * @param {address} creator - Creator of the instance.
+    /**
+     * @dev Check if the sender has access to the given instance
+     * @param _instance The instance to check
+     * @param _sender The sender to check
+     * @return bool
      */
-
-    function InsertInstance(
-        bytes32 InstanceID,
-        bytes32 DBSpaceOfID,
-        uint256 hatID,
-        uint256 price,
-        string memory name,
-        string memory about,
-        string memory img,
-        string memory chatID,
-        string memory IPNS,
-        address creator
-    ) internal {
-        mutate(
-            tableIDs[1],
-            SQLHelpers.toInsert(
-                DBSPACES_INSTANCES_TABLE_PREFIX,
-                tableIDs[1],
-                "InstanceID, DBSpaceOfID, name, about, img, chatID, IPNS, creator",
-                string.concat(
-                    SQLHelpers.quote(bytes32ToString(InstanceID)),
-                    ",",
-                    SQLHelpers.quote(bytes32ToString(DBSpaceOfID)),
-                    ",",
-                    SQLHelpers.quote(name),
-                    ",",
-                    SQLHelpers.quote(about),
-                    ",",
-                    SQLHelpers.quote(img),
-                    ",",
-                    SQLHelpers.quote(chatID),
-                    ",",
-                    SQLHelpers.quote(IPNS),
-                    ",",
-                    SQLHelpers.quote(Strings.toHexString(creator))
-                )
-            )
-        );
-    }
-
-    /*
-     * @dev Internal function to insert a new instance code.
-     * @param {bytes32} InstanceID - Instance ID.
-     * @param {string} name - Name of the instance code.
-     * @param {string} about - About of the instance code.
-     * @param {string} chatID - Chat ID of the instance code.
-     * @param {string} codeIPNS - IPNS of the instance code.
-     * @param {address} creator - Creator of the instance code.
-     */
-
-    function InsertInstanceCode(
-        bytes32 InstanceID,
-        string memory name,
-        string memory about,
-        string memory chatID,
-        string memory codeIPNS,
-        address creator
-    ) internal {
-        mutate(
-            tableIDs[2],
-            SQLHelpers.toInsert(
-                DB_INSTANCES_CODES_TABLE_PREFIX,
-                tableIDs[2],
-                "InstanceID, name, about, chatID, codeIPNS, creator",
-                string.concat(
-                    SQLHelpers.quote(bytes32ToString(InstanceID)),
-                    ",",
-                    SQLHelpers.quote(name),
-                    ",",
-                    SQLHelpers.quote(about),
-                    ",",
-                    SQLHelpers.quote(chatID),
-                    ",",
-                    SQLHelpers.quote(codeIPNS),
-                    ",",
-                    SQLHelpers.quote(Strings.toHexString(creator))
-                )
-            )
-        );
+    function hasAccess(
+        bytes32 _instance,
+        address _sender
+    ) public view returns (bool) {
+        uint256 hat = instances[_instance].hatID;
+        return
+            HATS.isAdminOfHat(_sender, hat) ||
+            HATS.isWearerOfHat(_sender, hat) ||
+            hat == 0;
     }
 
     // NEEDS TO GET REMOVED ONLY FOR TESTING

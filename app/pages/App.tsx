@@ -56,12 +56,12 @@ function StructuredObjectDefinition({ structuredObject, onChange }) {
             <Input
               placeholder="Description"
               value={description}
-              onChange={(e) => handleChange(e, key, "description")}
+              onChange={(e:any) => handleChange(e, key, "description")}
             />
           </FormControl>
           <FormControl>
             <FormLabel>Type</FormLabel>
-            <Select value={type} onChange={(e) => handleChange(e, key, "type")}>
+            <Select value={type} onChange={(e:any) => handleChange(e, key, "type")}>
               {supportedTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}
@@ -107,7 +107,7 @@ function StructuredObjectForm({ structuredObject, onSubmit }) {
             placeholder={`Enter ${key}`}
             // @ts-ignore
             value={formData[key] || ""}
-            onChange={(e) => handleChange(e, key)}
+            onChange={(e:any) => handleChange(e, key)}
           />
         </FormControl>
       ))}

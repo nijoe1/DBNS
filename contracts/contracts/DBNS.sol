@@ -117,9 +117,10 @@ contract DBNS is CORE {
             isType[_newDBInstance] = Types.OPEN_INSTANCE;
         }
 
-        InsertInstance(
+        instanceInsertion(
             _lock,
             _newDBInstance,
+            uint8(isType[_newDBInstance]),
             _node,
             _hatID,
             _price,

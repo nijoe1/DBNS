@@ -126,10 +126,9 @@ abstract contract IUNLOCK is Ownable {
         bytes32 _instanceID,
         address _subscriber
     ) public view returns (bool) {
-        uint256 _tokenId = instanceSubscriptions[_instanceID][_subscriber];
         return
             IPublicLockV12(instanceLock[_instanceID].lockAddress)
-                .keyExpirationTimestampFor(_tokenId) > block.timestamp;
+                .balanceOf(msg.sender) > 0;
     }
 
     /**

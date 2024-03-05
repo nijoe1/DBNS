@@ -27,7 +27,7 @@ abstract contract ITABLELAND {
         "db_spaces_instances";
 
     string internal constant DBSPACES_INSTANCES_SCHEMA =
-        "InstanceID text, DBSpaceOfID text, name text, about text, img text, chatID text, IPNS text, creator text";
+        "InstanceID text, instanceOfSpace text, instanceType text, name text, about text, img text, chatID text, IPNS text, hatID text, price text, lock text, creator text";
 
     string internal constant DB_INSTANCES_CODES_TABLE_PREFIX =
         "instances_codes";
@@ -113,7 +113,7 @@ abstract contract ITABLELAND {
     /*
      * @dev Internal function to insert a new instance.
      * @param {bytes32} InstanceID - Instance ID.
-     * @param {bytes32} DBSpaceOfID - DBSpace ID.
+     * @param {bytes32} instanceOfSpace - DBSpace ID.
      * @param {string} name - Name of the instance.
      * @param {string} about - About of the instance.
      * @param {string} img - Image of the instance.
@@ -122,10 +122,11 @@ abstract contract ITABLELAND {
      * @param {address} creator - Creator of the instance.
      */
 
-    function InsertInstance(
+    function instanceInsertion(
         address _lock,
-        bytes32 InstanceID,
-        bytes32 DBSpaceOfID,
+        bytes32 _instanceID,
+        uint8 _lockType,
+        bytes32 _instanceOfSpace,
         uint256 hatID,
         uint256 price,
         string memory name,
@@ -140,11 +141,13 @@ abstract contract ITABLELAND {
             SQLHelpers.toInsert(
                 DBSPACES_INSTANCES_TABLE_PREFIX,
                 tableIDs[1],
-                "InstanceID, DBSpaceOfID, name, about, img, chatID, IPNS, creator",
+                "InstanceID, instanceOfSpace, instanceType, name, about, img, chatID, IPNS, hatID, price, lock, creator",
                 string.concat(
-                    SQLHelpers.quote(bytes32ToString(InstanceID)),
+                    SQLHelpers.quote(bytes32ToString(_instanceID)),
                     ",",
-                    SQLHelpers.quote(bytes32ToString(DBSpaceOfID)),
+                    SQLHelpers.quote(bytes32ToString(_instanceOfSpace)),
+                    ",",
+                    SQLHelpers.quote(Strings.toString(_lockType)),
                     ",",
                     SQLHelpers.quote(name),
                     ",",
@@ -155,6 +158,12 @@ abstract contract ITABLELAND {
                     SQLHelpers.quote(chatID),
                     ",",
                     SQLHelpers.quote(IPNS),
+                    ",",
+                    Strings.toString(hatID),
+                    ",",
+                    Strings.toString(price),
+                    ",",
+                    SQLHelpers.quote(Strings.toHexString(_lock)),
                     ",",
                     SQLHelpers.quote(Strings.toHexString(creator))
                 )
@@ -173,7 +182,7 @@ abstract contract ITABLELAND {
      */
 
     function InsertInstanceCode(
-        bytes32 InstanceID,
+        bytes32 _instanceID,
         string memory name,
         string memory about,
         string memory chatID,
@@ -187,7 +196,7 @@ abstract contract ITABLELAND {
                 tableIDs[2],
                 "InstanceID, name, about, chatID, codeIPNS, creator",
                 string.concat(
-                    SQLHelpers.quote(bytes32ToString(InstanceID)),
+                    SQLHelpers.quote(bytes32ToString(_instanceID)),
                     ",",
                     SQLHelpers.quote(name),
                     ",",

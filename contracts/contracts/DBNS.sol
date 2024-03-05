@@ -105,13 +105,13 @@ contract DBNS is CORE {
         instances[_newDBInstance] = SpaceInstance(_hatID, _price, msg.sender);
 
         address _lock;
-        if (price > 0) {
+        if (_price > 0) {
             isType[_newDBInstance] = Types.PAID_INSTANCE;
             _lock = createLock(_price, _name, _newDBInstance);
-        } else if (hatID > 0 && price > 0) {
+        } else if (_hatID > 0 && _price > 0) {
             isType[_newDBInstance] = Types.PAID_PRIVATE_INSTANCE;
             _lock = createLock(_price, _name, _newDBInstance);
-        } else if (hatID > 0) {
+        } else if (_hatID > 0) {
             isType[_newDBInstance] = Types.OPEN_PRIVATE_INSTANCE;
         } else {
             isType[_newDBInstance] = Types.OPEN_INSTANCE;
@@ -147,7 +147,7 @@ contract DBNS is CORE {
         string memory _chatID,
         string memory _codeIPNS
     ) external {
-        if (!hasAccess(_instance, msg.sender)) {
+        if (!hasMutateAccess(_instance, msg.sender)) {
             revert NoInstanceAccess();
         }
 
@@ -174,15 +174,50 @@ contract DBNS is CORE {
      * @param _sender The sender to check
      * @return bool
      */
-    function hasAccess(
+    function hasViewAccess(
         bytes32 _instance,
         address _sender
     ) public view returns (bool) {
         uint256 hat = instances[_instance].hatID;
+        if (isType[_instance] == Types.PAID_INSTANCE) {
+            return getIsActiveSubscription(_instance, _sender);
+        } else if (isType[_instance] == Types.PAID_PRIVATE_INSTANCE) {
+            return
+                getHatAccess(_sender, hat) ||
+                getIsActiveSubscription(_instance, _sender);
+        } else if (
+            isType[_instance] == Types.OPEN_PRIVATE_INSTANCE ||
+            isType[_instance] == Types.OPEN_INSTANCE
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function hasMutateAccess(
+        bytes32 _instance,
+        address _sender
+    ) public view returns (bool) {
+        uint256 hat = instances[_instance].hatID;
+        if (isType[_instance] == Types.PAID_INSTANCE) {
+            return instances[_instance].creator == _sender;
+        } else if (isType[_instance] == Types.PAID_PRIVATE_INSTANCE) {
+            return getHatAccess(_sender, hat);
+        } else if (isType[_instance] == Types.OPEN_PRIVATE_INSTANCE) {
+            return getHatAccess(_sender, hat);
+        } else if (isType[_instance] == Types.OPEN_INSTANCE) {
+            return true;
+        }
+    }
+
+    function getHatAccess(
+        address _sender,
+        uint256 _hatID
+    ) public view returns (bool) {
         return
-            HATS.isAdminOfHat(_sender, hat) ||
-            HATS.isWearerOfHat(_sender, hat) ||
-            hat == 0;
+            HATS.isAdminOfHat(_sender, _hatID) ||
+            HATS.isWearerOfHat(_sender, _hatID);
     }
 
     // NEEDS TO GET REMOVED ONLY FOR TESTING

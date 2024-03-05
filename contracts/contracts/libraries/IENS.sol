@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {BytesUtils} from "@ensdomains/ens-contracts/contracts/wrapper/BytesUtils.sol";
-
 import {Errors} from "../interfaces/Errors.sol";
 
 import {IERC1155Receiver, IENSResolver, INameWrapper, IERC165, IHats} from "../interfaces/interfaces.sol";
@@ -53,16 +51,6 @@ abstract contract IENS is IERC1155Receiver, Errors {
             // EXPIRY
             0
         );
-    }
-
-    /* @dev Function to get the parent node of a name.
-     * @param {bytes} - Name.
-     * @return {bytes32} - Parent node.
-     */
-    function getParentNode(bytes memory name) internal pure returns (bytes32) {
-        (, uint256 offset) = BytesUtils.readLabel(name, 0);
-        bytes32 parentNode = BytesUtils.namehash(name, offset);
-        return parentNode;
     }
 
     /*

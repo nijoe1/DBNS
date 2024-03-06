@@ -13,19 +13,19 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import "tailwindcss/tailwind.css";
-import { ObjectMatcher } from "@/utils/merge";
+import { ObjectMatcher } from "../utils/merge.js";
 
 const supportedTypes = ["string", "number", "boolean"];
 
 // @ts-ignore
 function StructuredObjectDefinition({ structuredObject, onChange }) {
-  const handleChange = (e: any, key: any, field: any) => {
+  const handleChange = (e, key, field) => {
     const newStructuredObject = { ...structuredObject };
     newStructuredObject[key][field] = e.target.value;
     onChange(newStructuredObject);
   };
 
-  const handleRemoveVariable = (key: any) => {
+  const handleRemoveVariable = (key) => {
     const newStructuredObject = { ...structuredObject };
     delete newStructuredObject[key];
     onChange(newStructuredObject);
@@ -56,12 +56,12 @@ function StructuredObjectDefinition({ structuredObject, onChange }) {
             <Input
               placeholder="Description"
               value={description}
-              onChange={(e:any) => handleChange(e, key, "description")}
+              onChange={(e) => handleChange(e, key, "description")}
             />
           </FormControl>
           <FormControl>
             <FormLabel>Type</FormLabel>
-            <Select value={type} onChange={(e:any) => handleChange(e, key, "type")}>
+            <Select value={type} onChange={(e) => handleChange(e, key, "type")}>
               {supportedTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}
@@ -81,7 +81,7 @@ function StructuredObjectDefinition({ structuredObject, onChange }) {
 function StructuredObjectForm({ structuredObject, onSubmit }) {
   const [formData, setFormData] = useState({});
 
-  const handleChange = (e:any, key:any) => {
+  const handleChange = (e, key) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [key]: e.target.value,
@@ -107,7 +107,7 @@ function StructuredObjectForm({ structuredObject, onSubmit }) {
             placeholder={`Enter ${key}`}
             // @ts-ignore
             value={formData[key] || ""}
-            onChange={(e:any) => handleChange(e, key)}
+            onChange={(e) => handleChange(e, key)}
           />
         </FormControl>
       ))}
@@ -116,29 +116,27 @@ function StructuredObjectForm({ structuredObject, onSubmit }) {
   );
 }
 
-function App() {
-  const [structuredObject, setStructuredObject] = useState<any>(
-    {}
-  );
+function MergerPage() {
+  const [structuredObject, setStructuredObject] = useState({});
   const [array1, setArray1] = useState([]);
   const [array2, setArray2] = useState([]);
   const [array3, setArray3] = useState([]);
   const [mergedArray, setMergedArray] = useState([]);
 
-  const handleAddToArray1 = (object:any) => {
+  const handleAddToArray1 = (object) => {
     // @ts-ignore
     setArray1((prevArray1) => [...prevArray1, object]);
   };
 
-  const handleAddToArray2 = (object:any) => {
+  const handleAddToArray2 = (object) => {
     // @ts-ignore
     setArray2((prevArray2) => [...prevArray2, object]);
   };
 
-  const handleAddToArray3 = (object:any) => {
-    // @ts-ignore
-    setArray3((prevArray3) => [...prevArray3, object]);
-  };
+  //   const handleAddToArray3 = (object) => {
+  //     // @ts-ignore
+  //     setArray3((prevArray3) => [...prevArray3, object]);
+  //   };
 
   const handleMergeArrays = () => {
     const matcher = new ObjectMatcher(array1[0]);
@@ -148,10 +146,10 @@ function App() {
     console.log("Merged Array:", merged);
   };
 
-  const handleUploadCSV = (event:any) => {
+  const handleUploadCSV = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
-    reader.onload = (e:any) => {
+    reader.onload = (e) => {
       const csvString = e.target.result;
       const arrayFromCsv = csvToObjectArray(csvString);
       // @ts-ignore
@@ -160,14 +158,14 @@ function App() {
     reader.readAsText(file);
   };
 
-  const csvToObjectArray = (csvString:any) => {
+  const csvToObjectArray = (csvString) => {
     const lines = csvString.trim().split("\n");
-    const headers = lines[0].split(",").map((header:any) => header.trim());
+    const headers = lines[0].split(",").map((header) => header.trim());
     const objects = [];
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(",");
       const obj = {};
-      values.forEach((value:any, index:any) => {
+      values.forEach((value, index) => {
         // @ts-ignore
         obj[headers[index]] = value.trim();
       });
@@ -176,10 +174,10 @@ function App() {
     return objects;
   };
 
-  function objectToCsv(data:any) {
+  function objectToCsv(data) {
     const keys = Object.keys(data[0]);
     const headerRow = keys.map((key) => key).join(",");
-    const rows = data.map((obj:any) => {
+    const rows = data.map((obj) => {
       return keys
         .map((key) => {
           const cell =
@@ -193,7 +191,7 @@ function App() {
     return headerRow + "\n" + rows.join("\n");
   }
 
-  function downloadCsv(data:any, filename:any) {
+  function downloadCsv(data, filename) {
     const csvString = objectToCsv(data);
     const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -210,51 +208,53 @@ function App() {
   }
 
   return (
-    <ChakraProvider>
-      <Container maxW="container.lg" mt={8}>
-        <VStack spacing={8}>
-          <StructuredObjectDefinition
-            structuredObject={structuredObject}
-            onChange={setStructuredObject}
-          />
-          <StructuredObjectForm
-            structuredObject={structuredObject}
-            onSubmit={handleAddToArray1}
-          />
-          <Textarea
-            placeholder="Array 1"
-            value={JSON.stringify(array1, null, 2)}
-            readOnly
-            rows={8}
-          />
-          <StructuredObjectForm
-            structuredObject={structuredObject}
-            onSubmit={handleAddToArray2}
-          />
-          <Textarea
-            placeholder="Array 2"
-            value={JSON.stringify(array2, null, 2)}
-            readOnly
-            rows={8}
-          />
-          <Input type="file" onChange={handleUploadCSV} />
-          <Textarea
-            placeholder="Array 3 (Uploaded CSV)"
-            value={JSON.stringify(array3, null, 2)}
-            readOnly
-            rows={8}
-          />
-          <Button onClick={handleMergeArrays}>Merge Arrays</Button>
-          <Textarea
-            placeholder="Merged Array"
-            value={JSON.stringify(mergedArray, null, 2)}
-            readOnly
-            rows={8}
-          />
-        </VStack>
-      </Container>
-    </ChakraProvider>
+    <>
+      <ChakraProvider>
+        <Container maxW="container.lg" mt={8}>
+          <VStack spacing={8}>
+            <StructuredObjectDefinition
+              structuredObject={structuredObject}
+              onChange={setStructuredObject}
+            />
+            <StructuredObjectForm
+              structuredObject={structuredObject}
+              onSubmit={handleAddToArray1}
+            />
+            <Textarea
+              placeholder="Array 1"
+              value={JSON.stringify(array1, null, 2)}
+              readOnly
+              rows={8}
+            />
+            <StructuredObjectForm
+              structuredObject={structuredObject}
+              onSubmit={handleAddToArray2}
+            />
+            <Textarea
+              placeholder="Array 2"
+              value={JSON.stringify(array2, null, 2)}
+              readOnly
+              rows={8}
+            />
+            <Input type="file" onChange={handleUploadCSV} />
+            <Textarea
+              placeholder="Array 3 (Uploaded CSV)"
+              value={JSON.stringify(array3, null, 2)}
+              readOnly
+              rows={8}
+            />
+            <Button onClick={handleMergeArrays}>Merge Arrays</Button>
+            <Textarea
+              placeholder="Merged Array"
+              value={JSON.stringify(mergedArray, null, 2)}
+              readOnly
+              rows={8}
+            />
+          </VStack>
+        </Container>
+      </ChakraProvider>
+    </>
   );
 }
 
-export default App;
+export default MergerPage;

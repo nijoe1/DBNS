@@ -30,7 +30,7 @@ export default function Home() {
       </div>
       <div className="w-screen h-screen  bg-gradient-to-r from-white via-white to-rose-100">
         {hashRoute === "#/MergerPage" && <MergerPage />}
-        {hashRoute === "#/LandingPage" && <LandingPage />}
+        {(hashRoute === "#/LandingPage" || hashRoute === "") && <LandingPage />}
       </div>
     </div>
   );

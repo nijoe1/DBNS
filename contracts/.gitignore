@@ -15,6 +15,9 @@ coverage.json
 typechain
 yarn.lock
 
+
+
+.env
 # don't push the environment vars!
 .env
 

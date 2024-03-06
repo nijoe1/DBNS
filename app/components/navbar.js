@@ -13,10 +13,7 @@ const Navbar = () => {
   return (
     <div className="w-screen bg-gradient-to-r rounded-lg mb-3">
       <div className="flex justify-between mx-6 ml-10">
-        <div
-          onClick={() => navigateToHashRoute("/")}
-          className="mt-4 cursor-pointer"
-        >
+        <div onClick={() => router.push("/")} className="mt-4 cursor-pointer">
           <div className="flex">
             <Image
               className="cursor-pointer my-auto mx-2"

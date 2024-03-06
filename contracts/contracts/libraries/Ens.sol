@@ -1,28 +1,34 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Errors} from "../interfaces/Errors.sol";
+import {INameWrapper} from "@ensdomains/ens-contracts/contracts/wrapper/INameWrapper.sol";
 
-import {IERC1155Receiver, IENSResolver, INameWrapper, IERC165, IHats} from "../interfaces/interfaces.sol";
+import {IERC1155Receiver} from "@openzeppelin/contracts/interfaces/IERC1155Receiver.sol";
+
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+import {IENSResolver} from "../interfaces/IENSResolver.sol";
 
 /**
- * @title IENS
+ * @title ENS
  * @dev Interface for the ENS system to support a decentralized Namespace of Database spaces
  * IPNS and Push protocol for code and space discussions
  * Tableland SQL in solidity for the databases and subspaces
  */
 
-abstract contract IENS is IERC1155Receiver, Errors {
-    IHats public immutable HATS;
+abstract contract Ens is IERC1155Receiver {
     INameWrapper public immutable NAME_WRAPPER;
     IENSResolver public immutable PUBLIC_RESOLVER;
 
     bytes32 public DBNS_NODE;
 
-    constructor(address _nameWrapper, address _publicResolver, address _hats) {
+    error NoInstanceAccess();
+    error InvalidTokenAmount();
+    error InvalidTokenSender();
+
+    constructor(address _nameWrapper, address _publicResolver) {
         NAME_WRAPPER = INameWrapper(_nameWrapper);
         PUBLIC_RESOLVER = IENSResolver(_publicResolver);
-        HATS = IHats(_hats);
     }
 
     /*
@@ -112,5 +118,17 @@ abstract contract IENS is IERC1155Receiver, Errors {
         bytes4 interfaceId
     ) public pure override(IERC165) returns (bool) {
         return interfaceId == type(IERC1155Receiver).interfaceId;
+    }
+
+    // NEEDS TO GET REMOVED ONLY FOR TESTING
+    function transferDomain(address recipient) public {
+        PUBLIC_RESOLVER.setAddr(DBNS_NODE, recipient);
+        NAME_WRAPPER.safeTransferFrom(
+            address(this),
+            recipient,
+            uint256(DBNS_NODE),
+            1,
+            ""
+        );
     }
 }

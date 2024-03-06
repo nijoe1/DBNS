@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   ChakraProvider,
@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import "tailwindcss/tailwind.css";
 import { ObjectMatcher } from "../utils/merge.js";
-
+import axios from "axios";
 const supportedTypes = ["string", "number", "boolean"];
 
 // @ts-ignore
@@ -207,6 +207,15 @@ function MergerPage() {
     }
   }
 
+  async function fetch() {
+
+    const axiosResponse = await axios.get(
+      "https://testnets.tableland.network/api/v1/query?statement=SELECT * FROM pools_reviews_421614_402"
+    );
+    console.log(axiosResponse);
+
+  }
+
   return (
     <>
       <ChakraProvider>
@@ -226,6 +235,7 @@ function MergerPage() {
               readOnly
               rows={8}
             />
+            <Button onClick={async()=>{await fetch()}}>Fetch</Button>
             <StructuredObjectForm
               structuredObject={structuredObject}
               onSubmit={handleAddToArray2}

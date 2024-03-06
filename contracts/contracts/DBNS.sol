@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {CORE} from "./libraries/CORE.sol";
+import {Core} from "./libraries/Core.sol";
 
 /**
  * @title DBNS
@@ -12,34 +12,13 @@ import {CORE} from "./libraries/CORE.sol";
  * ENS system to support a decentralized Namespace of Database spaces
  * IPNS and Push protocol for code and space discussions
  */
-contract DBNS is CORE {
-    enum Types {
-        PAID_PRIVATE_INSTANCE,
-        OPEN_PRIVATE_INSTANCE,
-        PAID_INSTANCE,
-        OPEN_INSTANCE,
-        SUBNODE,
-        CODE
-    }
-
-    struct SpaceInstance {
-        uint256 hatID;
-        uint256 price;
-        address creator;
-    }
-
-    mapping(bytes32 => SpaceInstance) public instances;
-
-    mapping(bytes32 => address) public codeOwner;
-
-    mapping(bytes32 => Types) public isType;
-
+contract DBNS is Core {
     constructor(
         address _nameWrapper,
         address _publicResolver,
         address _unlockContract,
         address _hats
-    ) CORE(_nameWrapper, _publicResolver, _unlockContract, _hats) {}
+    ) Core(_nameWrapper, _publicResolver, _unlockContract, _hats) {}
 
     /**
      * @dev Create a new space under the given node
@@ -53,7 +32,7 @@ contract DBNS is CORE {
 
         isType[_newDBSpace] = Types.SUBNODE;
 
-        InsertSpace(_newDBSpace, DBNS_NODE, _name, _subspace);
+        spaceInsertion(_newDBSpace, DBNS_NODE, _name, _subspace);
     }
 
     /**
@@ -75,7 +54,7 @@ contract DBNS is CORE {
 
         isType[_newDBSubSpace] = Types.SUBNODE;
 
-        InsertSpace(_newDBSubSpace, _DBSpace, _name, _subspace);
+        spaceInsertion(_newDBSubSpace, _DBSpace, _name, _subspace);
     }
 
     /**
@@ -102,20 +81,15 @@ contract DBNS is CORE {
 
         bytes32 _newDBInstance = keccak256(abi.encodePacked(_node, _IPNS));
 
+
         instances[_newDBInstance] = SpaceInstance(_hatID, _price, msg.sender);
 
-        address _lock;
-        if (_price > 0) {
-            isType[_newDBInstance] = Types.PAID_INSTANCE;
-            _lock = createLock(_price, _name, _newDBInstance);
-        } else if (_hatID > 0 && _price > 0) {
-            isType[_newDBInstance] = Types.PAID_PRIVATE_INSTANCE;
-            _lock = createLock(_price, _name, _newDBInstance);
-        } else if (_hatID > 0) {
-            isType[_newDBInstance] = Types.OPEN_PRIVATE_INSTANCE;
-        } else {
-            isType[_newDBInstance] = Types.OPEN_INSTANCE;
-        }
+        address _lock = createInstanceType(
+            _newDBInstance,
+            _hatID,
+            _price,
+            _name
+        );
 
         instanceInsertion(
             _lock,
@@ -160,6 +134,7 @@ contract DBNS is CORE {
         isType[_newDBInstanceCode] = Types.CODE;
 
         InsertInstanceCode(
+            _instance,
             _newDBInstanceCode,
             _name,
             _about,
@@ -169,67 +144,51 @@ contract DBNS is CORE {
         );
     }
 
-    /**
-     * @dev Check if the sender has access to the given instance
-     * @param _instance The instance to check
-     * @param _sender The sender to check
-     * @return bool
-     */
-    function hasViewAccess(
-        bytes32 _instance,
-        address _sender
-    ) public view returns (bool) {
-        uint256 hat = instances[_instance].hatID;
-        if (isType[_instance] == Types.PAID_INSTANCE) {
-            return getIsActiveSubscription(_instance, _sender);
-        } else if (isType[_instance] == Types.PAID_PRIVATE_INSTANCE) {
-            return
-                getHatAccess(_sender, hat) ||
-                getIsActiveSubscription(_instance, _sender);
-        } else if (
-            isType[_instance] == Types.OPEN_PRIVATE_INSTANCE ||
-            isType[_instance] == Types.OPEN_INSTANCE
-        ) {
-            return true;
-        } else {
-            return false;
+    function updateCode(
+        bytes32 _codeID,
+        string memory _name,
+        string memory _about
+    ) external {
+        if (codeOwner[_codeID] != msg.sender) {
+            revert NoCodeOwner();
         }
+
+        // UpdateInstanceCode(
+        //     _codeID,
+        //     _name,
+        //     _about,
+        //     _chatID,
+        //     _codeIPNS,
+        //     msg.sender
+        // );
     }
 
-    function hasMutateAccess(
+    function updateInstance(
         bytes32 _instance,
-        address _sender
-    ) public view returns (bool) {
-        uint256 hat = instances[_instance].hatID;
-        if (isType[_instance] == Types.PAID_INSTANCE) {
-            return instances[_instance].creator == _sender;
-        } else if (isType[_instance] == Types.PAID_PRIVATE_INSTANCE) {
-            return getHatAccess(_sender, hat);
-        } else if (isType[_instance] == Types.OPEN_PRIVATE_INSTANCE) {
-            return getHatAccess(_sender, hat);
-        } else if (isType[_instance] == Types.OPEN_INSTANCE) {
-            return true;
+        uint256 _hatID,
+        uint256 _price,
+        string memory _name,
+        string memory _about,
+        string memory _img,
+        string memory _chatID,
+        string memory _IPNS
+    ) external {
+        if (instances[_instance].creator != msg.sender) {
+            revert NoInstanceAccess();
         }
+
+        // UpdateInstance(
+        //     _instance,
+        //     _hatID,
+        //     _price,
+        //     _name,
+        //     _about,
+        //     _img,
+        //     _chatID,
+        //     _IPNS,
+        //     msg.sender
+        // );
     }
 
-    function getHatAccess(
-        address _sender,
-        uint256 _hatID
-    ) public view returns (bool) {
-        return
-            HATS.isAdminOfHat(_sender, _hatID) ||
-            HATS.isWearerOfHat(_sender, _hatID);
-    }
-
-    // NEEDS TO GET REMOVED ONLY FOR TESTING
-    function transferDomain(address recipient) public onlyOwner {
-        PUBLIC_RESOLVER.setAddr(DBNS_NODE, recipient);
-        NAME_WRAPPER.safeTransferFrom(
-            address(this),
-            recipient,
-            uint256(DBNS_NODE),
-            1,
-            ""
-        );
-    }
+    
 }

@@ -29,7 +29,7 @@
     "**/*.ts",
     "**/*.tsx",
     "components/Animation"
-, "pages/MergerPage.js", "utils/merge.js", "pages/index.jsx", "components/navbar.js"  ],
+, "pages/MergerPage.js", "utils/merge.js", "pages/index.jsx", "components/navbar.js", "pages/CsvViewer.js"  ],
   "exclude": [
     "node_modules"
   ]

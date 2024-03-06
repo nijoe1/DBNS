@@ -9,9 +9,12 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
-abstract contract IUNLOCK is Ownable {
-    uint256 internal constant month = 30 days;
-    uint256 internal constant max = type(uint256).max;
+abstract contract Unlock is Ownable {
+    error SubscribeToGainAccess();
+    error NoInstanceCreator();
+
+    uint256 internal constant MONTH = 30 days;
+    uint256 internal constant MAX = type(uint256).max;
 
     struct InstanceStruct {
         address creator;
@@ -34,12 +37,12 @@ abstract contract IUNLOCK is Ownable {
         string memory _lockName,
         bytes32 _instanceID
     ) internal returns (address newLock) {
-        address newLock = UNLOCK.createLock(
+        newLock = UNLOCK.createLock(
             // Expiration duration of subscription
-            month,
+            MONTH,
             address(0),
             _keyPrice,
-            max,
+            MAX,
             _lockName,
             bytes12(0)
         );
@@ -80,9 +83,8 @@ abstract contract IUNLOCK is Ownable {
         bytes[] memory _data = new bytes[](1);
         uint256[] memory tokenID = new uint256[](1);
 
-        address LockAddress = instanceLock[_instanceID].lockAddress;
-        address tokenAddress = IPublicLockV12(LockAddress).tokenAddress();
-        uint _priceToPay = IPublicLockV12(LockAddress).keyPrice();
+        address lockAddress = instanceLock[_instanceID].lockAddress;
+        uint _priceToPay = IPublicLockV12(lockAddress).keyPrice();
 
         _referrers[0] = address(this);
 
@@ -90,7 +92,7 @@ abstract contract IUNLOCK is Ownable {
 
         _recipients[0] = msg.sender;
 
-        tokenID = IPublicLockV12(LockAddress).purchase{value: msg.value}(
+        tokenID = IPublicLockV12(lockAddress).purchase{value: msg.value}(
             _values,
             _recipients,
             _referrers,
@@ -102,7 +104,6 @@ abstract contract IUNLOCK is Ownable {
     }
 
     function extendSubscription(
-        uint256 _value,
         uint256 _tokenId,
         bytes32 _instanceID
     ) external payable {
@@ -122,13 +123,18 @@ abstract contract IUNLOCK is Ownable {
         );
     }
 
-    function getIsActiveSubscription(
+    function hasActiveSubscription(
         bytes32 _instanceID,
         address _subscriber
     ) public view returns (bool) {
         return
-            IPublicLockV12(instanceLock[_instanceID].lockAddress)
-                .balanceOf(msg.sender) > 0;
+            IPublicLockV12(instanceLock[_instanceID].lockAddress).balanceOf(
+                _subscriber
+            ) > 0;
+    }
+
+    function getTime() public view returns (uint256) {
+        return block.timestamp;
     }
 
     /**
@@ -140,13 +146,15 @@ abstract contract IUNLOCK is Ownable {
     function withdraw(bytes32 _instanceID) external {
         InstanceStruct memory _instance = instanceLock[_instanceID];
 
+        if (msg.sender != _instance.creator) {
+            revert NoInstanceCreator();
+        }
+
         IPublicLockV12 lockContract = IPublicLockV12(_instance.lockAddress);
 
         uint256 balance = address(_instance.lockAddress).balance;
 
-        address tokenAddress = lockContract.tokenAddress();
-
-        lockContract.withdraw(tokenAddress, payable(address(this)), balance);
+        lockContract.withdraw(address(0), payable(address(this)), balance);
 
         address payable withdrawer = payable(_instance.creator);
 

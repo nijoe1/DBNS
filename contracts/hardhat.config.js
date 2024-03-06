@@ -17,8 +17,8 @@ module.exports = {
       viaIR: true,
     },
   },
-  // defaultNetwork: "sepolia",
-  defaultNetwork: "goerli",
+  defaultNetwork: "sepolia",
+  // defaultNetwork: "goerli",
 
   networks: {
     sepolia: {
@@ -36,6 +36,10 @@ module.exports = {
       url: "https://rpc.ankr.com/polygon_mumbai",
       accounts: [PRIVATE_KEY],
     },
+    "local-tableland": {
+      url: "http://127.0.0.1:8545",
+      accounts: [PRIVATE_KEY],
+    },
   },
   etherscan: {
     // apiKey: "JYMKRTHHFUSX4X11I1NQRNW6X7K2FJFJUU",
@@ -48,6 +52,5 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
-    tasks: "./tasks",
   },
 };

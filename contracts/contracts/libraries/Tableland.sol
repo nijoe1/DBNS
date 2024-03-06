@@ -9,7 +9,7 @@ import {SQLHelpers} from "@tableland/evm/contracts/utils/SQLHelpers.sol";
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
-abstract contract ITABLELAND {
+abstract contract Tableland {
     ITablelandTables public immutable TABLELAND;
 
     string[] createTableStatements;
@@ -33,7 +33,7 @@ abstract contract ITABLELAND {
         "instances_codes";
 
     string internal constant DB_INSTANCES_CODES_SCHEMA =
-        "InstanceID text, name text, about text, chatID text, codeIPNS text, creator text";
+        "InstanceID text, codeID text, name text, about text, chatID text, codeIPNS text, creator text";
 
     constructor() {
         TABLELAND = TablelandDeployments.get();
@@ -85,7 +85,7 @@ abstract contract ITABLELAND {
      * @param {string} DBSubSpaceOfName - Name of the sub space.
      */
 
-    function InsertSpace(
+    function spaceInsertion(
         bytes32 DBSpaceID,
         bytes32 DBSubSpaceOfID,
         string memory DBSpaceName,
@@ -183,6 +183,7 @@ abstract contract ITABLELAND {
 
     function InsertInstanceCode(
         bytes32 _instanceID,
+        bytes32 _codeID,
         string memory name,
         string memory about,
         string memory chatID,
@@ -194,9 +195,11 @@ abstract contract ITABLELAND {
             SQLHelpers.toInsert(
                 DB_INSTANCES_CODES_TABLE_PREFIX,
                 tableIDs[2],
-                "InstanceID, name, about, chatID, codeIPNS, creator",
+                "InstanceID, codeID, name, about, chatID, codeIPNS, creator",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(_instanceID)),
+                    ",",
+                    SQLHelpers.quote(bytes32ToString(_codeID)),
                     ",",
                     SQLHelpers.quote(name),
                     ",",
@@ -218,7 +221,9 @@ abstract contract ITABLELAND {
      * @return {string} - Converted data.
      */
 
-    function bytes32ToString(bytes32 data) public pure returns (string memory) {
+    function bytes32ToString(
+        bytes32 data
+    ) internal pure returns (string memory) {
         // Fixed buffer size for hexadecimal convertion
         bytes memory converted = new bytes(data.length * 2);
 

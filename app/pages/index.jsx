@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, Wrap, WrapItem } from "@chakra-ui/react";
 import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 import { useRouter } from "next/router";
 
 import LandingPage from "./LandingPage";
@@ -34,10 +35,13 @@ export default function Home() {
       <div className="fixed z-50 top-0 left-0 w-full">
         <Navbar />
       </div>
-      <div className="w-screen h-screen  bg-gradient-to-r from-white via-white to-rose-100">
+      <div className="w-screen h-screen  bg-gradient-to-b from-gray-300 via-gray-400 to-gray-500">
         {hashRoute === "#/MergerPage" && <MergerPage />}
-        {(hashRoute === "#/LandingPage" || route === "") && <LandingPage />}
-        {(hashRoute === "#/CsvViewer" || route === "") && <CsvViewer />}
+        {route === "" && hashRoute == "" && <LandingPage />}
+        {hashRoute === "#/CsvViewer" && <CsvViewer />}
+      </div>
+      <div className="fixed z-50 bottom-0 left-0 w-full ">
+        <Footer />
       </div>
     </div>
   );

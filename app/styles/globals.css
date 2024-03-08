@@ -8,7 +8,7 @@
 
 @layer base {
   html {
-    @apply bg-gradient-to-r from-white via-white to-rose-100;
+    @apply bg-gradient-to-b from-gray-500  to-gray-600;
   }
 }
 

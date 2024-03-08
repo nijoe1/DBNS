@@ -18,7 +18,7 @@ function LandingPage() {
               onClick={() =>
                 window.open("https://github.com/nijoe1/DBNS", "_blank")
               }
-              className="mt-5 bg-gradient-to-r from-indigo-200 to bg-indigo-500 hover:from-indigo-500 hover:to-indigo-200 text-white font-bold py-2 px-4 rounded-full"
+              className="mt-5 bg-gradient-to-b from-gray-400 to bg-gray-700 hover:from-indigo-500 hover:to-indigo-200 text-white font-bold py-2 px-4 rounded-full"
             >
               Source Code
             </button>
@@ -73,7 +73,7 @@ function LandingPage() {
         </div>
 
         {/* Powered By Section */}
-        <div className="mt-5 mb-[4%] text-center">
+        <div className="mt-5 mb-[6%] text-center">
           <h2 className="text-2xl font-bold mb-4">Powered By</h2>
           <div className="flex flex-wrap justify-center items-center gap-8">
             <div className="flex flex-col items-center">

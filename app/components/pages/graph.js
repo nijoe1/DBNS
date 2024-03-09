@@ -36,7 +36,16 @@ const StyledNodesTree = ({ data }) => {
         height: window.innerHeight,
       });
     };
-  });
+
+    // Add event listener to update window dimensions on resize
+    window.addEventListener("resize", handleResize);
+
+    // Initial call to set window dimensions
+    handleResize();
+
+    // Remove event listener on component unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   // Define custom styles for different node types
   const nodeStyles = {
     root: { fill: "red", stroke: "#000", strokeWidth: "2px" },
@@ -92,8 +101,8 @@ const StyledNodesTree = ({ data }) => {
         branchNodeClassName="node__branch"
         leafNodeClassName="node__leaf"
         renderCustomNodeElement={renderCustomNodeElement}
-        // translate={{ x: windowDimensions.width / 2 - 10, y: windowDimensions.height / 3 }}
-        zoom={0.5}
+        translate={{ x: windowDimensions.width / 2.2, y: windowDimensions.height / 3.3 }}
+        zoom={1}
         separation={{ siblings: 2, nonSiblings: 2 }}
         initialDepth={1}
       />

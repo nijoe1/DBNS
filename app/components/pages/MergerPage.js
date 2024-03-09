@@ -14,7 +14,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import "tailwindcss/tailwind.css";
-import { ObjectMatcher } from "../utils/merge.js";
+import { ObjectMatcher } from "../../utils/merge.js";
 import axios from "axios";
 const supportedTypes = ["string", "number", "boolean"];
 

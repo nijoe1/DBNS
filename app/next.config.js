@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
   reactStrictMode: true,
   trailingSlash: true,
@@ -8,6 +9,7 @@ const nextConfig = {
   },
 
   webpack: (config) => {
+    
     config.resolve = {
       ...config.resolve,
       fallback: {

@@ -40,6 +40,9 @@ const instancesData = [
 ];
 
 const SingleSpacePage = () => {
+  const navigateToHashRoute = (hashRoute) => {
+    window.location.hash = hashRoute;
+  };
   return (
     <Flex justify="center" align="center" mt="4">
       <Grid templateColumns="repeat(4, 1fr)" gap={6}>
@@ -60,7 +63,15 @@ const SingleSpacePage = () => {
                 {instance.name}
               </Text>
               <Text mt="2">{instance.about}</Text>
-              <Button colorScheme="blue" mt="2" size="sm">
+              <Button
+                colorScheme="blue"
+                mt="2"
+                size="sm"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToHashRoute("/instance");
+                }}
+              >
                 Go to Instance
               </Button>
             </Box>

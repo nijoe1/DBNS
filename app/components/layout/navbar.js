@@ -57,7 +57,7 @@ const Navbar = () => {
         as="nav"
         align="center"
         justify="space-between"
-        padding="1rem"
+        padding="0.5rem"
         bg="gray.800" // Change background color
         color="white" // Change text color
       >
@@ -128,11 +128,11 @@ const Navbar = () => {
                 <Button
                   variant="white"
                   onClick={() => {
-                    navigateToHashRoute("/MergerPage");
+                    navigateToHashRoute("/Spaces");
                     onClose();
                   }}
                 >
-                  MergerPage
+                  Spaces
                 </Button>
                 {/* Add more navigation items as needed */}
               </Stack>
@@ -172,28 +172,12 @@ const Navbar = () => {
             </p>
             <Button
               variant="white"
-              ml={8}
-              onClick={() => navigateToHashRoute("/CsvViewer")}
-            >
-              CsvViewer
-            </Button>
-            <Button
-              variant="white"
               mr={4}
               onClick={() => {
                 navigateToHashRoute("/Spaces");
               }}
             >
               Spaces
-            </Button>
-            <Button
-              variant="white"
-              mr={4}
-              onClick={() => {
-                navigateToHashRoute("/Graph");
-              }}
-            >
-              graph
             </Button>
           </div>
         </div>

@@ -63,7 +63,7 @@ const UploadCsvPage = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="w-5/6  h-screen  bg-400 mt-[6%] flex flex-col justify-center mx-auto mb-[4%] ">
+    <div className="bg-400 mt-[6%] flex flex-col x-overflow justify-center mx-auto mb-[4%] ">
       <Box p={4} borderWidth="1px" borderRadius="lg">
         <Center>
           <input type="file" accept=".csv" onChange={handleFileUpload} />

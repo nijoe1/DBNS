@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import SingleSpacePage from "./SpaceInstances";
-import LandingPage from "./LandingPage";
-import MergerPage from "./MergerPage";
-import CsvViewer from "./CsvViewer";
-import GraphViz from "./graph";
-import Spaces from "./Spaces";
+import InstanceDetailsPage from "@/components/pages/instance";
+import SingleSpacePage from "@/components/pages/SpaceInstances";
+import LandingPage from "@/components/pages/LandingPage";
+import MergerPage from "@/components/pages/MergerPage";
+import CsvViewer from "@/components/pages/CsvViewer";
+import GraphViz from "@/components/pages/graph";
+import Spaces from "@/components/pages/Spaces";
+import SpacesGraph from "@/components/pages/SpacesGraph";
 
 export default function Home() {
   const [hashRoute, setHashRoute] = useState("");
@@ -32,12 +34,12 @@ export default function Home() {
 
   return (
     <div>
-      {routeWithoutParams.toLowerCase() === "#/spaces" && <Spaces />}
-      {hashRoute === "#/Graph" && <GraphViz />}
+      {routeWithoutParams.toLowerCase() === "#/spaces" && <SpacesGraph />}
       {hashRoute === "#/MergerPage" && <MergerPage />}
       {route === "" && hashRoute == "" && <LandingPage />}
-      {hashRoute === "#/CsvViewer" && <CsvViewer />}
+      {hashRoute === "#/SpacesGraph" && <SpacesGraph />}
       {routeWithoutParams === "#/SingleSpacePage" && <SingleSpacePage />}
+      {routeWithoutParams === "#/instance" && <InstanceDetailsPage />}
     </div>
   );
 }

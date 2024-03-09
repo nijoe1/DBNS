@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
 import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 import "@rainbow-me/rainbowkit/styles.css";
 import {
   getDefaultWallets,
@@ -13,10 +14,7 @@ import { sepolia } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import { useRouter } from "next/router";
 
-const { chains, publicClient } = configureChains(
-  [sepolia],
-  [publicProvider()]
-);
+const { chains, publicClient } = configureChains([sepolia], [publicProvider()]);
 
 const { connectors } = getDefaultWallets({
   appName: "My RainbowKit App",
@@ -30,11 +28,10 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 
-const id = ''
+const id = "";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const showHeader = router.pathname === "/create" || `/contribute/${id}` ? false : true;
   return (
     <ChakraProvider>
       <WagmiConfig config={wagmiConfig}>
@@ -46,8 +43,13 @@ export default function App({ Component, pageProps }: AppProps) {
           })}
           chains={chains}
         >
-          {showHeader && <Navbar />}
-          <Component {...pageProps} />
+          <div className="fixed z-50 top-0 left-0 w-full">
+            <Navbar />
+          </div>{" "}
+          <div className="w-screen h-screen bg-gradient-to-b from-gray-400  to-gray-400 mt-[6%]">
+            <Component {...pageProps} />
+          </div>
+          <Footer />
         </RainbowKitProvider>
       </WagmiConfig>
     </ChakraProvider>

@@ -35,14 +35,11 @@ module.exports = async ({ deployments }) => {
 
   // console.log(tx);
 
-  let tx = await DBNS.transferDomain(
-    
-    wallet.address
-  );
+  let tx = await DBNS.transferDomain(wallet.address);
   await tx.wait();
 
   console.log(tx);
-  
+
   //   function createSpaceInstance(
   //     bytes32 _node,
   //     uint256 _hatID,

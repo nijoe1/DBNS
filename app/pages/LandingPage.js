@@ -1,10 +1,10 @@
-
+import { Box } from "@chakra-ui/react";
 function LandingPage() {
   return (
-    <div>
-      <div className="w-5/6 mt-20 flex flex-col justify-center mx-auto mb-2">
-        <div className="mt-20 mx-auto p-6 bg-white shadow-xl rounded-lg max-w-4xl">
-          <div className="items-center text-center">
+    <Box mt={"20"}>
+      <div className="w-5/6 flex flex-col justify-center mx-auto my-auto bg-400 ">
+        <div className=" mx-auto p-6 bg-white shadow-xl rounded-lg max-w-4xl mt-[6%]">
+          <div className="items-center text-center bg-400 ">
             <p className="text-4xl font-bold bg-clip-text bg-gradient-to-b from-indigo-200 to bg-indigo-500">
               DBNS
             </p>
@@ -73,7 +73,7 @@ function LandingPage() {
         </div>
 
         {/* Powered By Section */}
-        <div className="mt-5 mb-[6%] text-center">
+        <div className="mt-5  text-center">
           <h2 className="text-2xl font-bold mb-4">Powered By</h2>
           <div className="flex flex-wrap justify-center items-center gap-8">
             <div className="flex flex-col items-center">
@@ -129,7 +129,7 @@ function LandingPage() {
           </div>
         </div>
       </div>
-    </div>
+    </Box>
   );
 }
 

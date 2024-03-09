@@ -128,4 +128,3 @@ const stop = async function () {
 
 // Catch errors and log them.
 go().catch((err) => console.log(err));
-

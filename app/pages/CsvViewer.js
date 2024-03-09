@@ -63,7 +63,7 @@ const UploadCsvPage = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="w-5/6 mt-20 flex flex-col justify-center mx-auto mb-2">
+    <div className="w-5/6  h-screen  bg-400 mt-[6%] flex flex-col justify-center mx-auto mb-[4%] ">
       <Box p={4} borderWidth="1px" borderRadius="lg">
         <Center>
           <input type="file" accept=".csv" onChange={handleFileUpload} />
@@ -102,7 +102,7 @@ const UploadCsvPage = () => {
                 ))}
               </Tbody>
             </Table>
-            <SimpleGrid mt={4} columns={2} spacing={4}>
+            <SimpleGrid mt={4} mb={10} columns={2} spacing={4}>
               <Button
                 disabled={currentPage === 1}
                 onClick={() => paginate(currentPage - 1)}

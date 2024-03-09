@@ -51,7 +51,7 @@ export const createIPNS = async (cid, apiKey) => {
   const pubResponse = await lighthouse.publishRecord(
     cid, // IPFS hash
     keyResponse.data.ipnsName,
-    apiKey
+    apiKey,
   );
   return pubResponse.data.ipnsId;
 };
@@ -68,7 +68,7 @@ export const uploadFile = async (file, apiKey, setUploadProgress) => {
     false,
     null,
     progressCallback,
-    dealParams
+    dealParams,
   );
   let RAAS_Response = await registerCIDtoRAAS(output.data.Hash);
 
@@ -89,7 +89,7 @@ export const uploadFolder = async (files, type, apiKey, setUploadProgress) => {
     true,
     null,
     progressCallback,
-    dealParams
+    dealParams,
   );
   for (const file of output.data) {
     if (file.Name != "") {
@@ -118,7 +118,7 @@ export const uploadFolder = async (files, type, apiKey, setUploadProgress) => {
     false,
     null,
     progressCallback,
-    dealParams
+    dealParams,
   );
   return [jsonCID.data.Hash];
 };
@@ -145,7 +145,7 @@ export const jsonCIDsUpload = async (apiKey, type, CIDs) => {
     false,
     null,
     null,
-    dealParams
+    dealParams,
   );
   return [jsonCID.data.Hash];
 };
@@ -156,7 +156,7 @@ export const uploadFileEncrypted = async (
   apiKey,
   address,
   jwt,
-  setUploadProgress
+  setUploadProgress,
 ) => {
   const progressCallback = (progressData) => {
     const percentageDone =
@@ -170,7 +170,7 @@ export const uploadFileEncrypted = async (
     jwt,
     null,
     progressCallback,
-    dealParams
+    dealParams,
   );
 
   const { masterKey, keyShards } = await generate();
@@ -179,7 +179,7 @@ export const uploadFileEncrypted = async (
     address,
     output.data[0].cid,
     jwt,
-    keyShards
+    keyShards,
   );
 
   await registerCIDtoRAAS(output.data[0].cid);
@@ -203,7 +203,7 @@ const registerCIDtoRAAS = async (cid) => {
   try {
     const response = await axios.post(
       "https://calibration.lighthouse.storage/api/register_job",
-      formData
+      formData,
     );
     return response.data;
   } catch (error) {
@@ -218,7 +218,7 @@ export const getDealStatusByCID = async (cid) => {
     const response = await fetch(endpoint);
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch deal status. Status: ${response.status}`
+        `Failed to fetch deal status. Status: ${response.status}`,
       );
     }
 
@@ -263,7 +263,7 @@ export const applyAccessConditions = async (
   uid,
   address,
   jwt,
-  resolver
+  resolver,
 ) => {
   const conditions = [
     {
@@ -288,7 +288,7 @@ export const applyAccessConditions = async (
     cid,
     jwt,
     conditions,
-    aggregator
+    aggregator,
   );
 
   let RAAS_Response = await registerCIDtoRAAS(cid);
@@ -299,7 +299,7 @@ export const applyAccessConditions = async (
     address,
     response.data.cid,
     jwt,
-    keyShards
+    keyShards,
   );
   return response;
 };

@@ -61,9 +61,7 @@ contract DBNS is Core {
      * @dev Create a new instance under the given node
      * @param _node The parent node
      * @param _hatID The hatID of the new instance
-     * @param _name The name of the new instance
-     * @param _about The about of the new instance
-     * @param _img The img of the new instance
+     * @param _metadataCID The name of the new instance
      * @param _chatID The chatID of the new instance
      * @param _IPNS The IPNS of the new instance
      */
@@ -71,9 +69,7 @@ contract DBNS is Core {
         bytes32 _node,
         uint256 _hatID,
         uint256 _price,
-        string memory _name,
-        string memory _about,
-        string memory _img,
+        string memory _metadataCID,
         string memory _chatID,
         string memory _IPNS
     ) external {
@@ -81,15 +77,9 @@ contract DBNS is Core {
 
         bytes32 _newDBInstance = keccak256(abi.encodePacked(_node, _IPNS));
 
-
         instances[_newDBInstance] = SpaceInstance(_hatID, _price, msg.sender);
 
-        address _lock = createInstanceType(
-            _newDBInstance,
-            _hatID,
-            _price,
-            _name
-        );
+        address _lock = createInstanceType(_newDBInstance, _hatID, _price);
 
         instanceInsertion(
             _lock,
@@ -98,9 +88,7 @@ contract DBNS is Core {
             _node,
             _hatID,
             _price,
-            _name,
-            _about,
-            _img,
+            _metadataCID,
             _chatID,
             _IPNS,
             msg.sender
@@ -189,6 +177,4 @@ contract DBNS is Core {
         //     msg.sender
         // );
     }
-
-    
 }

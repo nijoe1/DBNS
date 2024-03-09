@@ -11,6 +11,7 @@ import {
   Textarea,
   Tooltip,
   VStack,
+  Box,
 } from "@chakra-ui/react";
 import "tailwindcss/tailwind.css";
 import { ObjectMatcher } from "../utils/merge.js";
@@ -208,62 +209,64 @@ function MergerPage() {
   }
 
   async function fetch() {
-
     const axiosResponse = await axios.get(
-      "https://testnets.tableland.network/api/v1/query?statement=SELECT * FROM pools_reviews_421614_402"
+      "https://testnets.tableland.network/api/v1/query?statement=SELECT * FROM pools_reviews_421614_402",
     );
     console.log(axiosResponse);
-
   }
 
   return (
-    <>
-      <ChakraProvider>
-        <Container maxW="container.lg" mt={8}>
-          <VStack spacing={8}>
-            <StructuredObjectDefinition
-              structuredObject={structuredObject}
-              onChange={setStructuredObject}
-            />
-            <StructuredObjectForm
-              structuredObject={structuredObject}
-              onSubmit={handleAddToArray1}
-            />
-            <Textarea
-              placeholder="Array 1"
-              value={JSON.stringify(array1, null, 2)}
-              readOnly
-              rows={8}
-            />
-            <Button onClick={async()=>{await fetch()}}>Fetch</Button>
-            <StructuredObjectForm
-              structuredObject={structuredObject}
-              onSubmit={handleAddToArray2}
-            />
-            <Textarea
-              placeholder="Array 2"
-              value={JSON.stringify(array2, null, 2)}
-              readOnly
-              rows={8}
-            />
-            <Input type="file" onChange={handleUploadCSV} />
-            <Textarea
-              placeholder="Array 3 (Uploaded CSV)"
-              value={JSON.stringify(array3, null, 2)}
-              readOnly
-              rows={8}
-            />
-            <Button onClick={handleMergeArrays}>Merge Arrays</Button>
-            <Textarea
-              placeholder="Merged Array"
-              value={JSON.stringify(mergedArray, null, 2)}
-              readOnly
-              rows={8}
-            />
-          </VStack>
-        </Container>
-      </ChakraProvider>
-    </>
+    <Box mt={"20"} mb={"20"}>
+      <Container maxW="container.lg">
+        <VStack spacing={8}>
+          <StructuredObjectDefinition
+            structuredObject={structuredObject}
+            onChange={setStructuredObject}
+          />
+          <StructuredObjectForm
+            structuredObject={structuredObject}
+            onSubmit={handleAddToArray1}
+          />
+          <Textarea
+            placeholder="Array 1"
+            value={JSON.stringify(array1, null, 2)}
+            readOnly
+            rows={8}
+          />
+          <Button
+            onClick={async () => {
+              await fetch();
+            }}
+          >
+            Fetch
+          </Button>
+          <StructuredObjectForm
+            structuredObject={structuredObject}
+            onSubmit={handleAddToArray2}
+          />
+          <Textarea
+            placeholder="Array 2"
+            value={JSON.stringify(array2, null, 2)}
+            readOnly
+            rows={8}
+          />
+          <Input type="file" onChange={handleUploadCSV} />
+          <Textarea
+            placeholder="Array 3 (Uploaded CSV)"
+            value={JSON.stringify(array3, null, 2)}
+            readOnly
+            rows={8}
+          />
+          <Button onClick={handleMergeArrays}>Merge Arrays</Button>
+          <Textarea
+            placeholder="Merged Array"
+            value={JSON.stringify(mergedArray, null, 2)}
+            readOnly
+            rows={8}
+          />
+        </VStack>
+      </Container>
+    </Box>
   );
 }
 

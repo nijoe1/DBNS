@@ -27,7 +27,7 @@ abstract contract Tableland {
         "db_spaces_instances";
 
     string internal constant DBSPACES_INSTANCES_SCHEMA =
-        "InstanceID text, instanceOfSpace text, instanceType text, name text, about text, img text, chatID text, IPNS text, hatID text, price text, lock text, creator text";
+        "InstanceID text, instanceOfSpace text, instanceType text, metadataCID text, chatID text, IPNS text, hatID text, price text, lock text, creator text";
 
     string internal constant DB_INSTANCES_CODES_TABLE_PREFIX =
         "instances_codes";
@@ -129,9 +129,7 @@ abstract contract Tableland {
         bytes32 _instanceOfSpace,
         uint256 hatID,
         uint256 price,
-        string memory name,
-        string memory about,
-        string memory img,
+        string memory metadataCID,
         string memory chatID,
         string memory IPNS,
         address creator
@@ -141,7 +139,7 @@ abstract contract Tableland {
             SQLHelpers.toInsert(
                 DBSPACES_INSTANCES_TABLE_PREFIX,
                 tableIDs[1],
-                "InstanceID, instanceOfSpace, instanceType, name, about, img, chatID, IPNS, hatID, price, lock, creator",
+                "InstanceID, instanceOfSpace, instanceType, metadataCID, chatID, IPNS, hatID, price, lock, creator",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(_instanceID)),
                     ",",
@@ -149,11 +147,7 @@ abstract contract Tableland {
                     ",",
                     SQLHelpers.quote(Strings.toString(_lockType)),
                     ",",
-                    SQLHelpers.quote(name),
-                    ",",
-                    SQLHelpers.quote(about),
-                    ",",
-                    SQLHelpers.quote(img),
+                    SQLHelpers.quote(metadataCID),
                     ",",
                     SQLHelpers.quote(chatID),
                     ",",

@@ -20,14 +20,12 @@ const StepperForm: React.FC<{
   const { connector } = useAccount();
   const publicClient = usePublicClient();
 
-
-
   const generateLighthouseApiKey = async (address: any) => {
     let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
     if (!key) {
       const verificationMessage = (
         await axios.get(
-          `https://api.lighthouse.storage/api/auth/get_message?publicKey=${address}`
+          `https://api.lighthouse.storage/api/auth/get_message?publicKey=${address}`,
         )
       ).data;
       const signed = await signMessage({
@@ -37,7 +35,7 @@ const StepperForm: React.FC<{
       if (API_KEY.data.apiKey) {
         localStorage.setItem(
           `API_KEY_${address?.toLowerCase()}`,
-          API_KEY.data.apiKey
+          API_KEY.data.apiKey,
         );
         nextStep();
       } else {
@@ -57,7 +55,7 @@ const StepperForm: React.FC<{
           address,
           await signMessage({
             message: response.data.message,
-          })
+          }),
         );
         if (res) {
           localStorage.setItem(`lighthouse-jwt-${address}`, res);

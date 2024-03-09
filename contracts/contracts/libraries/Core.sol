@@ -18,6 +18,7 @@ import {Tableland} from "./Tableland.sol";
 
 abstract contract Core is Ens, Hats, Tableland, Unlock {
     enum Types {
+        NULL,
         PAID_PRIVATE_INSTANCE,
         OPEN_PRIVATE_INSTANCE,
         PAID_INSTANCE,
@@ -57,20 +58,18 @@ abstract contract Core is Ens, Hats, Tableland, Unlock {
      * @param _newDBInstance The new instance
      * @param _hatID The hatID of the new instance
      * @param _price The price of the new instance
-     * @param _name The name of the new instance
      */
     function createInstanceType(
         bytes32 _newDBInstance,
         uint256 _hatID,
-        uint256 _price,
-        string memory _name
+        uint256 _price
     ) internal returns (address _lock) {
         if (_price > 0) {
             isType[_newDBInstance] = Types.PAID_INSTANCE;
-            _lock = createLock(_price, _name, _newDBInstance);
+            _lock = createLock(_price, "DBNS", _newDBInstance);
         } else if (_hatID > 0 && _price > 0) {
             isType[_newDBInstance] = Types.PAID_PRIVATE_INSTANCE;
-            _lock = createLock(_price, _name, _newDBInstance);
+            _lock = createLock(_price, "DBNS", _newDBInstance);
         } else if (_hatID > 0) {
             isType[_newDBInstance] = Types.OPEN_PRIVATE_INSTANCE;
         } else {
@@ -110,17 +109,18 @@ abstract contract Core is Ens, Hats, Tableland, Unlock {
         address _sender
     ) public view returns (bool access) {
         uint256 hat = instances[_instance].hatID;
-        if (isType[_instance] == Types.PAID_INSTANCE) {
+        Types _instanceType = isType[_instance];
+        if (_instanceType == Types.PAID_INSTANCE) {
             access = instances[_instance].creator == _sender;
-        } else if (isType[_instance] == Types.PAID_PRIVATE_INSTANCE) {
+        } else if (_instanceType == Types.PAID_PRIVATE_INSTANCE) {
             access = getHatAccess(_sender, hat);
-        } else if (isType[_instance] == Types.OPEN_PRIVATE_INSTANCE) {
+        } else if (_instanceType == Types.OPEN_PRIVATE_INSTANCE) {
             access = getHatAccess(_sender, hat);
-        } else if (isType[_instance] == Types.OPEN_INSTANCE) {
+        } else if (_instanceType == Types.OPEN_INSTANCE) {
             access = true;
         }
-        uint8 _isType = uint8(isType[_instance]);
-        if(_isType > 3){
+        uint8 _isType = uint8(_instanceType);
+        if (_isType > 4 || _instanceType == Types.NULL) {
             access = false;
         }
     }

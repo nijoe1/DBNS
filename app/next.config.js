@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-const nextConfig = {
+module.exports = {
   reactStrictMode: true,
   trailingSlash: true,
 
@@ -15,12 +15,11 @@ const nextConfig = {
     };
     return config;
   },
-};
-module.exports = {
-  nextConfig,
+
   images: {
-    domains: ["gateway.lighthouse.storage"],
+    // domains: ["gateway.lighthouse.storage"],
     unoptimized: true,
   },
+
   basePath: "/out",
 };

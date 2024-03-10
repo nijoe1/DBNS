@@ -2,7 +2,6 @@
   "name": "dbns",
   "version": "0.1.0",
   "private": true,
-  
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -31,6 +30,7 @@
     "framer-motion": "^10.16.4",
     "next": "14.0.2",
     "next-transpile-modules": "^10.0.1",
+    "notebookjs": "^0.8.2",
     "papaparse": "^5.4.1",
     "prettier": "^3.2.5",
     "raw-loader": "^4.0.2",

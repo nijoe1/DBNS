@@ -16,4 +16,10 @@ const nextConfig = {
     return config;
   },
 };
-module.exports = nextConfig;
+module.exports = {
+  nextConfig,
+  images: {
+    domains: ["gateway.lighthouse.storage"],
+  },
+  outDir: "./out",
+};

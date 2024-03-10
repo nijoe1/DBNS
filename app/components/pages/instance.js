@@ -19,20 +19,21 @@ import { useAccount, usePublicClient } from "wagmi";
 import ChatComponent from "@/components/ChatComponent";
 import { useSelector } from "react-redux";
 import usePush from "@/hooks/usePush";
+import { useRouter } from "next/router";
 const InstanceDetailsPage = () => {
   const { initializePush } = usePush();
-
+  const router = useRouter();
   const pushSign = useSelector((state) => state.push.pushSign);
-
+  console.log(pushSign);
   const { address } = useAccount();
   useEffect(() => {
     async function initialize() {
-      initializePush();
+      await initializePush();
     }
-    if (!pushSign) {
+    if (Object.keys(pushSign).length === 0) {
       initialize();
     }
-  }, []);
+  }, [router]);
   async function createGroup() {
     const createdGroup = await pushSign.chat.group.create("name", {
       description: "groupDescription",

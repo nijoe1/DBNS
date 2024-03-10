@@ -49,7 +49,7 @@ const Home = () => {
       {hashRoute === "#/MergerPage" && <MergerPage />}
       {(hashRoute === "" || hashRoute === "#/") && <LandingPage />}
       {hashRoute === "#/SpacesGraph" && <SpacesGraph />}
-      {hashRoute === "#/SingleSpacePage" && <SingleSpacePage />}
+      {hashRoute.includes("#/SingleSpacePage") && <SingleSpacePage />}
       {hashRoute === "#/instance" && <InstanceDetailsPage />}
     </div>
   );

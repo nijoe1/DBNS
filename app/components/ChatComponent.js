@@ -41,6 +41,11 @@ const ChatComponent = ({ pushSign, address }) => {
 
   const sendMessage = async () => {
     try {
+      const groupPermissions = await pushSign.chat.group.permissions(recipient);
+      if (groupPermissions.entry && groupPermissions.chat) {
+        const joinGroup = await pushSign.chat.group.join(recipient);
+      }
+
       if (file) {
         if (!fileType.includes("image")) {
           // Send a text message containing the information about the attached file

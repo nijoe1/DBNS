@@ -2,40 +2,49 @@ import React, { useState } from "react";
 
 import { signMessage } from "@wagmi/core";
 import lighthouse from "@lighthouse-web3/sdk";
-import { usePublicClient, useAccount } from "wagmi";
 
 import axios from "axios";
 import { generateLighthouseJWT } from "@/utils/lighthouse";
+import usePush from "@/hooks/usePush";
+import { useWalletClient } from "wagmi";
 
 const StepperForm: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  currentAddress: string;
   address: string;
-}> = ({ isOpen, onClose, currentAddress, address }) => {
+}> = ({ isOpen, onClose, address }) => {
+  const { data: walletClient } = useWalletClient();
+  const { initializePush } = usePush();
+
+
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [ceramicClicked, setCeramicClicked] = useState(false);
   const [apiClicked, setApiClicked] = useState(false);
   const [tokenClicked, setTokenClicked] = useState(false);
-  const { connector } = useAccount();
-  const publicClient = usePublicClient();
 
   const generateLighthouseApiKey = async (address: any) => {
     let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
     if (!key) {
       const verificationMessage = (
         await axios.get(
-          `https://api.lighthouse.storage/api/auth/get_message?publicKey=${address}`,
+          `https://api.lighthouse.storage/api/auth/get_message?publicKey=${address}`
         )
       ).data;
-      const signed = await signMessage({
-        message: verificationMessage,
-      });
+      let signed;
+      if (walletClient) {
+        signed = await walletClient?.signMessage({
+          account: address as `0x${string}`,
+          message: verificationMessage,
+        });
+      } else {
+        return;
+      }
+
       const API_KEY = await lighthouse.getApiKey(address, signed);
       if (API_KEY.data.apiKey) {
         localStorage.setItem(
           `API_KEY_${address?.toLowerCase()}`,
-          API_KEY.data.apiKey,
+          API_KEY.data.apiKey
         );
         nextStep();
       } else {
@@ -45,18 +54,24 @@ const StepperForm: React.FC<{
       nextStep();
     }
   };
+
   const generateLighthouseJWToken = async (address: string) => {
     let key = localStorage.getItem(`lighthouse-jwt-${address}`);
     if (!key) {
       const response = await lighthouse.getAuthMessage(address);
 
+      let signed;
+      if (walletClient) {
+        signed = await walletClient?.signMessage({
+          account: address as `0x${string}`,
+          message: response.data.message,
+        });
+      } else {
+        return;
+      }
+
       if (response && response.data && response.data.message) {
-        let res = await generateLighthouseJWT(
-          address,
-          await signMessage({
-            message: response.data.message,
-          }),
-        );
+        let res = await generateLighthouseJWT(address, signed);
         if (res) {
           localStorage.setItem(`lighthouse-jwt-${address}`, res);
           nextStep();
@@ -69,9 +84,9 @@ const StepperForm: React.FC<{
 
   const steps = [
     {
-      title: "Connect to Ceramic",
-      description: "To get access to gasless interactions.",
-      buttonText: "Connect to Ceramic",
+      title: "Connect to Push Protocol",
+      description: "To get access to chat interactions.",
+      buttonText: "Connect to Push",
     },
     {
       title: "Connect to Lighthouse",
@@ -92,8 +107,7 @@ const StepperForm: React.FC<{
   };
 
   const closeModal = () => {
-    setCurrentStep(1);
-    window.location.reload();
+    setCurrentStep(0);
     onClose();
   };
 
@@ -114,20 +128,22 @@ const StepperForm: React.FC<{
             <button
               disabled={ceramicClicked}
               onClick={async () => {
-                // setCeramicClicked(!ceramicClicked);
-                // await isConnected();
-                // // Get all keys from localStorage
-                // const keys = Object.keys(localStorage);
+                setCeramicClicked(!ceramicClicked);
 
-                // // Iterate through keys and remove those containing "API_KEY" or "lighthouse-jwt"
-                // keys.forEach((key) => {
-                //   if (
-                //     key.includes("API_KEY") ||
-                //     key.includes("lighthouse-jwt")
-                //   ) {
-                //     localStorage.removeItem(key);
-                //   }
-                // });
+                await initializePush();
+                // Get all keys from localStorage
+                const keys = Object.keys(localStorage);
+
+                // Iterate through keys and remove those containing "API_KEY" or "lighthouse-jwt"
+                keys.forEach((key) => {
+                  if (
+                    key.includes("API_KEY") ||
+                    key.includes("lighthouse-jwt")
+                  ) {
+                    localStorage.removeItem(key);
+                  }
+                });
+                
                 nextStep();
               }}
               className="bg-black text-white py-2 px-4 rounded-lg mt-4"

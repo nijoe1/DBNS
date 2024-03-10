@@ -3,21 +3,25 @@ import InstanceDetailsPage from "@/components/pages/instance";
 import SingleSpacePage from "@/components/pages/SpaceInstances";
 import LandingPage from "@/components/pages/LandingPage";
 import MergerPage from "@/components/pages/MergerPage";
-import CsvViewer from "@/components/pages/CsvViewer";
-import GraphViz from "@/components/pages/graph";
-import Spaces from "@/components/pages/Spaces";
 import SpacesGraph from "@/components/pages/SpacesGraph";
+import { useRouter } from "next/router";
 
-export default function Home() {
+const Home = () => {
+  const router = useRouter();
   const [hashRoute, setHashRoute] = useState("");
-  const [route, setRoute] = useState("");
-  const [routeWithoutParams, setRouteWithoutParams] = useState("default");
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const handleHashChange = async () => {
+    // Check if there's a route stored in local storage
+    const storedRoute = localStorage.getItem("route");
+    if (storedRoute) {
+      window.location.hash = storedRoute;
+    }
+    
+    // Handle hash change
+    const handleHashChange = () => {
       setHashRoute(window.location.hash);
-      setRoute(window.location.pathname);
-      setRouteWithoutParams(window.location.hash.split("?")[0]);
-      console.log(window.location.hash.split("?")[0]);
+      localStorage.setItem("route", window.location.hash);
     };
 
     window.addEventListener("hashchange", handleHashChange);
@@ -27,19 +31,28 @@ export default function Home() {
       setHashRoute(window.location.hash);
     }
 
+    // Set loading to false after initial setup
+    setLoading(false);
+
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
     };
-  }, []);
+  }, [router]);
+
+  if (loading) {
+    return null; // Render nothing while loading
+  }
 
   return (
     <div>
-      {routeWithoutParams.toLowerCase() === "#/spaces" && <SpacesGraph />}
+      {hashRoute.toLowerCase() === "#/spaces" && <SpacesGraph />}
       {hashRoute === "#/MergerPage" && <MergerPage />}
-      {route === "" && hashRoute == "" && <LandingPage />}
+      {(hashRoute === "" || hashRoute === "#/") && <LandingPage />}
       {hashRoute === "#/SpacesGraph" && <SpacesGraph />}
-      {routeWithoutParams === "#/SingleSpacePage" && <SingleSpacePage />}
-      {routeWithoutParams === "#/instance" && <InstanceDetailsPage />}
+      {hashRoute === "#/SingleSpacePage" && <SingleSpacePage />}
+      {hashRoute === "#/instance" && <InstanceDetailsPage />}
     </div>
   );
-}
+};
+
+export default Home;

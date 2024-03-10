@@ -101,7 +101,10 @@ const StyledNodesTree = ({ data }) => {
         branchNodeClassName="node__branch"
         leafNodeClassName="node__leaf"
         renderCustomNodeElement={renderCustomNodeElement}
-        translate={{ x: windowDimensions.width / 2.2, y: windowDimensions.height / 3.3 }}
+        translate={{
+          x: windowDimensions.width / 2.2,
+          y: windowDimensions.height / 3.3,
+        }}
         zoom={1}
         separation={{ siblings: 2, nonSiblings: 2 }}
         initialDepth={1}

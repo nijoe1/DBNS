@@ -1,16 +1,84 @@
-import React from "react";
-import { Box, Badge, Tab, TabList, TabPanel, TabPanels, Tabs, Image, Text, Grid, GridItem } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Image,
+  Text,
+  Grid,
+  GridItem,
+  Badge,
+  Tabs,
+  TabList,
+  TabPanels,
+  TabPanel,
+  Tab,
+} from "@chakra-ui/react";
+
 import CsvViewer from "./CsvViewer"; // Import CsvViewer component
 import CodeViewer from "./CodeViewer"; // Import CodeViewer component
-
+import { useAccount, usePublicClient } from "wagmi";
+import ChatComponent from "@/components/ChatComponent";
+import { useSelector } from "react-redux";
+import usePush from "@/hooks/usePush";
 const InstanceDetailsPage = () => {
+  const { initializePush } = usePush();
+
+  const pushSign = useSelector((state) => state.push.pushSign);
+
+  const { address } = useAccount();
+  useEffect(() => {
+    async function initialize() {
+      initializePush();
+    }
+    if (!pushSign) {
+      initialize();
+    }
+  }, []);
+  async function createGroup() {
+    const createdGroup = await pushSign.chat.group.create("name", {
+      description: "groupDescription",
+      image: "groupImage",
+      members: [],
+      admins: [],
+      private: false,
+      rules: {
+        entry: { conditions: [] },
+        chat: { conditions: [] },
+      },
+    });
+    await pushSign.chat.send(
+      "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da",
+      {
+        content: "Hello Bob!",
+        type: "Text",
+      }
+    );
+    const aliceChatHistoryWithBob = await pushSign.chat.history(
+      "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da"
+    );
+    console.log(aliceChatHistoryWithBob);
+    const groupInfo = await pushSign.chat.group.info(createdGroup.chatId);
+
+    console.log(groupInfo);
+  }
   return (
     <Box p="4" className="mx-[20%]">
       <Box bg="gray.200" p="4" borderRadius="md" boxShadow="md" mb="4">
-        <Image src="/path/to/image.jpg" alt="Profile Image" borderRadius="full" boxSize="150px" mb="4" />
-        <Text fontSize="xl" fontWeight="bold">John Doe</Text>
-        <Text fontSize="md" color="gray.500">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Text>
-        <Badge colorScheme="green" borderRadius="full" px="2" py="1" mt="2">Open</Badge>
+        <Image
+          src="/path/to/image.jpg"
+          alt="Profile Image"
+          borderRadius="full"
+          boxSize="150px"
+          mb="4"
+        />
+        <Text fontSize="xl" fontWeight="bold">
+          John Doe
+        </Text>
+        <Text fontSize="md" color="gray.500">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </Text>
+        <Badge colorScheme="green" borderRadius="full" px="2" py="1" mt="2">
+          Open
+        </Badge>
       </Box>
 
       <Tabs isFitted variant="soft-rounded" minWidth="200px">
@@ -31,31 +99,19 @@ const InstanceDetailsPage = () => {
           </TabPanel>
           <TabPanel>
             {/* Chat Tab */}
-            <Box minHeight="200px" overflow="auto" p="4" bg="gray.200" borderRadius="md" boxShadow="md">
-              Chat component goes here...
+            <Box
+              minHeight="200px"
+              overflow="auto"
+              p="4"
+              bg="gray.200"
+              borderRadius="md"
+              boxShadow="md"
+            >
+              <ChatComponent pushSign={pushSign} address={address} />
             </Box>
           </TabPanel>
           <TabPanel>
-            {/* Codes Tab */}
-            <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-              {/* Code Cards */}
-              <GridItem colSpan={2}>
-                <CodeViewer />
-              </GridItem>
-              {/* Code Markdown */}
-              {/* <GridItem colSpan={1}> */}
-                {/* Markdown component goes here... */}
-                {/* <Box minHeight="200px" overflow="auto" p="4" bg="gray.200" borderRadius="md" boxShadow="md">
-                  Markdown component goes here...
-                </Box>
-              </GridItem> */}
-              {/* IPYNB Cell */}
-              {/* <GridItem colSpan={3}>
-                <Box minHeight="200px" overflow="auto" p="4" bg="gray.200" borderRadius="md" boxShadow="md">
-                  IPYNB Cell component goes here...
-                </Box>
-              </GridItem> */}
-            </Grid>
+            <CodeViewer />
           </TabPanel>
         </TabPanels>
       </Tabs>

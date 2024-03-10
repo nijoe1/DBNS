@@ -1,18 +1,19 @@
-// Import Push SDK & Ethers
-const { PushAPI, CONSTANTS } = require("@pushprotocol/restapi");
-const { ethers } = require("ethers");
+import { PushAPI, CONSTANTS } from "@pushprotocol/restapi";
 
-// Creating a random signer from a wallet, ideally this is the wallet you will connect
-const signer = ethers.Wallet.createRandom();
-
-async function main() {
-  // Initialize wallet user
-  // 'CONSTANTS.ENV.PROD' -> mainnet apps | 'CONSTANTS.ENV.STAGING' -> testnet apps
-  const userAlice = await PushAPI.initialize(signer, {
-    env: CONSTANTS.ENV.STAGING,
-  });
-
-  console.log(userAlice);
+// Define async function to initialize user
+async function initUser(signer) {
+  try {
+    // Initialize wallet user
+    // 'CONSTANTS.ENV.PROD' -> mainnet apps | 'CONSTANTS.ENV.STAGING' -> testnet apps
+    const user = await PushAPI.initialize(signer, {
+      env: CONSTANTS.ENV.STAGING,
+    });
+    return user;
+  } catch (error) {
+    console.error("Error initializing user:", error);
+    throw error;
+  }
 }
 
-main();
+// Export the async function
+export { initUser };

@@ -4,29 +4,28 @@ import { ChakraProvider } from "@chakra-ui/react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import "@rainbow-me/rainbowkit/styles.css";
-import {
-  getDefaultWallets,
-  RainbowKitProvider,
-  lightTheme,
-} from "@rainbow-me/rainbowkit";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { WagmiProvider, http } from "wagmi";
+import { getDefaultConfig, lightTheme } from "@rainbow-me/rainbowkit";
 import { sepolia } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
+import ReduxProvider from "@/providers/ReduxProvider";
+import {
+	darkTheme,
+	getDefaultWallets,
+	RainbowKitProvider
+} from '@rainbow-me/rainbowkit'
 import { useRouter } from "next/router";
 
-const { chains, publicClient } = configureChains([sepolia], [publicProvider()]);
-
-const { connectors } = getDefaultWallets({
-  appName: "My RainbowKit App",
+const config = getDefaultConfig({
+  appName: "RainbowKit demo",
   projectId: "ad9d4173328447d73a95b113fec565eb",
-  chains,
+  chains: [sepolia],
+  transports: {
+    [sepolia.id]: http(),
+  },
 });
 
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-});
+const queryClient = new QueryClient();
 
 const id = "";
 
@@ -34,24 +33,30 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   return (
     <ChakraProvider>
-      <WagmiConfig config={wagmiConfig}>
-        <RainbowKitProvider
-          theme={lightTheme({
-            accentColor: "#7b3fe4",
-            accentColorForeground: "white",
-            fontStack: "system",
-          })}
-          chains={chains}
-        >
-          <div className="fixed z-50 top-0 left-0 w-full">
-            <Navbar />
-          </div>{" "}
-          <div className="w-screen h-screen bg-gradient-to-b from-gray-400  to-gray-400 mt-[6%]">
-            <Component {...pageProps} />
-          </div>
-          <Footer />
-        </RainbowKitProvider>
-      </WagmiConfig>
+      <WagmiProvider config={config}>
+        <ReduxProvider>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitProvider
+              theme={darkTheme({
+                accentColor: "#f85858",
+                accentColorForeground: "white",
+                borderRadius: "large",
+                fontStack: "system",
+                overlayBlur: "small",
+              })}
+              modalSize="compact"
+            >
+              <div className="fixed z-50 top-0 left-0 w-full">
+                <Navbar />
+              </div>{" "}
+              <div className="w-screen h-screen bg-gradient-to-b from-gray-400  to-gray-400 mt-[6%]">
+                <Component {...pageProps} />
+              </div>
+              <Footer />
+            </RainbowKitProvider>
+          </QueryClientProvider>
+        </ReduxProvider>
+      </WagmiProvider>
     </ChakraProvider>
   );
 }

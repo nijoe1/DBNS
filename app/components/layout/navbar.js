@@ -11,24 +11,31 @@ import {
   DrawerOverlay,
   Stack,
   Flex,
-  Text,
   Button,
   Input,
-  InputGroup,
-  InputRightElement,
 } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { IoSearchCircle } from "react-icons/io5";
-import { useRouter } from "next/router";
-
+import StepperForm from "../StepperForm";
+import { useAccount, useChainId } from "wagmi";
 const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const router = useRouter();
+  const { address } = useAccount();
+  const chainID = useChainId();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [changeChain, setChangeChain] = useState(true);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   const navigateToHashRoute = (hashRoute) => {
     if (hashRoute == "/") {
-      window.location = "/";
+      window.location.hash = "/";
     } else {
       window.location.hash = hashRoute;
     }
@@ -49,6 +56,36 @@ const Navbar = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    const check = async () => {
+      let prevAddress;
+      try {
+        prevAddress = localStorage.getItem("prevAddress");
+      } catch {}
+      if (address && address != prevAddress) {
+        localStorage.removeItem("ceramic-session");
+        localStorage.setItem("prevAddress", address ? address : "".toString());
+        localStorage.setItem("prevChain", chainID.toString());
+        setChangeChain(false);
+        openModal();
+      }
+    };
+    check();
+  }, [address]);
+
+  useEffect(() => {
+    let prevChain;
+    let prevAddress;
+    try {
+      prevAddress = localStorage.getItem("prevAddress");
+      prevChain = localStorage.getItem("prevChain");
+    } catch {}
+    if (prevAddress && parseInt(prevChain || "0") != chainID && changeChain) {
+      localStorage.setItem("prevChain", chainID.toString());
+      window.location.href = "/";
+    }
+  }, [chainID]);
 
   if (isSmallScreen) {
     return (
@@ -179,6 +216,15 @@ const Navbar = () => {
             >
               Spaces
             </Button>
+            <Button
+              variant="white"
+              mr={4}
+              onClick={() => {
+                navigateToHashRoute("/instance");
+              }}
+            >
+              Instance
+            </Button>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -203,6 +249,11 @@ const Navbar = () => {
             // display={{ base: "none", md: "block" }}
           />
         </div>
+        <StepperForm
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          address={address}
+        />
       </Flex>
     );
   }

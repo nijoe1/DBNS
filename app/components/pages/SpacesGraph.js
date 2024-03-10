@@ -41,7 +41,6 @@ const SpacesGraph = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-
   useEffect(() => {
     // Generate tree data for the selected category or entire tree if no category is selected
     const initialTreeData = generateTreeData();
@@ -120,10 +119,14 @@ const SpacesGraph = () => {
     };
 
     // Extract immediate children of the root node as categories
-    const categories = exampleData.children.map((child) => child.name.split(".")[0]);
+    const categories = exampleData.children.map(
+      (child) => child.name.split(".")[0],
+    );
 
     // Set categories as options
-    setCategoryOptions(categories.map((category) => ({ value: category, label: category })));
+    setCategoryOptions(
+      categories.map((category) => ({ value: category, label: category })),
+    );
 
     // If a category is selected, find its subtree and return it
     if (selectedCategory) {
@@ -135,12 +138,15 @@ const SpacesGraph = () => {
 
   // Function to generate token node
   const getTokenNode = (_parentNode, characterName) => {
-    const abi = new ethers.AbiCoder();
-    const parentNode = ethers.namehash(_parentNode);
+    const abi = new ethers.utils.AbiCoder();
+    const parentNode = ethers.utils.namehash(_parentNode);
     let subNodeBytes = stringToBytes(characterName);
-    const LabelHash = ethers.keccak256(subNodeBytes);
-    let newSubNodeBytes = abi.encode(["bytes32", "bytes32"], [parentNode, LabelHash]);
-    const newSubNode = ethers.keccak256(newSubNodeBytes);
+    const LabelHash = ethers.utils.keccak256(subNodeBytes);
+    let newSubNodeBytes = abi.encode(
+      ["bytes32", "bytes32"],
+      [parentNode, LabelHash],
+    );
+    const newSubNode = ethers.utils.keccak256(newSubNodeBytes);
     console.log(characterName, _parentNode, " Node:", newSubNode);
     return newSubNode;
   };
@@ -148,13 +154,18 @@ const SpacesGraph = () => {
   // Function to convert string to bytes
   const stringToBytes = (str) => {
     let bytes = Buffer.from(str);
-    return "0x" + bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
+    return (
+      "0x" +
+      bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "")
+    );
   };
 
   // Function to find the node for the selected category
   const findCategoryNode = (data, category) => {
     const categoryNode = { ...data };
-    categoryNode.children = categoryNode.children.filter((child) => child.name.split(".")[0] === category);
+    categoryNode.children = categoryNode.children.filter(
+      (child) => child.name.split(".")[0] === category,
+    );
     return categoryNode;
   };
 
@@ -164,7 +175,7 @@ const SpacesGraph = () => {
     branch: { fill: "blue", stroke: "#000", strokeWidth: "2px" },
     leaf: { fill: "yellow", stroke: "#000", strokeWidth: "2px" },
   };
-  
+
   // Handle click event on the label to navigate to the spaces page
   const handleLabelClick = (name) => {
     console.log(name);
@@ -172,12 +183,12 @@ const SpacesGraph = () => {
     // Implement navigation logic here, for example:
     navigateToHashRoute(`/SingleSpacePage?id=${name.id}`);
   };
-  
+
   // Handle click event on the circle to toggle nodes
   const handleCircleClick = (nodeDatum, toggleNode) => {
     toggleNode();
   };
-  
+
   // Custom node and label rendering function
   const renderCustomNodeElement = ({ nodeDatum, toggleNode }) => (
     <g>
@@ -239,7 +250,10 @@ const SpacesGraph = () => {
             branchNodeClassName="node__branch"
             leafNodeClassName="node__leaf"
             renderCustomNodeElement={renderCustomNodeElement}
-            translate={{ x: windowDimensions.width / 3.0, y: windowDimensions.height / 7 }}
+            translate={{
+              x: windowDimensions.width / 3.0,
+              y: windowDimensions.height / 7,
+            }}
             zoom={1}
             separation={{ siblings: 2, nonSiblings: 2 }}
             initialDepth={1}

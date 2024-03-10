@@ -9,7 +9,6 @@ const nextConfig = {
   },
 
   webpack: (config) => {
-    
     config.resolve = {
       ...config.resolve,
       fallback: {

@@ -3,10 +3,6 @@
 const nextConfig = {
   reactStrictMode: true,
   trailingSlash: true,
-  output: "export",
-  images: {
-    unoptimized: true,
-  },
 
   webpack: (config) => {
     config.resolve = {
@@ -20,5 +16,4 @@ const nextConfig = {
     return config;
   },
 };
-
 module.exports = nextConfig;

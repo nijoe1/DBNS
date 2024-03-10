@@ -20,6 +20,7 @@ module.exports = {
   nextConfig,
   images: {
     domains: ["gateway.lighthouse.storage"],
+    unoptimized: true,
   },
-  outDir: "./out",
+  basePath: "/out",
 };

@@ -57,7 +57,7 @@ const Footer = () => {
           <Text>For Data Economy Hackathon from</Text>
 
           <Link href="https://github.com/nijoe1" isExternal>
-            Nick
+            Nick🇬🇷
           </Link>
         </HStack>
         <Text mr={2}>·</Text>

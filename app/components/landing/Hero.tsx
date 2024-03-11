@@ -55,8 +55,8 @@ export function Hero(): JSX.Element {
           </div>
         </div>
         <div className="bg-black/80 rounded-lg">
-          <div className="mt-20 px-4 py-4 mx-auto md:px-8 md:motion-safe:animate-sponsors flex flex-col items-center w-2/3">
-            <p className="text-center text-lg my-5 text-white font-bold">
+          <div className="mt-20 px-4 pb-4 mx-auto md:px-8 md:motion-safe:animate-sponsors flex flex-col items-center w-3/4">
+            <p className="text-center text-lg my-5 text-black bg-white p-3 border-gray rounded-lg font-bold">
               Powered By
             </p>
             <div className="w-full">
@@ -72,7 +72,14 @@ export function Hero(): JSX.Element {
                   <img
                     src="/images/tableland.png"
                     alt="tableland"
-                    className="h-[60px]  scale-90"
+                    className="h-[90px]  scale-90"
+                  />
+                </li>
+				<li>
+                  <img
+                    src="/images/hats.png"
+                    alt="tableland"
+                    className="h-[90px]  scale-90"
                   />
                 </li>
                 <li>
@@ -86,7 +93,21 @@ export function Hero(): JSX.Element {
                   <img
                     src="/images/push.png"
                     alt="push"
-                    className="h-[60px]  scale-90"
+                    className="h-[65px]  scale-90"
+                  />
+                </li>
+				<li>
+                  <img
+                    src="/images/fns.jpg"
+                    alt="push"
+                    className="h-[65px]  scale-90"
+                  />
+                </li>
+				<li>
+                  <img
+                    src="/images/filecoin.png"
+                    alt="push"
+                    className="h-[65px]  scale-90"
                   />
                 </li>
               </ul>

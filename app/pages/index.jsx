@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 const Home = () => {
   const router = useRouter();
   const [hashRoute, setHashRoute] = useState("");
+  const [route, setRoute] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,6 +23,7 @@ const Home = () => {
     const handleHashChange = () => {
       setHashRoute(window.location.hash);
       localStorage.setItem("route", window.location.hash);
+      setRoute(window.location)
     };
 
     window.addEventListener("hashchange", handleHashChange);
@@ -30,8 +32,8 @@ const Home = () => {
     if (window.location.hash !== "") {
       setHashRoute(window.location.hash);
     }
-    if (window.location == "/") {
-      setHashRoute(window.location);
+    if (window.location == "") {
+      setRoute(window.location);
     }
 
     // Set loading to false after initial setup
@@ -50,7 +52,7 @@ const Home = () => {
     <div>
       {hashRoute.toLowerCase() === "#/spaces" && <SpacesGraph />}
       {hashRoute === "#/MergerPage" && <MergerPage />}
-      {(hashRoute === "" || hashRoute === "#/") && <LandingPage />}
+      {(route === "/" || hashRoute === "#/") && <LandingPage />}
       {hashRoute === "#/SpacesGraph" && <SpacesGraph />}
       {hashRoute.includes("#/SingleSpacePage") && <SingleSpacePage />}
       {hashRoute === "#/instance" && <InstanceDetailsPage />}

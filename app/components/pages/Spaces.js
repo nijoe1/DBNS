@@ -24,9 +24,6 @@ const Spaces = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Determine the number of columns based on screen size, defaulting to 3
-  const numColumns =
-    useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4, xl: 5 }) || 3;
 
   // Filter dataset categories based on search query and selected category
   const filteredCategories = datasetCategories.filter((category) => {

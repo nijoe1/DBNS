@@ -171,9 +171,9 @@ const SpacesGraph = () => {
 
   // Define custom styles for different node types
   const nodeStyles = {
-    root: { fill: "red", stroke: "#000", strokeWidth: "2px" },
-    branch: { fill: "blue", stroke: "#000", strokeWidth: "2px" },
-    leaf: { fill: "yellow", stroke: "#000", strokeWidth: "2px" },
+    root: { fill: "#424242", stroke: "#000", strokeWidth: "2px" },
+    branch: { fill: "#727272", stroke: "#000", strokeWidth: "2px" },
+    leaf: { fill: "#ecf1f6", stroke: "#000", strokeWidth: "2px" },
   };
 
   // Handle click event on the label to navigate to the spaces page
@@ -211,56 +211,63 @@ const SpacesGraph = () => {
   );
 
   return (
-    <Flex direction="column" align="center" justify="center">
-      {/* Search bar */}
-      <Input
-        placeholder="Search category..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        mb={4}
-        w="300px"
-      />
-      {/* Category dropdown */}
-      <Select
-        placeholder="All categories..."
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-        mb={4}
-        w="300px"
-      >
-        {categoryOptions.map((category) => (
-          <option key={category.value} value={category.value}>
-            {category.label}
-          </option>
-        ))}
-      </Select>
-      {/* Display tree */}
-      {treeData && (
-        <Box
-          id="treeWrapper"
-          style={{ width: "70vw", height: "calc(100vh - 150px)" }}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
+    <Flex direction="column" align="center" justify="center" className="mt-[3%]">
+    <Box
+      p="4"
+      borderWidth="3px"
+      borderColor={"black"}
+      borderRadius="lg"
+      overflow="hidden"
+      boxShadow="md"
+      style={{ width: "70vw", height: "calc(100vh - 150px)" }}
+      display="flex"
+      alignItems="center"    >
+      <Flex direction="column" align="center" justify="center">
+        {/* Category dropdown */}
+        <Select
+          placeholder="All categories..."
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          mb={4}
+          mt="6%"
+          w="300px"
         >
-          <Tree
-            data={treeData}
-            orientation="vertical"
-            rootNodeClassName="node__root"
-            branchNodeClassName="node__branch"
-            leafNodeClassName="node__leaf"
-            renderCustomNodeElement={renderCustomNodeElement}
-            translate={{
-              x: windowDimensions.width / 3.0,
-              y: windowDimensions.height / 7,
-            }}
-            zoom={1}
-            separation={{ siblings: 2, nonSiblings: 2 }}
-            initialDepth={1}
-          />
-        </Box>
-      )}
+          {categoryOptions.map((category) => (
+            <option key={category.value} value={category.value}>
+              {category.label}
+            </option>
+          ))}
+        </Select>
+        {/* Display tree */}
+        {treeData && (
+          <Box
+            id="treeWrapper"
+            style={{ width: "70vw", height: "calc(100vh - 150px)" }}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Tree
+              data={treeData}
+              orientation="vertical"
+              rootNodeClassName="node__root"
+              branchNodeClassName="node__branch"
+              leafNodeClassName="node__leaf"
+              renderCustomNodeElement={renderCustomNodeElement}
+              translate={{
+                x: windowDimensions.width / 3.0,
+                y: windowDimensions.height / 7,
+              }}
+              zoom={1}
+              separation={{ siblings: 2, nonSiblings: 2 }}
+              initialDepth={1}
+            />
+          </Box>
+        )}
+      </Flex>
+    </Box>
     </Flex>
+
   );
 };
 

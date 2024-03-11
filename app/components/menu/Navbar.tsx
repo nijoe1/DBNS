@@ -33,7 +33,7 @@ export default function Navbar(): JSX.Element {
       try {
         prevAddress = localStorage.getItem("prevAddress");
       } catch {}
-      if (address && address !== prevAddress) {
+      if (address && address != prevAddress) {
         localStorage.removeItem("ceramic-session");
         localStorage.setItem("prevAddress", address ? address : "".toString());
         localStorage.setItem("prevChain", chainID.toString());
@@ -42,7 +42,7 @@ export default function Navbar(): JSX.Element {
       }
     };
     check();
-  }, [address, chainID]);
+  }, [address]);
 
   useEffect(() => {
     let prevChain;
@@ -51,7 +51,7 @@ export default function Navbar(): JSX.Element {
       prevAddress = localStorage.getItem("prevAddress");
       prevChain = localStorage.getItem("prevChain");
     } catch {}
-    if (prevAddress && parseInt(prevChain || "0") !== chainID && changeChain) {
+    if (prevAddress && parseInt(prevChain || "0") != chainID && changeChain) {
       localStorage.setItem("prevChain", chainID.toString());
       window.location.href = "/";
     }

@@ -23,12 +23,9 @@ export function Hero(): JSX.Element {
       <section className="py-10 mt-5  overflow-hidden">
         <div className="mx-auto text-gray-600 gap-x-5 items-center justify-between overflow md:flex md:px-4">
           <div className="flex-none space-y-5 px-4 sm:max-w-lg md:px-0 lg:max-w-xl motion-safe:animate-hero-text-sm md:motion-safe:animate-hero-text">
-            <h1 className="text-4xl text-black/80 font-bold md:text-5xl">
-              DBNS{" "}
+            <h1 className="text-4xl text-primary font-extrabold md:text-5xl">
+              DBNS the unified & decentralized namespace of datasets
             </h1>
-            <h2 className="text-4xl text-primary font-extrabold md:text-5xl">
-              The unified & decentralized namespace of datasets
-            </h2>
             <p>
               Creating the new era of storing datasets and perform transparent
               computations on top of them using the Filecoin Virtual Machine
@@ -53,7 +50,7 @@ export function Hero(): JSX.Element {
               </Button>
             </div>
           </div>
-          <div className="flex-none mt-14 md:mt-0 md:max-w-xl motion-safe:animate-hero-image-sm md:motion-safe:animate-hero-image">
+          <div className="flex-none mt-14 md:mt-0 md:max-w-lg motion-safe:animate-hero-image-sm md:motion-safe:animate-hero-image">
             {typeof document != undefined && <HeroAnimation />}
           </div>
         </div>

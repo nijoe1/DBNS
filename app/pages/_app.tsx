@@ -48,6 +48,7 @@ export default function App({ Component, pageProps }: AppProps) {
             >
               <Navbar />
               <Component {...pageProps} />
+              <div className="flex flex-grow mt-[20%]"></div>
               <Footer />
             </RainbowKitProvider>
           </QueryClientProvider>

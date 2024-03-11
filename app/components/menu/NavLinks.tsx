@@ -9,7 +9,6 @@ export type link = {
 };
 import { Button } from "@chakra-ui/react";
 function NavLink({ text, href }: link): JSX.Element {
-	
   const navigateToHashRoute = (hashRoute: any) => {
     if (hashRoute == "/") {
       window.location.hash = "/";
@@ -43,13 +42,20 @@ function ResponsiveNavLink({
   setIsSidebarOpen,
 }: ResponsiveNavLinkProps): JSX.Element {
   const pathname = window.location.hash;
-  const active = pathname === href;
 
+  const navigateToHashRoute = (hashRoute: any) => {
+    if (hashRoute == "/") {
+      window.location.hash = "/";
+    } else {
+      window.location.hash = hashRoute;
+    }
+  };
   return (
     <div
       className={`hover:bg-black/20 transition-all w-full text-center py-3`}
       onClick={(e) => {
         e.preventDefault();
+        navigateToHashRoute(href);
         setIsSidebarOpen(false);
       }}
     >

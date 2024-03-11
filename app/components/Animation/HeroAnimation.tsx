@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import {databases} from "./databases"; // Assuming databases is the animation data
+import databases from "./databases.json"; // Assuming databases is the animation data
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 

@@ -23,6 +23,10 @@ const StepperForm: React.FC<{
   const [tokenClicked, setTokenClicked] = useState(false);
 
   const generateLighthouseApiKey = async (address: any) => {
+    if (typeof localStorage === "undefined") {
+      return;
+    }
+
     let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
     if (!key) {
       const verificationMessage = (

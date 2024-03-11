@@ -3,6 +3,7 @@
 module.exports = {
   reactStrictMode: true,
   trailingSlash: true,
+  
 
   webpack: (config) => {
     config.resolve = {
@@ -15,11 +16,5 @@ module.exports = {
     };
     return config;
   },
-
-  images: {
-    // domains: ["gateway.lighthouse.storage"],
-    unoptimized: true,
-  },
-
-  basePath: "/out",
+  dir: 'out',
 };

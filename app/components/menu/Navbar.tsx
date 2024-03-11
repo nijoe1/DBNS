@@ -58,7 +58,7 @@ export default function Navbar(): JSX.Element {
   }, [chainID]);
 
   return (
-    <Container className="bg-black/80 rounded-b-md">
+    <Container className="bg-black/80 rounded-md mt-4">
       <nav
         className={`flex w-full mx-auto md:justify-between lg:grid lg:px-3 relative ${!isConnected ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}
       >

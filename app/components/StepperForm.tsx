@@ -16,7 +16,6 @@ const StepperForm: React.FC<{
   const { data: walletClient } = useWalletClient();
   const { initializePush } = usePush();
 
-
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [ceramicClicked, setCeramicClicked] = useState(false);
   const [apiClicked, setApiClicked] = useState(false);
@@ -31,7 +30,7 @@ const StepperForm: React.FC<{
     if (!key) {
       const verificationMessage = (
         await axios.get(
-          `https://api.lighthouse.storage/api/auth/get_message?publicKey=${address}`
+          `https://api.lighthouse.storage/api/auth/get_message?publicKey=${address}`,
         )
       ).data;
       let signed;
@@ -48,7 +47,7 @@ const StepperForm: React.FC<{
       if (API_KEY.data.apiKey) {
         localStorage.setItem(
           `API_KEY_${address?.toLowerCase()}`,
-          API_KEY.data.apiKey
+          API_KEY.data.apiKey,
         );
         nextStep();
       } else {
@@ -147,7 +146,7 @@ const StepperForm: React.FC<{
                     localStorage.removeItem(key);
                   }
                 });
-                
+
                 nextStep();
               }}
               className="bg-black text-white py-2 px-4 rounded-lg mt-4"

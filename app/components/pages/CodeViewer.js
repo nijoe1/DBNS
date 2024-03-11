@@ -7,7 +7,6 @@ const CodeViewer = () => {
       width="100%"
       maxWidth="1000px"
       maxHeight="700px"
-
       mx="auto"
       borderRadius="md"
       p={4}

@@ -17,7 +17,7 @@ const Home = () => {
     if (storedRoute) {
       window.location.hash = storedRoute;
     }
-    
+
     // Handle hash change
     const handleHashChange = () => {
       setHashRoute(window.location.hash);
@@ -29,6 +29,9 @@ const Home = () => {
     // Initial setup
     if (window.location.hash !== "") {
       setHashRoute(window.location.hash);
+    }
+    if (window.location == "/") {
+      setHashRoute(window.location);
     }
 
     // Set loading to false after initial setup

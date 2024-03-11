@@ -51,10 +51,10 @@ const InstanceDetailsPage = () => {
       {
         content: "Hello Bob!",
         type: "Text",
-      }
+      },
     );
     const aliceChatHistoryWithBob = await pushSign.chat.history(
-      "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da"
+      "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da",
     );
     console.log(aliceChatHistoryWithBob);
     const groupInfo = await pushSign.chat.group.info(createdGroup.chatId);

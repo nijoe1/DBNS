@@ -1,8 +1,8 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
-import Navbar from "@/components/layout/navbar";
-import Footer from "@/components/layout/footer";
+import Navbar from "@/components/menu/Navbar";
+import Footer from "@/components/menu/Footer";
 import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, http } from "wagmi";
@@ -10,10 +10,10 @@ import { getDefaultConfig, lightTheme } from "@rainbow-me/rainbowkit";
 import { sepolia } from "wagmi/chains";
 import ReduxProvider from "@/providers/ReduxProvider";
 import {
-	darkTheme,
-	getDefaultWallets,
-	RainbowKitProvider
-} from '@rainbow-me/rainbowkit'
+  darkTheme,
+  getDefaultWallets,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/router";
 
 const config = getDefaultConfig({
@@ -46,12 +46,8 @@ export default function App({ Component, pageProps }: AppProps) {
               })}
               modalSize="compact"
             >
-              <div className="fixed z-50 top-0 left-0 w-full">
-                <Navbar />
-              </div>{" "}
-              <div className="w-screen h-screen bg-gradient-to-b from-gray-400  to-gray-400 mt-[6%]">
-                <Component {...pageProps} />
-              </div>
+              <Navbar />
+              <Component {...pageProps} />
               <Footer />
             </RainbowKitProvider>
           </QueryClientProvider>

@@ -211,63 +211,70 @@ const SpacesGraph = () => {
   );
 
   return (
-    <Flex direction="column" align="center" justify="center" className="mt-[3%]">
-    <Box
-      p="4"
-      borderWidth="3px"
-      borderColor={"black"}
-      borderRadius="lg"
-      overflow="hidden"
-      boxShadow="md"
-      style={{ width: "70vw", height: "calc(100vh - 150px)" }}
-      display="flex"
-      alignItems="center"    >
-      <Flex direction="column" align="center" justify="center">
-        {/* Category dropdown */}
-        <Select
-          placeholder="All categories..."
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          mb={4}
-          mt="6%"
-          w="300px"
-        >
-          {categoryOptions.map((category) => (
-            <option key={category.value} value={category.value}>
-              {category.label}
-            </option>
-          ))}
-        </Select>
-        {/* Display tree */}
-        {treeData && (
-          <Box
-            id="treeWrapper"
-            style={{ width: "70vw", height: "calc(100vh - 150px)" }}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
+    <Flex
+      direction="column"
+      align="center"
+      justify="center"
+      className="mt-[3%]"
+    >
+      <Box
+        p="4"
+        borderWidth="3px"
+        borderColor={"black"}
+        borderRadius="lg"
+        overflow="hidden"
+        boxShadow="md"
+        width={["90%", "70%", "50%"]} // Adjust width for different screen sizes
+        height="calc(100vh - 150px)" // Adjust height dynamically
+        display="flex"
+        alignItems="center"
+      >
+        <Flex direction="column" align="center" justify="center" width="100%">
+          {/* Category dropdown */}
+          <Select
+            placeholder="All categories..."
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            mb={4}
+            mt="6%"
+            width={["90%", "70%", "50%"]} // Adjust width for different screen sizes
           >
-            <Tree
-              data={treeData}
-              orientation="vertical"
-              rootNodeClassName="node__root"
-              branchNodeClassName="node__branch"
-              leafNodeClassName="node__leaf"
-              renderCustomNodeElement={renderCustomNodeElement}
-              translate={{
-                x: windowDimensions.width / 3.0,
-                y: windowDimensions.height / 7,
-              }}
-              zoom={1}
-              separation={{ siblings: 2, nonSiblings: 2 }}
-              initialDepth={1}
-            />
-          </Box>
-        )}
-      </Flex>
-    </Box>
+            {categoryOptions.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
+          </Select>
+          {/* Display tree */}
+          {treeData && (
+            <Box
+              id="treeWrapper"
+              width="100%"
+              height="calc(100vh - 250px)" // Adjust height dynamically
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Tree
+                data={treeData}
+                orientation="vertical"
+                rootNodeClassName="node__root"
+                branchNodeClassName="node__branch"
+                leafNodeClassName="node__leaf"
+                renderCustomNodeElement={renderCustomNodeElement}
+                translate={{
+                  x: windowDimensions.width / 3.0,
+                  y: windowDimensions.height / 7,
+                }}
+                zoom={1}
+                separation={{ siblings: 2, nonSiblings: 2 }}
+                initialDepth={1}
+              />
+            </Box>
+          )}
+        </Flex>
+      </Box>
     </Flex>
-
   );
 };
 

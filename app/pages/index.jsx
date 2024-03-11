@@ -23,7 +23,7 @@ const Home = () => {
     const handleHashChange = () => {
       setHashRoute(window.location.hash);
       localStorage.setItem("route", window.location.hash);
-      setRoute(window.location)
+      setRoute(window.location);
     };
 
     window.addEventListener("hashchange", handleHashChange);

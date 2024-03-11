@@ -3,8 +3,6 @@ import {
   Box,
   Image,
   Text,
-  Grid,
-  GridItem,
   Badge,
   Tabs,
   TabList,
@@ -15,17 +13,19 @@ import {
 
 import CsvViewer from "./CsvViewer"; // Import CsvViewer component
 import CodeViewer from "./CodeViewer"; // Import CodeViewer component
-import { useAccount, usePublicClient } from "wagmi";
+import { useAccount } from "wagmi";
 import ChatComponent from "@/components/ChatComponent";
 import { useSelector } from "react-redux";
 import usePush from "@/hooks/usePush";
 import { useRouter } from "next/router";
+
 const InstanceDetailsPage = () => {
   const { initializePush } = usePush();
   const router = useRouter();
   const pushSign = useSelector((state) => state.push.pushSign);
   console.log(pushSign);
   const { address } = useAccount();
+
   useEffect(() => {
     async function initialize() {
       await initializePush();
@@ -34,47 +34,21 @@ const InstanceDetailsPage = () => {
       initialize();
     }
   }, [router]);
-  async function createGroup() {
-    const createdGroup = await pushSign.chat.group.create("name", {
-      description: "groupDescription",
-      image: "groupImage",
-      members: [],
-      admins: [],
-      private: false,
-      rules: {
-        entry: { conditions: [] },
-        chat: { conditions: [] },
-      },
-    });
-    await pushSign.chat.send(
-      "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da",
-      {
-        content: "Hello Bob!",
-        type: "Text",
-      },
-    );
-    const aliceChatHistoryWithBob = await pushSign.chat.history(
-      "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da",
-    );
-    console.log(aliceChatHistoryWithBob);
-    const groupInfo = await pushSign.chat.group.info(createdGroup.chatId);
 
-    console.log(groupInfo);
-  }
   return (
-    <Box p="4" className="mx-[20%]">
-      <Box bg="gray.200" p="4" borderRadius="md" boxShadow="md" mb="4">
+    <Box p={["2", "4"]} className="mx-auto" maxW={["90%", "80%", "70%"]}>
+      <Box bg="#727272" p="4" borderRadius="md" boxShadow="md" mb="4">
         <Image
           src="/path/to/image.jpg"
           alt="Profile Image"
           borderRadius="full"
-          boxSize="150px"
+          boxSize={["120px", "150px"]}
           mb="4"
         />
-        <Text fontSize="xl" fontWeight="bold">
+        <Text fontSize={["lg", "xl"]} fontWeight="bold" color="#f0f0f0">
           John Doe
         </Text>
-        <Text fontSize="md" color="gray.500">
+        <Text fontSize={["sm", "md"]} color="#f0f0f0">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         </Text>
         <Badge colorScheme="green" borderRadius="full" px="2" py="1" mt="2">
@@ -82,7 +56,12 @@ const InstanceDetailsPage = () => {
         </Badge>
       </Box>
 
-      <Tabs isFitted variant="soft-rounded" minWidth="200px">
+      <Tabs
+        isFitted
+        variant="soft-rounded"
+        colorScheme="blue" // Change the color scheme to blue
+        minWidth={["150px", "200px"]}
+      >
         <TabList mb="4">
           <Tab>Dataset</Tab>
           <Tab>Chat</Tab>
@@ -104,7 +83,7 @@ const InstanceDetailsPage = () => {
               minHeight="200px"
               overflow="auto"
               p="4"
-              bg="gray.200"
+              bg="#424242"
               borderRadius="md"
               boxShadow="md"
             >

@@ -75,7 +75,7 @@ export function Hero(): JSX.Element {
                     className="h-[90px]  scale-90"
                   />
                 </li>
-				<li>
+                <li>
                   <img
                     src="/images/hats.png"
                     alt="tableland"
@@ -96,14 +96,14 @@ export function Hero(): JSX.Element {
                     className="h-[65px]  scale-90"
                   />
                 </li>
-				<li>
+                <li>
                   <img
                     src="/images/fns.jpg"
                     alt="push"
-                    className="h-[65px]  scale-90"
+                    className="h-[65px]  scale-90 rounded-md"
                   />
                 </li>
-				<li>
+                <li>
                   <img
                     src="/images/filecoin.png"
                     alt="push"

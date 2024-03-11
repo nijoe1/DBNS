@@ -45,7 +45,7 @@ const SingleSpacePage = () => {
   };
   return (
     <Flex justify="center" align="center" mt="4">
-      <Grid templateColumns="repeat(4, 1fr)" gap={6}>
+      <Grid templateColumns={["1fr", "1fr", "1fr", "1fr"]} gap={6}>
         {instancesData.map((instance) => (
           <GridItem key={instance.id}>
             <Box
@@ -54,6 +54,8 @@ const SingleSpacePage = () => {
               borderRadius="lg"
               overflow="hidden"
               boxShadow="md"
+              width="100%" // Adjust width for different screen sizes
+              height="100%" // Adjust height for different screen sizes
             >
               <Image src={instance.imageUrl} alt={instance.name} />
               <Badge colorScheme="green" mt="2">

@@ -41,7 +41,6 @@ function ResponsiveNavLink({
   href,
   setIsSidebarOpen,
 }: ResponsiveNavLinkProps): JSX.Element {
-
   const navigateToHashRoute = (hashRoute: any) => {
     if (hashRoute == "/") {
       window.location.hash = "/";

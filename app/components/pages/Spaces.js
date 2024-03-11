@@ -24,7 +24,6 @@ const Spaces = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-
   // Filter dataset categories based on search query and selected category
   const filteredCategories = datasetCategories.filter((category) => {
     return (

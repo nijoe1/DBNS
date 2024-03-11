@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Image,
-  Text,
-  Grid,
-  Input,
-  Button,
-  Flex,
-  Avatar,
-} from "@chakra-ui/react";
-import { AiOutlineFileImage } from "react-icons/ai";
+import { Box, Image, Text, Input, Button, Flex } from "@chakra-ui/react";
 import { BsFileText } from "react-icons/bs";
 import { FaDownload } from "react-icons/fa";
 import { RiImageAddFill, RiSendPlane2Fill } from "react-icons/ri";
@@ -101,7 +91,13 @@ const ChatComponent = ({ pushSign, address }) => {
   };
 
   return (
-    <Box maxHeight="500px" overflowY="auto">
+    <Box
+      maxHeight="500px"
+      overflowY="auto"
+      p="4"
+      borderRadius="md"
+      boxShadow="md"
+    >
       {messages.map((message, index) => (
         <Flex
           key={index}
@@ -123,7 +119,7 @@ const ChatComponent = ({ pushSign, address }) => {
           </Box>
           <Box borderWidth="1px" borderColor="gray.700" p={2} rounded="md">
             {message.messageType === "Image" ? (
-              <Flex direction="column" alignItems="center">
+              <Box>
                 <Image
                   src={message.messageObj.content}
                   alt="Message"
@@ -136,9 +132,9 @@ const ChatComponent = ({ pushSign, address }) => {
                     minute: "2-digit",
                   })}
                 </Text>
-              </Flex>
+              </Box>
             ) : message.messageType === "File" ? (
-              <Flex direction="column" alignItems="center">
+              <Flex align="center">
                 <Button
                   as="a"
                   href={message.messageObj.content}
@@ -153,7 +149,7 @@ const ChatComponent = ({ pushSign, address }) => {
                   <FaDownload />
                   Download {fileType}
                 </Button>
-                <Text fontSize="sm" color="gray.500" mt={1}>
+                <Text fontSize="sm" color="gray.500" ml={2}>
                   {new Date(message.timestamp).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -187,7 +183,6 @@ const ChatComponent = ({ pushSign, address }) => {
           <input
             type="file"
             id="file-upload"
-            // accept="image/*, .pdf, .doc, .docx"
             style={{ display: "none" }}
             onChange={handleFileChange}
           />

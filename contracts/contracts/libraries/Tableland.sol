@@ -38,7 +38,7 @@ abstract contract Tableland {
     string internal constant SUBSCRIPTIONS_TABLE_PREFIX = "subscriptions";
 
     string internal constant SUBSCRIPTIONS_SCHEMA =
-        "InstanceID text, subscriber text, endsAt text";
+        "InstanceID text, subscriber text, tokenID text, endsAt text";
 
     string internal constant DB_INSTANCES_MEMBERS_TABLE_PREFIX = "members";
 
@@ -244,15 +244,59 @@ abstract contract Tableland {
         );
     }
 
+    function updateInstanceMetadata(
+        bytes32 InstanceID,
+        string memory metadataCID
+    ) internal {
+        mutate(
+            tableIDs[1],
+            SQLHelpers.toUpdate(
+                DBSPACES_INSTANCES_TABLE_PREFIX,
+                tableIDs[1],
+                string.concat("metadataCID = ", SQLHelpers.quote(metadataCID)),
+                string.concat(
+                    "InstanceID = ",
+                    SQLHelpers.quote(bytes32ToString(InstanceID))
+                )
+            )
+        );
+    }
+
+    function updateInstanceCode(
+        bytes32 codeID,
+        string memory name,
+        string memory about
+    ) internal {
+        mutate(
+            tableIDs[2],
+            SQLHelpers.toUpdate(
+                DB_INSTANCES_CODES_TABLE_PREFIX,
+                tableIDs[2],
+                string.concat(
+                    "name = ",
+                    SQLHelpers.quote(name),
+                    ", about = ",
+                    SQLHelpers.quote(about)
+                ),
+                string.concat(
+                    "codeID = ",
+                    SQLHelpers.quote(bytes32ToString(codeID))
+                )
+            )
+        );
+    }
+
     /*
      * @dev Internal function to insert a new subscription.
      * @param {bytes32} InstanceID - Instance ID.
      * @param {address} subscriber - Subscriber address.
+     * @param {uint256} tokenID - Subscription token ID.
      * @param {uint256} endsAt - Subscription end date.
      */
     function insertSubscription(
         bytes32 InstanceID,
         address subscriber,
+        uint256 tokenID,
         uint256 endsAt
     ) internal {
         mutate(
@@ -260,13 +304,39 @@ abstract contract Tableland {
             SQLHelpers.toInsert(
                 SUBSCRIPTIONS_TABLE_PREFIX,
                 tableIDs[3],
-                "InstanceID, subscriber, endsAt",
+                "InstanceID, subscriber, tokenID, endsAt",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(InstanceID)),
                     ",",
                     SQLHelpers.quote(Strings.toHexString(subscriber)),
                     ",",
+                    SQLHelpers.quote(Strings.toString(tokenID)),
+                    ",",
                     SQLHelpers.quote(Strings.toString(endsAt))
+                )
+            )
+        );
+    }
+
+    function updateSubscription(
+        bytes32 InstanceID,
+        address subscriber,
+        uint256 endsAt
+    ) internal {
+        mutate(
+            tableIDs[3],
+            SQLHelpers.toUpdate(
+                SUBSCRIPTIONS_TABLE_PREFIX,
+                tableIDs[3],
+                string.concat(
+                    "endsAt = ",
+                    SQLHelpers.quote(Strings.toString(endsAt))
+                ),
+                string.concat(
+                    "InstanceID = ",
+                    SQLHelpers.quote(bytes32ToString(InstanceID)),
+                    " AND subscriber = ",
+                    SQLHelpers.quote(Strings.toHexString(subscriber))
                 )
             )
         );
@@ -277,9 +347,10 @@ abstract contract Tableland {
      * @param {bytes32} InstanceID - Instance ID.
      * @param {address[]} members - Members address array.
      */
-    function insertMembers(bytes32 InstanceID, address[] memory members)
-        internal    
-    {
+    function insertMembers(
+        bytes32 InstanceID,
+        address[] memory members
+    ) internal {
         string memory id = bytes32ToString(InstanceID);
         for (uint256 i = 0; i < members.length; i++) {
             mutate(
@@ -291,6 +362,28 @@ abstract contract Tableland {
                     string.concat(
                         SQLHelpers.quote(id),
                         ",",
+                        SQLHelpers.quote(Strings.toHexString(members[i]))
+                    )
+                )
+            );
+        }
+    }
+
+    function removeMembers(
+        bytes32 InstanceID,
+        address[] memory members
+    ) internal {
+        string memory id = bytes32ToString(InstanceID);
+        for (uint256 i = 0; i < members.length; i++) {
+            mutate(
+                tableIDs[4],
+                SQLHelpers.toDelete(
+                    DB_INSTANCES_MEMBERS_TABLE_PREFIX,
+                    tableIDs[4],
+                    string.concat(
+                        "InstanceID = ",
+                        SQLHelpers.quote(id),
+                        " AND member = ",
                         SQLHelpers.quote(Strings.toHexString(members[i]))
                     )
                 )

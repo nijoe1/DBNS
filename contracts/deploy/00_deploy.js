@@ -19,6 +19,7 @@ module.exports = async ({ deployments }) => {
   // Calibration Testnet
   // const FNS = "0x331e3228ca613F52B8E6a0F1EFD7000Cb6DFA581";
   // const PUBLIC_RESOLVER = "	0x55608172cD23E7e1c2BD939f1C3210027EbD031a";
+  // const REGISTRAR = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
   // const IMPLEMENTATION = "";
   // const UNLOCK = "0xa4E2E8c8A18bd0641cb3288Bf7a55fb3A2F1880F";
   // PUBLICLOCK > deployed to : 0xa6E4BAB853c696BC9eE1eB6f1Ea09365E50B4038
@@ -26,6 +27,7 @@ module.exports = async ({ deployments }) => {
   // sepolia Testnet
   const ENS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
   const PUBLIC_RESOLVER = "	0x8FADE66B79cC9f707aB26799354482EB93a5B7dD";
+  const REGISTRAR = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
   const IMPLEMENTATION = "";
   const UNLOCK = "0x36b34e10295cCE69B652eEB5a8046041074515Da";
 

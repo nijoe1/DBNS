@@ -133,10 +133,7 @@ abstract contract Core is FNS, Gated, Tableland, Unlock {
     ) external {
         address _gatedAddress = instances[_instance].gatedContract;
         address _owner = instances[_instance].creator;
-        require(
-            _owner == msg.sender,
-            "No access"
-        );
+        require(_owner == msg.sender, "No access");
         if (_gatedAddress != address(0)) {
             IGated(_gatedAddress).mint(_members);
         }
@@ -148,13 +145,9 @@ abstract contract Core is FNS, Gated, Tableland, Unlock {
     ) external {
         address _gatedAddress = instances[_instance].gatedContract;
         address _owner = instances[_instance].creator;
-        require(
-            _owner == msg.sender,
-            "No access"
-        );
+        require(_owner == msg.sender, "No access");
         if (_gatedAddress != address(0)) {
             IGated(_gatedAddress).burn(_tokens);
         }
     }
-    
 }

@@ -154,9 +154,16 @@ contract DBNS is Core {
         );
     }
 
-    function purchaseInstanceSubscription(bytes32 _instanceID) external payable {
-        purchaseSubscription(_instanceID);
-        insertSubscription(_instanceID, msg.sender, block.timestamp + MONTH);
+    function purchaseInstanceSubscription(
+        bytes32 _instanceID
+    ) external payable {
+        uint256 _tokenID = purchaseSubscription(_instanceID);
+        insertSubscription(
+            _instanceID,
+            msg.sender,
+            _tokenID,
+            block.timestamp + MONTH
+        );
     }
 
     function updateCode(

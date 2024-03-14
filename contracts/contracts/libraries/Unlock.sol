@@ -75,7 +75,9 @@ abstract contract Unlock is Ownable {
      * @dev PurchaseSubscription function for an agentID
      * @param _instanceID to subscribe
      */
-    function purchaseSubscription(bytes32 _instanceID) internal {
+    function purchaseSubscription(
+        bytes32 _instanceID
+    ) internal returns (uint256 _tokenID) {
         address[] memory _referrers = new address[](1);
         address[] memory _recipients = new address[](1);
         address[] memory _keyManagers = new address[](1);
@@ -100,7 +102,9 @@ abstract contract Unlock is Ownable {
             _data
         );
 
-        instanceSubscriptions[_instanceID][msg.sender] = tokenID[0];
+        _tokenID = tokenID[0];
+
+        instanceSubscriptions[_instanceID][msg.sender] = _tokenID;
     }
 
     function extendSubscription(

@@ -7,7 +7,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, http } from "wagmi";
 import { getDefaultConfig, lightTheme } from "@rainbow-me/rainbowkit";
-import { sepolia } from "wagmi/chains";
+import { sepolia, filecoinCalibration } from "wagmi/chains";
 import ReduxProvider from "@/providers/ReduxProvider";
 import {
   darkTheme,
@@ -16,12 +16,20 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/router";
 
+const filecoin = {
+  ...filecoinCalibration,
+
+  iconUrl:
+    "https://gateway.lighthouse.storage/ipfs/QmXQMtADMsCqsYEvyuEA3PkFq2xtWAQetQFtkybjEXvk3Z",
+}
+
 const config = getDefaultConfig({
   appName: "RainbowKit demo",
   projectId: "ad9d4173328447d73a95b113fec565eb",
-  chains: [sepolia],
+  chains: [filecoin,sepolia],
   transports: {
     [sepolia.id]: http(),
+    [filecoinCalibration.id]:http(),
   },
 });
 

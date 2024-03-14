@@ -75,13 +75,7 @@ export function Hero(): JSX.Element {
                     className="h-[90px]  scale-90"
                   />
                 </li>
-                <li>
-                  <img
-                    src="/images/hats.png"
-                    alt="tableland"
-                    className="h-[90px]  scale-90"
-                  />
-                </li>
+                
                 <li>
                   <img
                     src="/images/fleek.webp"

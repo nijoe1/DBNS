@@ -120,23 +120,23 @@ body {
 .node__root > circle {
   fill: #79b8ff;
   stroke: #004e96;
-  stroke-width: 2px;
+  strokeWidth: 2px;
 }
 
 .node__branch > circle {
   fill: #79b8ff;
   stroke: #004e96;
-  stroke-width: 2px;
+  strokeWidth: 2px;
 }
 
 .node__leaf > circle {
   fill: yellow;
   stroke: #000;
-  stroke-width: 2px;
+  strokeWidth: 2px;
 }
 
 .custom-link {
   stroke: #ccc;
-  stroke-width: 2px;
+  strokeWidth: 2px;
   fill: none;
 }

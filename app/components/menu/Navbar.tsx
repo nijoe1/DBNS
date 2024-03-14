@@ -57,6 +57,16 @@ export default function Navbar(): JSX.Element {
     }
   }, [chainID]);
 
+  useEffect(() => {
+    let storedRoute;
+    try {
+      storedRoute = localStorage.getItem("route");
+    } catch {}
+    if (!storedRoute) {
+      window.location.hash = "/";
+    }
+  }, []);
+
   return (
     <Container className="bg-black/80 rounded-md mt-4">
       <nav

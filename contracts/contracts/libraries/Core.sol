@@ -1,9 +1,9 @@
-// SPDX-LicEnse-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Ens} from "./Ens.sol";
+import {FNS} from "./FNS.sol";
 
-import {Hats} from "./Hats.sol";
+import {Gated, IGated} from "./Gated.sol";
 
 import {Unlock} from "./Unlock.sol";
 
@@ -16,7 +16,7 @@ import {Tableland} from "./Tableland.sol";
  * Tableland SQL in solidity for the databases and subspaces
  */
 
-abstract contract Core is Ens, Hats, Tableland, Unlock {
+abstract contract Core is FNS, Gated, Tableland, Unlock {
     enum Types {
         NULL,
         PAID_PRIVATE_INSTANCE,
@@ -28,7 +28,7 @@ abstract contract Core is Ens, Hats, Tableland, Unlock {
     }
 
     struct SpaceInstance {
-        uint256 hatID;
+        address gatedContract;
         uint256 price;
         address creator;
     }
@@ -42,13 +42,14 @@ abstract contract Core is Ens, Hats, Tableland, Unlock {
     error NoCodeOwner();
 
     constructor(
-        address _nameWrapper,
+        address _registry,
+        address _registrar,
         address _publicResolver,
         address _UnlockContract,
-        address _Hats
+        address _gatedImplementation
     )
-        Ens(_nameWrapper, _publicResolver)
-        Hats(_Hats)
+        FNS(_registry, _registrar, _publicResolver)
+        Gated(_gatedImplementation)
         Tableland()
         Unlock(_UnlockContract)
     {}
@@ -56,21 +57,22 @@ abstract contract Core is Ens, Hats, Tableland, Unlock {
     /**
      * @dev createInstanceType
      * @param _newDBInstance The new instance
-     * @param _hatID The hatID of the new instance
+     * @param _gatedContract The gatedContract of the new instance
      * @param _price The price of the new instance
      */
     function createInstanceType(
         bytes32 _newDBInstance,
-        uint256 _hatID,
+        address _gatedContract,
         uint256 _price
     ) internal returns (address _lock) {
+        bool _isPrivate = _gatedContract != address(0);
         if (_price > 0) {
             isType[_newDBInstance] = Types.PAID_INSTANCE;
             _lock = createLock(_price, "DBNS", _newDBInstance);
-        } else if (_hatID > 0 && _price > 0) {
+        } else if (_isPrivate && _price > 0) {
             isType[_newDBInstance] = Types.PAID_PRIVATE_INSTANCE;
             _lock = createLock(_price, "DBNS", _newDBInstance);
-        } else if (_hatID > 0) {
+        } else if (_isPrivate) {
             isType[_newDBInstance] = Types.OPEN_PRIVATE_INSTANCE;
         } else {
             isType[_newDBInstance] = Types.OPEN_INSTANCE;
@@ -87,12 +89,12 @@ abstract contract Core is Ens, Hats, Tableland, Unlock {
         bytes32 _instance,
         address _sender
     ) public view returns (bool) {
-        uint256 hat = instances[_instance].hatID;
+        address _gatedAddress = instances[_instance].gatedContract;
         if (isType[_instance] == Types.PAID_INSTANCE) {
             return hasActiveSubscription(_instance, _sender);
         } else if (isType[_instance] == Types.PAID_PRIVATE_INSTANCE) {
             return
-                getHatAccess(_sender, hat) ||
+                getAccess(_sender, _gatedAddress) ||
                 hasActiveSubscription(_instance, _sender);
         } else if (
             isType[_instance] == Types.OPEN_PRIVATE_INSTANCE ||
@@ -108,14 +110,14 @@ abstract contract Core is Ens, Hats, Tableland, Unlock {
         bytes32 _instance,
         address _sender
     ) public view returns (bool access) {
-        uint256 hat = instances[_instance].hatID;
+        address _gatedAddress = instances[_instance].gatedContract;
         Types _instanceType = isType[_instance];
         if (_instanceType == Types.PAID_INSTANCE) {
             access = instances[_instance].creator == _sender;
         } else if (_instanceType == Types.PAID_PRIVATE_INSTANCE) {
-            access = getHatAccess(_sender, hat);
+            access = getAccess(_sender, _gatedAddress);
         } else if (_instanceType == Types.OPEN_PRIVATE_INSTANCE) {
-            access = getHatAccess(_sender, hat);
+            access = getAccess(_sender, _gatedAddress);
         } else if (_instanceType == Types.OPEN_INSTANCE) {
             access = true;
         }
@@ -124,4 +126,35 @@ abstract contract Core is Ens, Hats, Tableland, Unlock {
             access = false;
         }
     }
+
+    function insertNewMerbers(
+        bytes32 _instance,
+        address[] memory _members
+    ) external {
+        address _gatedAddress = instances[_instance].gatedContract;
+        address _owner = instances[_instance].creator;
+        require(
+            _owner == msg.sender,
+            "No access"
+        );
+        if (_gatedAddress != address(0)) {
+            IGated(_gatedAddress).mint(_members);
+        }
+    }
+
+    function removeMembers(
+        bytes32 _instance,
+        uint256[] memory _tokens
+    ) external {
+        address _gatedAddress = instances[_instance].gatedContract;
+        address _owner = instances[_instance].creator;
+        require(
+            _owner == msg.sender,
+            "No access"
+        );
+        if (_gatedAddress != address(0)) {
+            IGated(_gatedAddress).burn(_tokens);
+        }
+    }
+    
 }

@@ -32,7 +32,7 @@ const id = "";
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   return (
-    <ChakraProvider>
+    <ChakraProvider >
       <WagmiProvider config={config}>
         <ReduxProvider>
           <QueryClientProvider client={queryClient}>

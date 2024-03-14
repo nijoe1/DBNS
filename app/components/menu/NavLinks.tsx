@@ -42,7 +42,7 @@ function ResponsiveNavLink({
   setIsSidebarOpen,
 }: ResponsiveNavLinkProps): JSX.Element {
   const navigateToHashRoute = (hashRoute: any) => {
-    if (hashRoute == "/") {
+    if (hashRoute === "/") {
       window.location.hash = "/";
     } else {
       window.location.hash = hashRoute;
@@ -50,7 +50,7 @@ function ResponsiveNavLink({
   };
   return (
     <div
-      className={`hover:bg-black/20 transition-all w-full text-center py-3`}
+      className={`hover:bg-black/20 transition-all w-full text-center py-3 cursor-pointer`} // Ensure consistent class names
       onClick={(e) => {
         e.preventDefault();
         navigateToHashRoute(href);

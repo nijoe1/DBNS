@@ -1,7 +1,7 @@
 require("hardhat-deploy");
 require("hardhat-deploy-ethers");
 
-const { ethers } = require("hardhat");
+const { ethers, unlock } = require("hardhat");
 const { Console } = require("console");
 const { get } = require("http");
 
@@ -12,9 +12,21 @@ module.exports = async ({ deployments }) => {
   const { deploy } = deployments;
   console.log("Wallet+ Ethereum Address:", wallet.address);
 
-  const NAME_WRAPPER = "0x0635513f179D50A207757E05759CbD106d7dFcE8";
-  const PUBLIC_RESOLVER = "0x8fade66b79cc9f707ab26799354482eb93a5b7dd";
-  const HATS = "0x3bc1A0Ad72417f2d411118085256fC53CBdDd137";
+  // deploy the Unlock contract
+  // const ul = await unlock.deployProtocol(12,12,0);
+  // console.log("Unlock Address:", ul);
+
+  // Calibration Testnet
+  // const FNS = "0x331e3228ca613F52B8E6a0F1EFD7000Cb6DFA581";
+  // const PUBLIC_RESOLVER = "	0x55608172cD23E7e1c2BD939f1C3210027EbD031a";
+  // const IMPLEMENTATION = "";
+  // const UNLOCK = "0xa4E2E8c8A18bd0641cb3288Bf7a55fb3A2F1880F";
+  // PUBLICLOCK > deployed to : 0xa6E4BAB853c696BC9eE1eB6f1Ea09365E50B4038
+
+  // sepolia Testnet
+  const ENS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
+  const PUBLIC_RESOLVER = "	0x8FADE66B79cC9f707aB26799354482EB93a5B7dD";
+  const IMPLEMENTATION = "";
   const UNLOCK = "0x36b34e10295cCE69B652eEB5a8046041074515Da";
 
   // const DBNS2 = await deploy("DBNS", {
@@ -24,10 +36,10 @@ module.exports = async ({ deployments }) => {
   //   gasLimit: 4000000,
   // });
 
-  const DBNS_INSTANCE = await ethers.getContractFactory("DBNS");
-  const DBNS = await DBNS_INSTANCE.attach(
-    "0x0432C22A3f26B2EEe1F848f9201EB3B8f40B53cC"
-  );
+  // const DBNS_INSTANCE = await ethers.getContractFactory("DBNS");
+  // const DBNS = await DBNS_INSTANCE.attach(
+  //   "0x0432C22A3f26B2EEe1F848f9201EB3B8f40B53cC"
+  // );
   // let tx = await DBNS.hasActiveSubscription(
   //   "0x823a00bbae1550949eba18e73944a288175aed7406109cc9503a95d3f5cb5fe2",
   //   wallet.address
@@ -35,10 +47,10 @@ module.exports = async ({ deployments }) => {
 
   // console.log(tx);
 
-  let tx = await DBNS.transferDomain(wallet.address);
-  await tx.wait();
+  // let tx = await DBNS.transferDomain(wallet.address);
+  // await tx.wait();
 
-  console.log(tx);
+  // console.log(tx);
 
   //   function createSpaceInstance(
   //     bytes32 _node,

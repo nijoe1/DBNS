@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Flex, Input, Select } from "@chakra-ui/react";
+import { Container } from "@/components//ui/container";
 import Tree from "react-d3-tree";
 import { ethers } from "ethers";
 
@@ -211,12 +212,7 @@ const SpacesGraph = () => {
   );
 
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      className="mt-[3%]"
-    >
+    <Container>
       <Box
         p="4"
         borderWidth="3px"
@@ -224,12 +220,18 @@ const SpacesGraph = () => {
         borderRadius="lg"
         overflow="hidden"
         boxShadow="md"
-        width={["90%", "70%", "50%"]} // Adjust width for different screen sizes
         height="calc(100vh - 150px)" // Adjust height dynamically
         display="flex"
         alignItems="center"
+        className="mx-[3%] "
       >
-        <Flex direction="column" align="center" justify="center" width="100%">
+        <Flex
+          direction="column"
+          align="center"
+          justify="center"
+          height="100%"
+          width="100%"
+        >
           {/* Category dropdown */}
           <Select
             placeholder="All categories..."
@@ -274,7 +276,7 @@ const SpacesGraph = () => {
           )}
         </Flex>
       </Box>
-    </Flex>
+    </Container>
   );
 };
 

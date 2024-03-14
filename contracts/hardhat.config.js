@@ -2,6 +2,7 @@ require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-deploy");
 require("hardhat-deploy-ethers");
 require("dotenv").config();
+require("@unlock-protocol/hardhat-plugin");
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -16,8 +17,8 @@ module.exports = {
       viaIR: true,
     },
   },
-  defaultNetwork: "sepolia",
-  // defaultNetwork: "goerli",
+  // defaultNetwork: "sepolia",
+  defaultNetwork: "calibration",
 
   networks: {
     sepolia: {
@@ -25,14 +26,10 @@ module.exports = {
       url: "https://ethereum-sepolia.blockpi.network/v1/rpc/public	",
       accounts: [PRIVATE_KEY],
     },
-    goerli: {
-      chainId: 5,
-      url: `https://rpc.ankr.com/eth_goerli`,
-      accounts: [PRIVATE_KEY],
-    },
-    mumbai: {
-      chainId: 80001,
-      url: "https://rpc.ankr.com/polygon_mumbai",
+    calibration: {
+      url: "https://rpc.ankr.com/filecoin_testnet",
+
+      // url: "https://filecoin-calibration.chainup.net/rpc/v1	",
       accounts: [PRIVATE_KEY],
     },
     "local-tableland": {

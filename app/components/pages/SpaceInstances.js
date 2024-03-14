@@ -9,6 +9,7 @@ import {
   Grid,
   GridItem,
 } from "@chakra-ui/react";
+import { Container } from "@/components//ui/container";
 
 // Sample data for database instances
 const instancesData = [
@@ -43,44 +44,54 @@ const SingleSpacePage = () => {
   const navigateToHashRoute = (hashRoute) => {
     window.location.hash = hashRoute;
   };
+
   return (
-    <Flex justify="center" align="center" mt="4">
-      <Grid templateColumns={["1fr", "1fr", "1fr", "1fr"]} gap={6}>
-        {instancesData.map((instance) => (
-          <GridItem key={instance.id}>
-            <Box
-              p="4"
-              borderWidth="1px"
-              borderRadius="lg"
-              overflow="hidden"
-              boxShadow="md"
-              width="100%" // Adjust width for different screen sizes
-              height="100%" // Adjust height for different screen sizes
-            >
-              <Image src={instance.imageUrl} alt={instance.name} />
-              <Badge colorScheme="green" mt="2">
-                Open
-              </Badge>
-              <Text fontWeight="semibold" mt="2">
-                {instance.name}
-              </Text>
-              <Text mt="2">{instance.about}</Text>
-              <Button
-                colorScheme="blue"
-                mt="2"
-                size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigateToHashRoute("/instance");
-                }}
+    <Container>
+      <Flex justify="center" align="center" mt="4">
+        <Grid
+          templateColumns={["1fr", "1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr 1fr"]}
+          gap={6}
+          width="100%"
+          className="flex md:justify-between lg:grid lg:px-3 relative"
+        >
+          {instancesData.map((instance) => (
+            <GridItem key={instance.id}>
+              <Box
+                p="4"
+                borderWidth="1px"
+                borderRadius="lg"
+                overflow="hidden"
+                boxShadow="md"
+                bg="#333333"
+                className="flex flex-col items-center"
               >
-                Go to Instance
-              </Button>
-            </Box>
-          </GridItem>
-        ))}
-      </Grid>
-    </Flex>
+                <Image src={instance.imageUrl} alt={instance.name} />
+                <Badge colorScheme="green" mt="2">
+                  Open
+                </Badge>
+                <Text fontWeight="semibold" mt="2" color="white">
+                  {instance.name}
+                </Text>
+                <Text mt="2" color="white">
+                  {instance.about}
+                </Text>
+                <Button
+                  className="bg-white text-black border border-black"
+                  mt="2"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateToHashRoute("/instance");
+                  }}
+                >
+                  Go to Instance
+                </Button>
+              </Box>
+            </GridItem>
+          ))}
+        </Grid>
+      </Flex>
+    </Container>
   );
 };
 

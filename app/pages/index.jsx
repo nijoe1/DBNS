@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import InstanceDetailsPage from "@/components/pages/instance";
 import SingleSpacePage from "@/components/pages/SpaceInstances";
 import LandingPage from "@/components/pages/LandingPage";
-import MergerPage from "@/components/pages/MergerPage";
+import ProfilePage from "@/components/pages/ProfilePage";
 import SpacesGraph from "@/components/pages/SpacesGraph";
 import { useRouter } from "next/router";
 
@@ -14,16 +14,31 @@ const Home = () => {
 
   useEffect(() => {
     // Check if there's a route stored in local storage
-    const storedRoute = localStorage.getItem("route");
+    let storedRoute = window.location.pathname
+    console.log(storedRoute)
+    try{
+      storedRoute = localStorage.getItem("route");
+    }catch(e){}
+    let storedHashRoute =window.location.hash
+    try{
+        storedHashRoute = localStorage.getItem("hashRoute");
+
+    }catch(e){}
+
+
     if (storedRoute) {
-      window.location.hash = storedRoute;
+      setRoute(storedRoute);
+    }
+
+    if (storedHashRoute) {
+      setHashRoute(storedHashRoute);
     }
 
     // Handle hash change
     const handleHashChange = () => {
-      setHashRoute(window.location.hash);
-      localStorage.setItem("route", window.location.hash);
-      setRoute(window.location);
+      const newHashRoute = window.location.hash;
+      setHashRoute(newHashRoute);
+      localStorage.setItem("hashRoute", newHashRoute);
     };
 
     window.addEventListener("hashchange", handleHashChange);
@@ -32,8 +47,9 @@ const Home = () => {
     if (window.location.hash !== "") {
       setHashRoute(window.location.hash);
     }
-    if (window.location == "") {
-      setRoute(window.location);
+
+    if (window.location.pathname !== "") {
+      setRoute(window.location.pathname);
     }
 
     // Set loading to false after initial setup
@@ -42,7 +58,7 @@ const Home = () => {
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
     };
-  }, [router]);
+  }, []);
 
   if (loading) {
     return null; // Render nothing while loading
@@ -51,9 +67,8 @@ const Home = () => {
   return (
     <div>
       {hashRoute.toLowerCase() === "#/spaces" && <SpacesGraph />}
-      {hashRoute === "#/MergerPage" && <MergerPage />}
-      {(route === "/" || hashRoute === "#/") && <LandingPage />}
-      {hashRoute === "#/SpacesGraph" && <SpacesGraph />}
+      {hashRoute === "#/profile" && <ProfilePage />}
+      {(route === "/" && hashRoute === "#/") && <LandingPage />}
       {hashRoute.includes("#/SingleSpacePage") && <SingleSpacePage />}
       {hashRoute === "#/instance" && <InstanceDetailsPage />}
     </div>

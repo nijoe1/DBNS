@@ -4,6 +4,7 @@ import { BsFileText } from "react-icons/bs";
 import { FaDownload } from "react-icons/fa";
 import { RiImageAddFill, RiSendPlane2Fill } from "react-icons/ri";
 import makeBlockie from "ethereum-blockies-base64";
+import { MdAttachFile } from "react-icons/md";
 
 const ChatComponent = ({ pushSign, address }) => {
   const [messages, setMessages] = useState([]);
@@ -53,6 +54,13 @@ const ChatComponent = ({ pushSign, address }) => {
           type: messageType,
           content: base64File,
         });
+        const sendNotifRes = await pushSign.channel.send(["*"], {
+          notification: { title: "test", body: "test" },
+          advanced: {
+            chatid:
+              "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da",
+          },
+        });
         setMessages([...messages, sentMessage]);
         setFile(null);
         setFileType("");
@@ -97,6 +105,7 @@ const ChatComponent = ({ pushSign, address }) => {
       p="4"
       borderRadius="md"
       boxShadow="md"
+      bg="#333333"
     >
       {messages.map((message, index) => (
         <Flex
@@ -113,11 +122,11 @@ const ChatComponent = ({ pushSign, address }) => {
             boxSize="30px"
             overflow="hidden"
             mr={2}
-            bg="gray.200"
+            bg="#333333"
           >
             <Image src={makeBlockie(address)} alt="Sender Avatar" />
           </Box>
-          <Box borderWidth="1px" borderColor="gray.700" p={2} rounded="md">
+          <Box borderWidth="1px" borderColor="black" p={2} rounded="md">
             {message.messageType === "Image" ? (
               <Box>
                 <Image
@@ -126,7 +135,7 @@ const ChatComponent = ({ pushSign, address }) => {
                   boxSize="100px"
                   borderRadius="md"
                 />
-                <Text fontSize="sm" color="gray.500" mt={1}>
+                <Text fontSize="sm" color="white" mt={1}>
                   {new Date(message.timestamp).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -143,13 +152,13 @@ const ChatComponent = ({ pushSign, address }) => {
                   leftIcon={<BsFileText />}
                   variant="link"
                   fontWeight="bold"
-                  color="blue.500"
+                  color="white"
                   download
                 >
                   <FaDownload />
                   Download {fileType}
                 </Button>
-                <Text fontSize="sm" color="gray.500" ml={2}>
+                <Text fontSize="sm" color="white" ml={2}>
                   {new Date(message.timestamp).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -158,8 +167,10 @@ const ChatComponent = ({ pushSign, address }) => {
               </Flex>
             ) : (
               <Box>
-                <Text>{message.messageObj.content}</Text>
-                <Text fontSize="sm" color="gray.500" mt={1}>
+                <Text fontSize="sm" color="white">
+                  {message.messageObj.content}
+                </Text>
+                <Text fontSize="sm" color="white" mt={1}>
                   {new Date(message.timestamp).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -170,16 +181,20 @@ const ChatComponent = ({ pushSign, address }) => {
           </Box>
         </Flex>
       ))}
-      <Flex mt={4}>
+      <Flex mt={4} className="flex items-center mx-auto">
         <Input
           value={newMessage}
+          className="text-white"
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
           mr={2}
+          _focus={{
+            borderColor: "white",
+          }}
         />
         <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-          <RiImageAddFill size={28} />
+          <MdAttachFile className="mr-2 mt-1" color="white" size={28} />
           <input
             type="file"
             id="file-upload"
@@ -189,8 +204,8 @@ const ChatComponent = ({ pushSign, address }) => {
         </label>
         <Button
           onClick={sendMessage}
-          colorScheme="blue"
-          leftIcon={<RiSendPlane2Fill />}
+          bg="#edf2f7"
+          leftIcon={<RiSendPlane2Fill className="mx-[1%]" />}
         >
           Send
         </Button>

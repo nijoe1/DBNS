@@ -12,7 +12,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 abstract contract Tableland {
     ITablelandTables public immutable TABLELAND;
 
-    string[] createTableStatements;
+    string[] internal createTableStatements;
 
     string[] public tables;
 
@@ -27,13 +27,23 @@ abstract contract Tableland {
         "db_spaces_instances";
 
     string internal constant DBSPACES_INSTANCES_SCHEMA =
-        "InstanceID text, instanceOfSpace text, instanceType text, metadataCID text, chatID text, IPNS text, hatID text, price text, lock text, creator text";
+        "InstanceID text, instanceOfSpace text, instanceType text, metadataCID text, chatID text, IPNS text, gatedContract text, price text, lock text, creator text";
 
     string internal constant DB_INSTANCES_CODES_TABLE_PREFIX =
         "instances_codes";
 
     string internal constant DB_INSTANCES_CODES_SCHEMA =
         "InstanceID text, codeID text, name text, about text, chatID text, codeIPNS text, creator text";
+
+    string internal constant SUBSCRIPTIONS_TABLE_PREFIX = "subscriptions";
+
+    string internal constant SUBSCRIPTIONS_SCHEMA =
+        "InstanceID text, subscriber text, endsAt text";
+
+    string internal constant DB_INSTANCES_MEMBERS_TABLE_PREFIX = "members";
+
+    string internal constant DB_INSTANCES_MEMBERS_SCHEMA =
+        "InstanceID text, member text";
 
     constructor() {
         TABLELAND = TablelandDeployments.get();
@@ -58,6 +68,20 @@ abstract contract Tableland {
             )
         );
 
+        createTableStatements.push(
+            SQLHelpers.toCreateFromSchema(
+                SUBSCRIPTIONS_SCHEMA,
+                SUBSCRIPTIONS_TABLE_PREFIX
+            )
+        );
+
+        createTableStatements.push(
+            SQLHelpers.toCreateFromSchema(
+                DB_INSTANCES_MEMBERS_SCHEMA,
+                DB_INSTANCES_MEMBERS_TABLE_PREFIX
+            )
+        );
+
         tableIDs = TABLELAND.create(address(this), createTableStatements);
 
         tables.push(
@@ -73,6 +97,17 @@ abstract contract Tableland {
             SQLHelpers.toNameFromId(
                 DB_INSTANCES_CODES_TABLE_PREFIX,
                 tableIDs[2]
+            )
+        );
+
+        tables.push(
+            SQLHelpers.toNameFromId(SUBSCRIPTIONS_TABLE_PREFIX, tableIDs[3])
+        );
+
+        tables.push(
+            SQLHelpers.toNameFromId(
+                DB_INSTANCES_MEMBERS_TABLE_PREFIX,
+                tableIDs[4]
             )
         );
     }
@@ -127,7 +162,7 @@ abstract contract Tableland {
         bytes32 _instanceID,
         uint8 _lockType,
         bytes32 _instanceOfSpace,
-        uint256 hatID,
+        address _gatedContract,
         uint256 price,
         string memory metadataCID,
         string memory chatID,
@@ -139,7 +174,7 @@ abstract contract Tableland {
             SQLHelpers.toInsert(
                 DBSPACES_INSTANCES_TABLE_PREFIX,
                 tableIDs[1],
-                "InstanceID, instanceOfSpace, instanceType, metadataCID, chatID, IPNS, hatID, price, lock, creator",
+                "InstanceID, instanceOfSpace, instanceType, metadataCID, chatID, IPNS, gatedContract, price, lock, creator",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(_instanceID)),
                     ",",
@@ -153,9 +188,9 @@ abstract contract Tableland {
                     ",",
                     SQLHelpers.quote(IPNS),
                     ",",
-                    Strings.toString(hatID),
+                    SQLHelpers.quote(Strings.toHexString(_gatedContract)),
                     ",",
-                    Strings.toString(price),
+                    SQLHelpers.quote(Strings.toString(price)),
                     ",",
                     SQLHelpers.quote(Strings.toHexString(_lock)),
                     ",",
@@ -207,6 +242,60 @@ abstract contract Tableland {
                 )
             )
         );
+    }
+
+    /*
+     * @dev Internal function to insert a new subscription.
+     * @param {bytes32} InstanceID - Instance ID.
+     * @param {address} subscriber - Subscriber address.
+     * @param {uint256} endsAt - Subscription end date.
+     */
+    function insertSubscription(
+        bytes32 InstanceID,
+        address subscriber,
+        uint256 endsAt
+    ) internal {
+        mutate(
+            tableIDs[3],
+            SQLHelpers.toInsert(
+                SUBSCRIPTIONS_TABLE_PREFIX,
+                tableIDs[3],
+                "InstanceID, subscriber, endsAt",
+                string.concat(
+                    SQLHelpers.quote(bytes32ToString(InstanceID)),
+                    ",",
+                    SQLHelpers.quote(Strings.toHexString(subscriber)),
+                    ",",
+                    SQLHelpers.quote(Strings.toString(endsAt))
+                )
+            )
+        );
+    }
+
+    /*
+     * @dev Internal function to insert the members.
+     * @param {bytes32} InstanceID - Instance ID.
+     * @param {address[]} members - Members address array.
+     */
+    function insertMembers(bytes32 InstanceID, address[] memory members)
+        internal    
+    {
+        string memory id = bytes32ToString(InstanceID);
+        for (uint256 i = 0; i < members.length; i++) {
+            mutate(
+                tableIDs[4],
+                SQLHelpers.toInsert(
+                    DB_INSTANCES_MEMBERS_TABLE_PREFIX,
+                    tableIDs[4],
+                    "InstanceID, member",
+                    string.concat(
+                        SQLHelpers.quote(id),
+                        ",",
+                        SQLHelpers.quote(Strings.toHexString(members[i]))
+                    )
+                )
+            );
+        }
     }
 
     /*

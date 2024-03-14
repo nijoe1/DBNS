@@ -14,19 +14,28 @@ import {Core} from "./libraries/Core.sol";
  */
 contract DBNS is Core {
     constructor(
-        address _nameWrapper,
+        address _registry,
+        address _registrar,
         address _publicResolver,
         address _unlockContract,
-        address _hats
-    ) Core(_nameWrapper, _publicResolver, _unlockContract, _hats) {}
+        address _gateImplementation
+    )
+        Core(
+            _registry,
+            _registrar,
+            _publicResolver,
+            _unlockContract,
+            _gateImplementation
+        )
+    {}
 
     /**
      * @dev Create a new space under the given node
      * @param _name The name of the new space
      */
     function createDBSpace(
-        string memory _name,
-        string memory _subspace
+        string calldata _name,
+        string calldata _subspace
     ) external {
         bytes32 _newDBSpace = createSubNode(DBNS_NODE, _name);
 
@@ -42,8 +51,8 @@ contract DBNS is Core {
      */
     function createDBSubSpace(
         bytes32 _DBSpace,
-        string memory _name,
-        string memory _subspace
+        string calldata _name,
+        string calldata _subspace
     ) external {
         require(
             isType[_DBSpace] == Types.SUBNODE,
@@ -60,33 +69,46 @@ contract DBNS is Core {
     /**
      * @dev Create a new instance under the given node
      * @param _node The parent node
-     * @param _hatID The hatID of the new instance
+     * @param _members The hatID of the new instance
      * @param _metadataCID The name of the new instance
      * @param _chatID The chatID of the new instance
      * @param _IPNS The IPNS of the new instance
      */
     function createSpaceInstance(
         bytes32 _node,
-        uint256 _hatID,
         uint256 _price,
-        string memory _metadataCID,
-        string memory _chatID,
-        string memory _IPNS
+        address[] calldata _members,
+        string calldata _metadataCID,
+        string calldata _chatID,
+        string calldata _IPNS
     ) external {
         require(isType[_node] == Types.SUBNODE, "DBNS: Node is not a subnode");
 
         bytes32 _newDBInstance = keccak256(abi.encodePacked(_node, _IPNS));
+        address _gatedContract;
+        if (_members.length > 0) {
+            _gatedContract = createGatedContract(_members);
+            insertMembers(_newDBInstance, _members);
+        }
 
-        instances[_newDBInstance] = SpaceInstance(_hatID, _price, msg.sender);
+        instances[_newDBInstance] = SpaceInstance(
+            _gatedContract,
+            _price,
+            msg.sender
+        );
 
-        address _lock = createInstanceType(_newDBInstance, _hatID, _price);
+        address _lock = createInstanceType(
+            _newDBInstance,
+            _gatedContract,
+            _price
+        );
 
         instanceInsertion(
             _lock,
             _newDBInstance,
             uint8(isType[_newDBInstance]),
             _node,
-            _hatID,
+            _gatedContract,
             _price,
             _metadataCID,
             _chatID,
@@ -105,10 +127,10 @@ contract DBNS is Core {
      */
     function createInstanceCode(
         bytes32 _instance,
-        string memory _name,
-        string memory _about,
-        string memory _chatID,
-        string memory _codeIPNS
+        string calldata _name,
+        string calldata _about,
+        string calldata _chatID,
+        string calldata _codeIPNS
     ) external {
         if (!hasMutateAccess(_instance, msg.sender)) {
             revert NoInstanceAccess();
@@ -132,10 +154,15 @@ contract DBNS is Core {
         );
     }
 
+    function purchaseInstanceSubscription(bytes32 _instanceID) external payable {
+        purchaseSubscription(_instanceID);
+        insertSubscription(_instanceID, msg.sender, block.timestamp + MONTH);
+    }
+
     function updateCode(
         bytes32 _codeID,
-        string memory _name,
-        string memory _about
+        string calldata _name,
+        string calldata _about
     ) external {
         if (codeOwner[_codeID] != msg.sender) {
             revert NoCodeOwner();
@@ -155,11 +182,11 @@ contract DBNS is Core {
         bytes32 _instance,
         uint256 _hatID,
         uint256 _price,
-        string memory _name,
-        string memory _about,
-        string memory _img,
-        string memory _chatID,
-        string memory _IPNS
+        string calldata _name,
+        string calldata _about,
+        string calldata _img,
+        string calldata _chatID,
+        string calldata _IPNS
     ) external {
         if (instances[_instance].creator != msg.sender) {
             revert NoInstanceAccess();

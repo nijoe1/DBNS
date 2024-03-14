@@ -75,7 +75,7 @@ abstract contract Unlock is Ownable {
      * @dev PurchaseSubscription function for an agentID
      * @param _instanceID to subscribe
      */
-    function purchaseSubscription(bytes32 _instanceID) external payable {
+    function purchaseSubscription(bytes32 _instanceID) internal {
         address[] memory _referrers = new address[](1);
         address[] memory _recipients = new address[](1);
         address[] memory _keyManagers = new address[](1);

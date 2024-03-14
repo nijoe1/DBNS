@@ -27,74 +27,74 @@ export default function usePush() {
 
       dispatch(setPushSign(user as any));
 
-      const stream = await user.initStream(
-        [
-          CONSTANTS.STREAM.CHAT,
-          CONSTANTS.STREAM.CHAT_OPS,
-          CONSTANTS.STREAM.NOTIF,
-          CONSTANTS.STREAM.CONNECT,
-          CONSTANTS.STREAM.DISCONNECT,
-        ],
-        {},
-      );
+        const stream = await user.initStream(
+          [
+            CONSTANTS.STREAM.CHAT,
+            CONSTANTS.STREAM.CHAT_OPS,
+            CONSTANTS.STREAM.NOTIF,
+            CONSTANTS.STREAM.CONNECT,
+            CONSTANTS.STREAM.DISCONNECT,
+          ],
+          {},
+        );
 
-      stream.on(CONSTANTS.STREAM.CONNECT, () => {
-        console.log("CONNECTED");
-      });
+        stream.on(CONSTANTS.STREAM.CONNECT, () => {
+          console.log("CONNECTED");
+        });
 
-      stream.on(CONSTANTS.STREAM.CHAT, async (data: any) => {
-        data.event.includes("message")
-          ? dispatch(
-              updateMessages({
-                fromDID: data.from,
-                timestamp: data.timestamp,
-                messageContent: data.message.content,
-                messageType: data.message.type,
-              }),
-            )
-          : data.event.includes("request")
-            ? user.chat.list("REQUESTS").then((requests: any) => {
-                const filterRecentRequest = requests.map((request: any) => ({
-                  profilePicture: request.profilePicture,
-                  did: request.did,
-                  msg: request.msg.messageContent,
-                  name: request.name,
-                  about: request.about,
-                }));
-
-                dispatch(setRecentRequest(filterRecentRequest));
-              })
-            : data.event.includes("accept")
-              ? user.chat.list("CHATS").then((chats: any) => {
-                  const filterRecentContact = chats.map((chat: any) => ({
-                    profilePicture: chat.profilePicture,
-                    did: chat.did,
-                    name: chat.name,
-                    about: chat.about,
-                    chatId: chat.chatId,
-                    msg: {
-                      content: chat.msg.messageContent,
-                      timestamp: chat.msg.timestamp,
-                      fromDID: chat.msg.fromDID,
-                    },
+        stream.on(CONSTANTS.STREAM.CHAT, async (data: any) => {
+          data.event.includes("message")
+            ? dispatch(
+                updateMessages({
+                  fromDID: data.from,
+                  timestamp: data.timestamp,
+                  messageContent: data.message.content,
+                  messageType: data.message.type,
+                }),
+              )
+            : data.event.includes("request")
+              ? user.chat.list("REQUESTS").then((requests: any) => {
+                  const filterRecentRequest = requests.map((request: any) => ({
+                    profilePicture: request.profilePicture,
+                    did: request.did,
+                    msg: request.msg.messageContent,
+                    name: request.name,
+                    about: request.about,
                   }));
 
-                  dispatch(setRecentContact(filterRecentContact));
+                  dispatch(setRecentRequest(filterRecentRequest));
                 })
-              : toast.error("Request Rejected");
-      });
+              : data.event.includes("accept")
+                ? user.chat.list("CHATS").then((chats: any) => {
+                    const filterRecentContact = chats.map((chat: any) => ({
+                      profilePicture: chat.profilePicture,
+                      did: chat.did,
+                      name: chat.name,
+                      about: chat.about,
+                      chatId: chat.chatId,
+                      msg: {
+                        content: chat.msg.messageContent,
+                        timestamp: chat.msg.timestamp,
+                        fromDID: chat.msg.fromDID,
+                      },
+                    }));
 
-      stream.on(CONSTANTS.STREAM.CHAT_OPS, (data: any) => {
-        console.log("CHAT_OPS", data);
-      });
+                    dispatch(setRecentContact(filterRecentContact));
+                  })
+                : toast.error("Request Rejected");
+        });
 
-      stream.on(CONSTANTS.STREAM.NOTIF, (data: any) => {
-        console.log("NOTIF", data);
-      });
+        stream.on(CONSTANTS.STREAM.CHAT_OPS, (data: any) => {
+          console.log("CHAT_OPS", data);
+        });
 
-      await stream.connect();
+        stream.on(CONSTANTS.STREAM.NOTIF, (data: any) => {
+          console.log("NOTIF", data);
+        });
 
-      stream.on(CONSTANTS.STREAM.DISCONNECT, () => {});
+        await stream.connect();
+
+        stream.on(CONSTANTS.STREAM.DISCONNECT, () => {});
 
       return user;
     } catch (error) {

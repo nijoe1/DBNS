@@ -51,11 +51,11 @@ export function Benefits(): JSX.Element {
                   width="38   "
                   height="38   "
                   viewBox="0 0 24 24"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                   stroke="#2c3e50"
                   fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M8 12h-6" />
@@ -87,11 +87,11 @@ export function Benefits(): JSX.Element {
                   width="38 "
                   height="38 "
                   viewBox="0 0 24 24"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                   stroke="#2c3e50"
                   fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M3 12a9 9 0 0 0 9 9a9 9 0 0 0 9 -9a9 9 0 0 0 -9 -9" />
@@ -122,11 +122,11 @@ export function Benefits(): JSX.Element {
                   width="38  "
                   height="38  "
                   viewBox="0 0 24 24"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                   stroke="#2c3e50"
                   fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
@@ -156,11 +156,11 @@ export function Benefits(): JSX.Element {
                   width="38"
                   height="38"
                   viewBox="0 0 24 24"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                   stroke="#2c3e50"
                   fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />

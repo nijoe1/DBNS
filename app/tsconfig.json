@@ -27,7 +27,8 @@
     "utils/merge.js",
     "pages/index.jsx",
     "components/layout/navbar.js",
-    "pages/CsvViewer.js"
+    "pages/CsvViewer.js",
+    "components/pages/instance.js"
   ],
   "exclude": ["node_modules"]
 }

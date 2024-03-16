@@ -25,14 +25,14 @@ contract GatedInstance is ERC721, Initializable {
         require(msg.sender == admin, "Only admin can mint");
         for (uint256 i = 0; i < newMembers.length; i++) {
             _tokenIds.increment();
-            _mint(newMembers[i], _tokenIds.current());
+            _mint(newMembers[i], uint256(keccak256(abi.encode(newMembers[i]))));
         }
     }
 
-    function burn(uint256[] memory _tokens) public {
+    function burn(address[] memory _members) public {
         require(msg.sender == admin, "Only admin can burn");
-        for (uint256 i = 0; i < _tokens.length; i++) {
-            _burn(_tokens[i]);
+        for (uint256 i = 0; i < _members.length; i++) {
+            _burn(uint256(keccak256(abi.encode(_members[i]))));
         }
     }
 

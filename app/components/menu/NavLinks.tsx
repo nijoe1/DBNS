@@ -3,19 +3,29 @@ import { Dispatch, SetStateAction } from "react";
 import { RxCrossCircled } from "react-icons/rx";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+
+import { useRouter } from "next/router";
+
 export type link = {
   text: string;
   href: string;
 };
 import { Button } from "@chakra-ui/react";
 function NavLink({ text, href }: link): JSX.Element {
+  const router = useRouter();
   const navigateToHashRoute = (hashRoute: any) => {
     if (hashRoute == "/") {
-      window.location.hash = "/";
+      router.push({
+        pathname: hashRoute,
+      });
     } else {
-      window.location.hash = hashRoute;
+      router.push({
+        pathname: "",
+        hash: hashRoute,
+      });
     }
   };
+  console.log("href", router);
 
   return (
     <Button
@@ -41,12 +51,17 @@ function ResponsiveNavLink({
   href,
   setIsSidebarOpen,
 }: ResponsiveNavLinkProps): JSX.Element {
+  const router = useRouter();
   const navigateToHashRoute = (hashRoute: any) => {
-    if (hashRoute === "/") {
-      window.location.hash = "/";
-    } else {
-      window.location.hash = hashRoute;
-    }
+    // if (hashRoute === "/") {
+    //   window.location.hash = "/";
+    // } else {
+    //   window.location.hash = hashRoute;
+    // }
+    router.push({
+      pathname: "",
+      hash: hashRoute,
+    });
   };
   return (
     <div

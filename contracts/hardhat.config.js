@@ -17,8 +17,8 @@ module.exports = {
       viaIR: true,
     },
   },
-  // defaultNetwork: "sepolia",
-  defaultNetwork: "calibration",
+  defaultNetwork: "sepolia",
+  // defaultNetwork: "calibration",
 
   networks: {
     sepolia: {

@@ -108,9 +108,9 @@ abstract contract Unlock is Ownable {
     }
 
     function extendSubscription(
-        uint256 _tokenId,
         bytes32 _instanceID
-    ) external payable {
+    ) internal returns (uint256 _tokenId) {
+        _tokenId = instanceSubscriptions[_instanceID][msg.sender];
         bytes memory _data;
 
         address _referrer = address(this);
@@ -135,6 +135,17 @@ abstract contract Unlock is Ownable {
             IPublicLockV12(instanceLock[_instanceID].lockAddress).balanceOf(
                 _subscriber
             ) > 0;
+    }
+
+    function getRemainingSubscriptionTime(
+        bytes32 _instanceID,
+        address _subscriber
+    ) public view returns (uint256) {
+        uint256 _tokenID = instanceSubscriptions[_instanceID][_subscriber];
+
+        return
+            IPublicLockV12(instanceLock[_instanceID].lockAddress)
+                .keyExpirationTimestampFor(_tokenID);
     }
 
     function getTime() public view returns (uint256) {

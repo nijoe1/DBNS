@@ -6,13 +6,12 @@ import Footer from "@/components/menu/Footer";
 import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, http } from "wagmi";
-import { getDefaultConfig, lightTheme } from "@rainbow-me/rainbowkit";
 import { sepolia, filecoinCalibration } from "wagmi/chains";
 import ReduxProvider from "@/providers/ReduxProvider";
 import {
   darkTheme,
-  getDefaultWallets,
   RainbowKitProvider,
+  getDefaultConfig,
 } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/router";
 
@@ -21,15 +20,15 @@ const filecoin = {
 
   iconUrl:
     "https://gateway.lighthouse.storage/ipfs/QmXQMtADMsCqsYEvyuEA3PkFq2xtWAQetQFtkybjEXvk3Z",
-}
+};
 
 const config = getDefaultConfig({
   appName: "RainbowKit demo",
   projectId: "ad9d4173328447d73a95b113fec565eb",
-  chains: [filecoin,sepolia],
+  chains: [filecoin, sepolia],
   transports: {
     [sepolia.id]: http(),
-    [filecoinCalibration.id]:http(),
+    [filecoinCalibration.id]: http(),
   },
 });
 
@@ -40,7 +39,7 @@ const id = "";
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   return (
-    <ChakraProvider >
+    <ChakraProvider>
       <WagmiProvider config={config}>
         <ReduxProvider>
           <QueryClientProvider client={queryClient}>

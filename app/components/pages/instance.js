@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 
 import CsvViewer from "../ui/CsvViewer"; // Import CsvViewer component
-import CodeViewer from "../ui/CodeViewer"; // Import CodeViewer component
+import InstanceCodes from "../ui/InstanceCodes"; // Import CodeViewer component
 import { useAccount } from "wagmi";
 import ChatComponent from "@/components/ui/ChatComponent";
 import { useSelector } from "react-redux";
@@ -73,34 +73,26 @@ const InstanceDetailsPage = () => {
         >
           <TabList mb="4">
             <Tab>Dataset</Tab>
-            <Tab>Chat</Tab>
-            <Tab>Codes</Tab>
+            <Tab>Discussion</Tab>
+            <Tab>Code (2)</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
               {/* Dataset Tab */}
+              <Box mt="4">
+                <button>Download Dataset</button>
+              </Box>
               <Box minHeight="200px" overflow="auto">
                 <CsvViewer />
-                <Box mt="4">
-                  <button>Download Dataset</button>
-                </Box>
               </Box>
             </TabPanel>
             <TabPanel>
               {/* Chat Tab */}
-              <Box
-                minHeight="200px"
-                overflow="auto"
-                p="4"
-                bg="#424242"
-                borderRadius="md"
-                boxShadow="md"
-              >
-                <ChatComponent pushSign={pushSign} address={address} />
-              </Box>
+
+              <ChatComponent pushSign={pushSign} address={address} />
             </TabPanel>
             <TabPanel>
-              <CodeViewer />
+              <InstanceCodes />
             </TabPanel>
           </TabPanels>
         </Tabs>

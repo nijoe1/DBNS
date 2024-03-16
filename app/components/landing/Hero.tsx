@@ -1,14 +1,20 @@
 import { Button } from "@/components/ui/Button";
 import { ArrowRightIcon } from "@chakra-ui/icons";
 import HeroAnimation from "@/components/Animation/HeroAnimation";
+import { useRouter } from "next/router";
 
 export function Hero(): JSX.Element {
+  const router = useRouter();
   const navigateToHashRoute = (hashRoute: any) => {
-    if (hashRoute == "/") {
-      window.location.hash = "/";
-    } else {
-      window.location.hash = hashRoute;
-    }
+    // if (hashRoute == "/") {
+    //   window.location.hash = "/";
+    // } else {
+    //   window.location.hash = hashRoute;
+    // }
+    router.push({
+      pathname: "",
+      hash: hashRoute,
+    });
   };
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
@@ -56,11 +62,18 @@ export function Hero(): JSX.Element {
         </div>
         <div className="bg-black/80 rounded-lg">
           <div className="mt-20 px-4 pb-4 mx-auto md:px-8 md:motion-safe:animate-sponsors flex flex-col items-center w-3/4">
-            <p className="text-center text-lg my-5 text-black bg-white p-3 border-gray rounded-lg font-bold">
+            <p className="text-center text-lg my-5 text-black bg-white p-2 border-gray rounded-lg font-bold">
               Powered By
             </p>
             <div className="w-full">
               <ul className="flex items-center flex-wrap justify-center lg:justify-between gap-4">
+                <li>
+                  <img
+                    src="/images/filecoin.png"
+                    alt="push"
+                    className="h-[65px]  scale-90"
+                  />
+                </li>
                 <li>
                   <img
                     src="/images/lighthouse-storage.png"
@@ -75,7 +88,7 @@ export function Hero(): JSX.Element {
                     className="h-[90px]  scale-90"
                   />
                 </li>
-                
+
                 <li>
                   <img
                     src="/images/fleek.webp"
@@ -99,9 +112,9 @@ export function Hero(): JSX.Element {
                 </li>
                 <li>
                   <img
-                    src="/images/filecoin.png"
-                    alt="push"
-                    className="h-[65px]  scale-90"
+                    src="/images/unlock.png"
+                    alt="unlock"
+                    className="h-[60px] rounded-md  scale-90"
                   />
                 </li>
               </ul>

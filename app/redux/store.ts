@@ -4,12 +4,10 @@ import { configureStore, Store } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 import pushReducer from "./slice/pushSlice";
-import modalsReducer from "./slice/modalsSlice";
 
 export const store: Store = configureStore({
   reducer: {
     push: pushReducer,
-    modals: modalsReducer,
   },
   middleware: (getDefaultMiddleware: any) =>
     getDefaultMiddleware({

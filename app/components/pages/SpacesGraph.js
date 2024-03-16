@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Box, Flex, Input, Select } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Input,
+  Select,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Button,
+} from "@chakra-ui/react";
 import { Container } from "@/components//ui/container";
 import Tree from "react-d3-tree";
 import { ethers } from "ethers";
+import { useRouter } from "next/router";
 
 const parentName = "dbns.eth";
 
 const SpacesGraph = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [newNodeName, setNewNodeName] = useState("");
+
+  const router = useRouter();
   const [treeData, setTreeData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -17,10 +35,15 @@ const SpacesGraph = () => {
   const [categoryOptions, setCategoryOptions] = useState([]);
 
   const navigateToHashRoute = (hashRoute) => {
-    if (hashRoute === "/") {
-      window.location = "/";
+    if (hashRoute == "/") {
+      router.push({
+        pathname: hashRoute,
+      });
     } else {
-      window.location.hash = hashRoute;
+      router.push({
+        pathname: "",
+        hash: hashRoute,
+      });
     }
   };
 
@@ -46,6 +69,7 @@ const SpacesGraph = () => {
     // Generate tree data for the selected category or entire tree if no category is selected
     const initialTreeData = generateTreeData();
     setTreeData(initialTreeData);
+    let node = getTokenNode("fsdfsdfsdfdf", "eth");
   }, []);
 
   useEffect(() => {
@@ -103,7 +127,7 @@ const SpacesGraph = () => {
                   attributes: { nodeType: "leaf" },
                 },
                 {
-                  name: "DL.AI.Technology.DBNS.eth",
+                  name: "DeepLearning.AI.Technology.DBNS.eth",
                   id: getTokenNode("DL", "DL.AI.Technology.DBNS.eth"),
                   attributes: { nodeType: "leaf" },
                 },
@@ -113,6 +137,18 @@ const SpacesGraph = () => {
               name: "P2P.Technology.DBNS.eth",
               id: getTokenNode("P2P", "Technology.DBNS.eth"),
               attributes: { nodeType: "leaf" },
+              children: [
+                {
+                  name: "ML.AI.Technology.DBNS.eth",
+                  id: getTokenNode("ML", "ML.AI.Technology.DBNS.eth"),
+                  attributes: { nodeType: "leaf" },
+                },
+                {
+                  name: "DeepLearning.AI.Technology.DBNS.eth",
+                  id: getTokenNode("DL", "DL.AI.Technology.DBNS.eth"),
+                  attributes: { nodeType: "leaf" },
+                },
+              ],
             },
           ],
         },
@@ -143,12 +179,24 @@ const SpacesGraph = () => {
     const parentNode = ethers.utils.namehash(_parentNode);
     let subNodeBytes = stringToBytes(characterName);
     const LabelHash = ethers.utils.keccak256(subNodeBytes);
+    console.log(
+      " Node:",
+      ethers.utils.keccak256(
+        abi.encode(
+          ["bytes32", "bytes32"],
+          [
+            ethers.utils.namehash("eth"),
+            ethers.utils.keccak256(stringToBytes("dscdsc")),
+          ],
+        ),
+      ),
+    );
+
     let newSubNodeBytes = abi.encode(
       ["bytes32", "bytes32"],
       [parentNode, LabelHash],
     );
     const newSubNode = ethers.utils.keccak256(newSubNodeBytes);
-    console.log(characterName, _parentNode, " Node:", newSubNode);
     return newSubNode;
   };
 
@@ -179,8 +227,6 @@ const SpacesGraph = () => {
 
   // Handle click event on the label to navigate to the spaces page
   const handleLabelClick = (name) => {
-    console.log(name);
-    console.log(`Navigating to space: ${name.name}`);
     // Implement navigation logic here, for example:
     navigateToHashRoute(`/SingleSpacePage?id=${name.id}`);
   };
@@ -188,6 +234,18 @@ const SpacesGraph = () => {
   // Handle click event on the circle to toggle nodes
   const handleCircleClick = (nodeDatum, toggleNode) => {
     toggleNode();
+  };
+
+  const handleNewClick = (nodeDatum, toggleNode) => {
+    onOpen();
+  };
+
+  const handleCreate = () => {
+    // Validate newNodeName
+    // Add your validation logic here to ensure it's not equal to any existing children node names
+
+    // Close the modal after creating the new subnode
+    onClose();
   };
 
   // Custom node and label rendering function
@@ -202,11 +260,35 @@ const SpacesGraph = () => {
         fill="black"
         strokeWidth="1"
         x="20"
-        y="4"
+        y="-2"
         onClick={() => handleLabelClick(nodeDatum)}
         style={{ cursor: "pointer" }}
       >
         {nodeDatum.name}
+      </text>
+      <rect
+        x="30"
+        y="4"
+        width="40"
+        height="20"
+        rx="5"
+        fill="gray"
+        stroke="black"
+        strokeWidth="1"
+        onClick={() => handleLabelClick(nodeDatum)}
+        style={{ cursor: "pointer" }}
+      />
+      <text
+        fill="black"
+        strokeWidth="1"
+        x="50"
+        y="15"
+        textAnchor="middle"
+        alignmentBaseline="middle"
+        onClick={() => handleNewClick(nodeDatum)}
+        style={{ cursor: "pointer" }}
+      >
+        {"new"}
       </text>
     </g>
   );
@@ -275,6 +357,27 @@ const SpacesGraph = () => {
             </Box>
           )}
         </Flex>
+        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+          <ModalOverlay />
+          <ModalContent bg="black" color="white" borderRadius="md">
+            <ModalHeader>Create New Subnode</ModalHeader>
+            <ModalBody>
+              <Input
+                placeholder="Enter subnode name"
+                value={newNodeName}
+                onChange={(e) => setNewNodeName(e.target.value)}
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} onClick={handleCreate}>
+                Create
+              </Button>
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     </Container>
   );

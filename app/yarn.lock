@@ -1601,7 +1601,7 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@lighthouse-web3/kavach@^0.1.4":
+"@lighthouse-web3/kavach@^0.1.4", "@lighthouse-web3/kavach@^0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@lighthouse-web3/kavach/-/kavach-0.1.5.tgz#77eed49d06493aa225f9040b155fa26a3d3c1bf6"
   integrity sha512-hJJTrU6dI3sicj/LOcoL/kn0MCI1Hwfwn5rlhJ/40uy+nlkwHUZvJCpICNUj6HoXCvKPVvSon1v5eIY9l/K6lA==

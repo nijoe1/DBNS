@@ -347,7 +347,7 @@ abstract contract Tableland {
      * @param {bytes32} InstanceID - Instance ID.
      * @param {address[]} members - Members address array.
      */
-    function insertMembers(
+    function _insertMembers(
         bytes32 InstanceID,
         address[] memory members
     ) internal {
@@ -369,7 +369,7 @@ abstract contract Tableland {
         }
     }
 
-    function removeMembers(
+    function _removeMembers(
         bytes32 InstanceID,
         address[] memory members
     ) internal {

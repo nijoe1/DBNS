@@ -1,12 +1,17 @@
 import { Button } from "@chakra-ui/react";
-
+import { useRouter } from "next/router";
 export default function NavbarLogo(): JSX.Element {
+  const router = useRouter();
   const navigateToHashRoute = (hashRoute: any) => {
-    if (hashRoute == "/") {
-      window.location.hash = "/";
-    } else {
-      window.location.hash = hashRoute;
-    }
+    // if (hashRoute == "/") {
+    //   window.location.hash = "/";
+    // } else {
+    //   window.location.hash = hashRoute;
+    // }
+    router.push({
+      pathname: "",
+      hash: hashRoute,
+    });
   };
   return (
     <Button onClick={() => navigateToHashRoute("/")}>

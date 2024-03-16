@@ -20,7 +20,7 @@ const ChatComponent = ({ pushSign, address }) => {
       const chatHistory = await pushSign.chat.history(recipient, {
         limit: "30",
       });
-      setMessages(chatHistory.reverse());
+      setMessages(chatHistory);
     } catch (error) {
       console.error("Error fetching chat history:", error);
     }
@@ -104,9 +104,39 @@ const ChatComponent = ({ pushSign, address }) => {
       overflowY="auto"
       p="4"
       borderRadius="md"
-      boxShadow="md"
+      boxShadow="lg"
       bg="#333333"
+      height="500px" // Set a fixed height for the chat container
     >
+      <Flex mt={4} mb={4} className="flex items-center mx-auto">
+        <Input
+          value={newMessage}
+          className="text-white"
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="Type your message..."
+          mr={2}
+          _focus={{
+            borderColor: "white",
+          }}
+        />
+        <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
+          <MdAttachFile className="mr-2 mt-1" color="white" size={28} />
+          <input
+            type="file"
+            id="file-upload"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+        </label>
+        <Button
+          onClick={sendMessage}
+          bg="#edf2f7"
+          leftIcon={<RiSendPlane2Fill className="mx-[1%]" />}
+        >
+          Send
+        </Button>
+      </Flex>
       {messages.map((message, index) => (
         <Flex
           key={index}
@@ -181,35 +211,6 @@ const ChatComponent = ({ pushSign, address }) => {
           </Box>
         </Flex>
       ))}
-      <Flex mt={4} className="flex items-center mx-auto">
-        <Input
-          value={newMessage}
-          className="text-white"
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
-          mr={2}
-          _focus={{
-            borderColor: "white",
-          }}
-        />
-        <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-          <MdAttachFile className="mr-2 mt-1" color="white" size={28} />
-          <input
-            type="file"
-            id="file-upload"
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
-        </label>
-        <Button
-          onClick={sendMessage}
-          bg="#edf2f7"
-          leftIcon={<RiSendPlane2Fill className="mx-[1%]" />}
-        >
-          Send
-        </Button>
-      </Flex>
     </Box>
   );
 };

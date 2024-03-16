@@ -68,7 +68,7 @@ const ProfilePage = () => {
   const fetchNotifications = async () => {
     try {
       const response = await pushSign.notification.list("INBOX");
-      console.log(response)
+      console.log(response);
       setNotifications(response);
     } catch (error) {
       console.error("Error fetching notifications:", error);

@@ -41,6 +41,8 @@ abstract contract Core is FNS, Gated, Tableland, Unlock {
 
     error NoCodeOwner();
 
+    error InstanceAlreadyExists();
+
     constructor(
         address _registry,
         address _registrar,
@@ -137,17 +139,19 @@ abstract contract Core is FNS, Gated, Tableland, Unlock {
         if (_gatedAddress != address(0)) {
             IGated(_gatedAddress).mint(_members);
         }
+        _insertMembers(_instance, _members);
     }
 
     function removeMembers(
         bytes32 _instance,
-        uint256[] memory _tokens
+        address[] memory _members
     ) external {
         address _gatedAddress = instances[_instance].gatedContract;
         address _owner = instances[_instance].creator;
         require(_owner == msg.sender, "No access");
         if (_gatedAddress != address(0)) {
-            IGated(_gatedAddress).burn(_tokens);
+            IGated(_gatedAddress).burn(_members);
         }
+        _removeMembers(_instance, _members);
     }
 }

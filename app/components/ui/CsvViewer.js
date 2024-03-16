@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -18,29 +18,37 @@ const UploadCsvPage = () => {
   const [csvData, setCsvData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  useEffect(() => {
+    fetchCsvData();
+  }, []);
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target.result;
-      console.log(text); // Log the CSV content to debug
+  const fetchCsvData = async () => {
+    try {
+      const response = await fetch(
+        "https://gateway.lighthouse.storage/ipfs/QmcucqWyBbpYBJQWxYGzoRddbVpVTupAahEzWso3FpehpQ",
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch CSV file");
+      }
+      const text = await response.text();
       const parsedData = customCsvParser(text);
       if (parsedData) {
         setCsvData(parsedData);
       } else {
-        toast({
-          title: "Error",
-          description: "Failed to parse CSV file",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+        throw new Error("Failed to parse CSV file");
       }
-    };
-    reader.readAsText(file);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   const customCsvParser = (csvString) => {
@@ -58,16 +66,37 @@ const UploadCsvPage = () => {
 
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = csvData.slice(indexOfFirstRow, indexOfLastRow);
+  let currentRows = csvData.slice(indexOfFirstRow, indexOfLastRow);
+
+  // Sorting
+  if (sortBy) {
+    currentRows.sort((a, b) => {
+      const valA = a[sortBy];
+      const valB = b[sortBy];
+      if (valA < valB) {
+        return sortOrder === "asc" ? -1 : 1;
+      }
+      if (valA > valB) {
+        return sortOrder === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+
+  const handleSort = (columnName) => {
+    if (sortBy === columnName) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(columnName);
+      setSortOrder("asc");
+    }
+  };
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="bg-400 mt-[6%] flex flex-col x-overflow justify-center mx-auto mb-[4%] ">
       <Box p={4} borderWidth="1px" borderRadius="lg">
-        <Center>
-          <input type="file" accept=".csv" onChange={handleFileUpload} />
-        </Center>
         {csvData.length > 0 && (
           <Box mt={4} overflowX="auto">
             <Table variant="unstyled" borderWidth="1px" borderRadius="lg">
@@ -76,9 +105,11 @@ const UploadCsvPage = () => {
                   {Object.keys(csvData[0]).map((header, index) => (
                     <Th
                       key={index}
-                      bg={index % 2 === 0 ? "blue.500" : "green.500"}
+                      bg="#424242"
                       color="white"
                       borderRadius="lg"
+                      onClick={() => handleSort(header)}
+                      cursor="pointer"
                     >
                       {header}
                     </Th>
@@ -87,13 +118,14 @@ const UploadCsvPage = () => {
               </Thead>
               <Tbody>
                 {currentRows.map((row, rowIndex) => (
-                  <Tr key={rowIndex}>
+                  <Tr key={rowIndex} bg="#edf2f7" border="#424242" p={2}>
                     {Object.values(row).map((cell, cellIndex) => (
                       <Td
                         key={cellIndex}
                         borderWidth="1px"
                         borderRadius="lg"
-                        borderColor="black"
+                        borderColor="#424242"
+                        color="#424242"
                       >
                         {cell}
                       </Td>

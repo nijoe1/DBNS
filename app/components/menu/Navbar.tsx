@@ -5,10 +5,12 @@ import NavLinks, { NavLinksResponsive } from "@/components/menu/NavLinks";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import StepperForm from "../StepperForm";
 import { useAccount, useChainId } from "wagmi";
+import { useRouter } from "next/router";
 
 // Import statements remain the same
 
 export default function Navbar(): JSX.Element {
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const { isConnected, address } = useAccount();
   const chainID = useChainId();

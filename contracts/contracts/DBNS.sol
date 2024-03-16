@@ -36,7 +36,7 @@ contract DBNS is Core {
     function createDBSpace(
         string calldata _name,
         string calldata _subspace
-    ) external {
+    ) public {
         bytes32 _newDBSpace = createSubNode(DBNS_NODE, _name);
 
         isType[_newDBSpace] = Types.SUBNODE;
@@ -85,6 +85,10 @@ contract DBNS is Core {
         require(isType[_node] == Types.SUBNODE, "DBNS: Node is not a subnode");
 
         bytes32 _newDBInstance = keccak256(abi.encodePacked(_node, _IPNS));
+
+        if (isType[_newDBInstance] != Types.NULL) {
+            revert InstanceAlreadyExists();
+        }
         address _gatedContract;
         if (_members.length > 0) {
             _gatedContract = createGatedContract(_members);
@@ -140,6 +144,9 @@ contract DBNS is Core {
             abi.encodePacked(_instance, _codeIPNS)
         );
 
+        if (isType[_newDBInstanceCode] != Types.NULL) {
+            revert InstanceAlreadyExists();
+        }
         codeOwner[_newDBInstanceCode] = msg.sender;
         isType[_newDBInstanceCode] = Types.CODE;
 
@@ -163,6 +170,20 @@ contract DBNS is Core {
             msg.sender,
             _tokenID,
             block.timestamp + MONTH
+        );
+    }
+
+    function extendInstanceSubscription(bytes32 _instanceID) external payable {
+        uint256 remaining = getRemainingSubscriptionTime(
+            _instanceID,
+            msg.sender
+        );
+        uint256 _tokenID = extendSubscription(_instanceID);
+        insertSubscription(
+            _instanceID,
+            msg.sender,
+            _tokenID,
+            remaining + MONTH
         );
     }
 

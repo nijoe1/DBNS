@@ -16,6 +16,7 @@
     "@chakra-ui/system": "^2.6.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@lighthouse-web3/kavach": "^0.1.5",
     "@lighthouse-web3/sdk": "^0.3.0",
     "@pushprotocol/restapi": "^1.6.10",
     "@rainbow-me/rainbowkit": "2",

@@ -10,6 +10,7 @@ import {
   GridItem,
 } from "@chakra-ui/react";
 import { Container } from "@/components//ui/container";
+import { useRouter } from "next/router";
 
 // Sample data for database instances
 const instancesData = [
@@ -41,8 +42,18 @@ const instancesData = [
 ];
 
 const SingleSpacePage = () => {
+  const router = useRouter();
   const navigateToHashRoute = (hashRoute) => {
-    window.location.hash = hashRoute;
+    if (hashRoute == "/") {
+      router.push({
+        pathname: hashRoute,
+      });
+    } else {
+      router.push({
+        pathname: "",
+        hash: hashRoute,
+      });
+    }
   };
 
   return (

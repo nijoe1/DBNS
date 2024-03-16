@@ -7,7 +7,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 interface IGated {
     function mint(address[] memory newMembers) external;
 
-    function burn(uint256[] memory _tokens) external;
+    function burn(address[] memory _members) external;
 }
 
 abstract contract Gated {

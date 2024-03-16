@@ -20,7 +20,8 @@ abstract contract FNS is IERC721Receiver {
     IFNSResolver public immutable PUBLIC_RESOLVER;
 
     bytes32 public DBNS_NODE;
-
+    bytes32 private constant ETH_NODE =
+        0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
     error NoInstanceAccess();
     error InvalidTokenAmount();
     error InvalidTokenSender();
@@ -69,12 +70,12 @@ abstract contract FNS is IERC721Receiver {
         uint256 tokenId,
         bytes calldata
     ) external returns (bytes4) {
-        if (msg.sender != address(REGISTRY)) {
+        if (msg.sender != address(REGISTRAR)) {
             revert InvalidTokenSender();
         }
 
         if (DBNS_NODE == bytes32(0)) {
-            DBNS_NODE = bytes32(tokenId);
+            DBNS_NODE = keccak256(abi.encodePacked(ETH_NODE, bytes32(tokenId)));
         }
         return IERC721Receiver.onERC721Received.selector;
     }

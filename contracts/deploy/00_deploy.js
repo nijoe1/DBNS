@@ -26,30 +26,41 @@ module.exports = async ({ deployments }) => {
 
   // sepolia Testnet
   const ENS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
-  const PUBLIC_RESOLVER = "	0x8FADE66B79cC9f707aB26799354482EB93a5B7dD";
+  const PUBLIC_RESOLVER = "0x8FADE66B79cC9f707aB26799354482EB93a5B7dD";
   const REGISTRAR = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
-  const IMPLEMENTATION = "";
   const UNLOCK = "0x36b34e10295cCE69B652eEB5a8046041074515Da";
 
-  // const DBNS2 = await deploy("DBNS", {
-  //   from: wallet.address,
-  //   args: [NAME_WRAPPER, PUBLIC_RESOLVER, UNLOCK, HATS],
-  //   log: true,
-  //   gasLimit: 4000000,
-  // });
+  const IMPLEMENTATION = await deploy("GatedInstance", {
+    from: wallet.address,
+    args: [],
+    log: true,
+    gasLimit: 4000000,
+  });
+  const _DBNS = await deploy("DBNS", {
+    from: wallet.address,
+    args: [ENS, REGISTRAR, PUBLIC_RESOLVER, UNLOCK, IMPLEMENTATION.address],
+    log: true,
+  });
+  // 0xd115d13d491885909a0E21CA90B9406790F1502e
+  const DBNS_INSTANCE = await ethers.getContractFactory("DBNS");
+  // const DBNS = DBNS_INSTANCE.attach(_DBNS.address);
+  const DBNS = DBNS_INSTANCE.attach(
+    "0xd115d13d491885909a0E21CA90B9406790F1502e"
+  );
 
-  // const DBNS_INSTANCE = await ethers.getContractFactory("DBNS");
-  // const DBNS = await DBNS_INSTANCE.attach(
-  //   "0x0432C22A3f26B2EEe1F848f9201EB3B8f40B53cC"
+  // let tx = await DBNS.tables(0)
+  // console.log(tx);
+
+  // let tx = await DBNS.createDBSpace(
+  //   "nick",
+  //   "nick"
   // );
-  // let tx = await DBNS.hasActiveSubscription(
-  //   "0x823a00bbae1550949eba18e73944a288175aed7406109cc9503a95d3f5cb5fe2",
-  //   wallet.address
-  // );
+
+  // await tx.wait();
 
   // console.log(tx);
 
-  // let tx = await DBNS.transferDomain(wallet.address);
+  // let tx = await DBNS.transferDomain(wallet.address,{gasLimit: 4000000});
   // await tx.wait();
 
   // console.log(tx);
@@ -65,28 +76,19 @@ module.exports = async ({ deployments }) => {
   //     string memory _IPNS
   // )
 
-  // tx = await DBNS.createSpaceInstance(
-  //   "0x41f57e10026b603d03d1919fe15f92e68e56d68bdbae46da5cc1a71d061e42bc",
-  //   0,
-  //   10,
-  //   "tock",
-  //   "tick",
-  //   "img",
-  //   "chatID",
+  // let tx = await DBNS.createSpaceInstance(
+  //   "0xe5b025831fde2b59d12c45b640cee0b6590bbb8b0a140e5d4dc04f90aaee3d8a",
+  //   2,
+  //   ["0x044b595c9b94a17adc489bd29696af40ccb3e4d2"],
+  //   "metadataCI3D",
+  //   "3",
   //   "IPNS"
   // );
+
   // await tx.wait();
 
-  // function createInstanceCode(
-  //   bytes32 _instance,
-  //   string memory _name,
-  //   string memory _about,
-  //   string memory _chatID,
-  //   string memory _codeIPNS
-  // )
-
-  // tx = await DBNS.createInstanceCode(
-  //   "0x823a00bbae1550949eba18e73944a288175aed7406109cc9503a95d3f5cb5fe2",
+  // let tx = await DBNS.createInstanceCode(
+  //   "0x30584450898765ea045173802f60dea66b5c4a444e58fb72ceafe93f2d2d2ec2",
   //   "name",
   //   "about",
   //   "chatID",
@@ -94,13 +96,17 @@ module.exports = async ({ deployments }) => {
   // );
   // await tx.wait();
 
-  //     function purchaseSubscription(bytes32 _instanceID) external payable {
-
-  // tx = await DBNS.purchaseSubscription(
-  //   "0x823a00bbae1550949eba18e73944a288175aed7406109cc9503a95d3f5cb5fe2",
-  //   { value: 10 }
+  // let tx = await DBNS.purchaseInstanceSubscription(
+  //   "0x30584450898765ea045173802f60dea66b5c4a444e58fb72ceafe93f2d2d2ec2",
+  //   { value: 2 }
   // );
   // await tx.wait();
+
+  let tx = await DBNS.removeMembers(
+    "0x30584450898765ea045173802f60dea66b5c4a444e58fb72ceafe93f2d2d2ec2",
+    [wallet.address]
+  );
+  await tx.wait();
 
   // Verify the contract
   // await hre.run("verify:verify", {

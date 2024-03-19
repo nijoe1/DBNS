@@ -34,14 +34,13 @@ contract DBNS is Core {
      * @param _name The name of the new space
      */
     function createDBSpace(
-        string calldata _name,
-        string calldata _subspace
+        string calldata _name
     ) public {
         bytes32 _newDBSpace = createSubNode(DBNS_NODE, _name);
 
         isType[_newDBSpace] = Types.SUBNODE;
 
-        spaceInsertion(_newDBSpace, DBNS_NODE, _name, _subspace);
+        spaceInsertion(_newDBSpace, DBNS_NODE, _name);
     }
 
     /**
@@ -51,8 +50,7 @@ contract DBNS is Core {
      */
     function createDBSubSpace(
         bytes32 _DBSpace,
-        string calldata _name,
-        string calldata _subspace
+        string calldata _name
     ) external {
         require(
             isType[_DBSpace] == Types.SUBNODE,
@@ -63,7 +61,7 @@ contract DBNS is Core {
 
         isType[_newDBSubSpace] = Types.SUBNODE;
 
-        spaceInsertion(_newDBSubSpace, _DBSpace, _name, _subspace);
+        spaceInsertion(_newDBSubSpace, _DBSpace, _name);
     }
 
     /**
@@ -92,7 +90,7 @@ contract DBNS is Core {
         address _gatedContract;
         if (_members.length > 0) {
             _gatedContract = createGatedContract(_members);
-            insertMembers(_newDBInstance, _members);
+            _insertMembers(_newDBInstance, _members);
         }
 
         instances[_newDBInstance] = SpaceInstance(

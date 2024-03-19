@@ -72,7 +72,7 @@ export default function Navbar(): JSX.Element {
   return (
     <Container className="bg-black/80 rounded-md mt-4">
       <nav
-        className={`flex w-full mx-auto md:justify-between lg:grid lg:px-3 relative ${!isConnected ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}
+        className={`flex w-full mx-auto md:justify-between lg:grid lg:px-3 relative ${!true ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}
       >
         <div className="absolute top-0 bottom-0 md:static flex items-center">
           <div className="lg:hidden">
@@ -97,7 +97,7 @@ export default function Navbar(): JSX.Element {
             </button>
             <div className={isSidebarOpen ? "" : "hidden"}>
               <NavLinksResponsive
-                isConnected={isConnected}
+                isConnected={true}
                 isSidebarOpen={isSidebarOpen} // Pass isSidebarOpen prop here
                 setIsSidebarOpen={setIsSidebarOpen}
               />
@@ -110,7 +110,7 @@ export default function Navbar(): JSX.Element {
         <div className="grow md:hidden flex justify-center">
           <Logo />
         </div>
-        {isConnected && <NavLinks />}
+        {true && <NavLinks />}
         <div className="hidden md:flex items-center justify-end gap-2">
           <ConnectButton showBalance={false} chainStatus={"icon"} />
         </div>

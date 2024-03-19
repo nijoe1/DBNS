@@ -15,6 +15,7 @@ import {IFNSResolver, IFNS, IFNSRegistrar} from "../interfaces/IENSResolver.sol"
  */
 
 abstract contract FNS is IERC721Receiver {
+
     IFNS public immutable REGISTRY;
     IFNSRegistrar public immutable REGISTRAR;
     IFNSResolver public immutable PUBLIC_RESOLVER;
@@ -22,6 +23,8 @@ abstract contract FNS is IERC721Receiver {
     bytes32 public DBNS_NODE;
     bytes32 private constant ETH_NODE =
         0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
+    bytes32 private constant ROOT_NODE =
+        0x0000000000000000000000000000000000000000000000000000000000000000;
     error NoInstanceAccess();
     error InvalidTokenAmount();
     error InvalidTokenSender();
@@ -43,14 +46,14 @@ abstract contract FNS is IERC721Receiver {
      * @return {bytes32} - New subnode.
      */
     function createSubNode(
-        bytes32 node,
+        bytes32 parentNode,
         string memory subNode
     ) internal returns (bytes32 newSubNode) {
         bytes32 label = keccak256(bytes(subNode));
 
         REGISTRY.setSubnodeRecord(
             // Gaming character subnode
-            node,
+            parentNode,
             // Character tokenID as sub.subdomain to the gaming character subdomain
             label,
             // Owner
@@ -61,7 +64,7 @@ abstract contract FNS is IERC721Receiver {
             0
         );
 
-        newSubNode = keccak256(abi.encodePacked(node, label));
+        newSubNode = _makeNode(parentNode, label);
     }
 
     function onERC721Received(
@@ -75,10 +78,18 @@ abstract contract FNS is IERC721Receiver {
         }
 
         if (DBNS_NODE == bytes32(0)) {
-            DBNS_NODE = keccak256(abi.encodePacked(ETH_NODE, bytes32(tokenId)));
+            DBNS_NODE = _makeNode(ETH_NODE, bytes32(tokenId));
         }
         return IERC721Receiver.onERC721Received.selector;
     }
+
+    function _makeNode(
+        bytes32 node,
+        bytes32 labelhash
+    ) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(node, labelhash));
+    }
+
 
     // NEEDS TO GET REMOVED ONLY FOR TESTING
     function transferDomain(address recipient) public {

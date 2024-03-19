@@ -1,23 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Flex,
-  Input,
-  Select,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Flex, Select, useDisclosure } from "@chakra-ui/react";
 import { Container } from "@/components//ui/container";
 import Tree from "react-d3-tree";
-import { ethers } from "ethers";
 import { useRouter } from "next/router";
-
+import { getTokenNode } from "@/utils/fns";
+import CreateSubSpaceModal from "@/components/contracts/createSubSpace";
+import {constructObject} from "@/utils/tableland";
 const parentName = "dbns.eth";
 
 const SpacesGraph = () => {
@@ -81,79 +69,80 @@ const SpacesGraph = () => {
   // Generate tree data for the selected category or entire tree if no category is selected
   const generateTreeData = (selectedCategory) => {
     // Replace this with your actual data for the "dbns.eth" category
-    const exampleData = {
-      name: parentName,
-      id: parentName,
-      attributes: { nodeType: "root" },
-      children: [
-        {
-          name: "Medical.DBNS.eth",
-          attributes: { nodeType: "branch" },
-          children: [
-            { name: "Subcategory 1", attributes: { nodeType: "leaf" } },
-            { name: "Subcategory 2", attributes: { nodeType: "leaf" } },
-          ],
-        },
-        {
-          name: "Finance.DBNS.eth",
-          id: getTokenNode("Finance", parentName),
-          attributes: { nodeType: "branch" },
-          children: [
-            {
-              name: "trading",
-              id: getTokenNode("trading", "Finance.DBNS.eth"),
-              attributes: { nodeType: "leaf" },
-            },
-            {
-              name: "Margin",
-              id: getTokenNode("Margin", "Finance.DBNS.eth"),
-              attributes: { nodeType: "leaf" },
-            },
-          ],
-        },
-        {
-          name: "Technology.DBNS.eth",
-          attributes: { nodeType: "branch" },
-          id: getTokenNode("Technology", parentName),
-          children: [
-            {
-              name: "AI.Technology.DBNS.eth",
-              id: getTokenNode("AI", "Technology.DBNS.eth"),
-              attributes: { nodeType: "branch" },
-              children: [
-                {
-                  name: "ML.AI.Technology.DBNS.eth",
-                  id: getTokenNode("ML", "ML.AI.Technology.DBNS.eth"),
-                  attributes: { nodeType: "leaf" },
-                },
-                {
-                  name: "DeepLearning.AI.Technology.DBNS.eth",
-                  id: getTokenNode("DL", "DL.AI.Technology.DBNS.eth"),
-                  attributes: { nodeType: "leaf" },
-                },
-              ],
-            },
-            {
-              name: "P2P.Technology.DBNS.eth",
-              id: getTokenNode("P2P", "Technology.DBNS.eth"),
-              attributes: { nodeType: "leaf" },
-              children: [
-                {
-                  name: "ML.AI.Technology.DBNS.eth",
-                  id: getTokenNode("ML", "ML.AI.Technology.DBNS.eth"),
-                  attributes: { nodeType: "leaf" },
-                },
-                {
-                  name: "DeepLearning.AI.Technology.DBNS.eth",
-                  id: getTokenNode("DL", "DL.AI.Technology.DBNS.eth"),
-                  attributes: { nodeType: "leaf" },
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    };
+    const exampleData = constructObject()
+    // {
+    //   name: parentName,
+    //   id: parentName,
+    //   attributes: { nodeType: "root" },
+    //   children: [
+    //     {
+    //       name: "Medical.DBNS.eth",
+    //       attributes: { nodeType: "branch" },
+    //       children: [
+    //         { name: "Subcategory 1", attributes: { nodeType: "leaf" } },
+    //         { name: "Subcategory 2", attributes: { nodeType: "leaf" } },
+    //       ],
+    //     },
+    //     {
+    //       name: "Finance.DBNS.eth",
+    //       id: getTokenNode("Finance", parentName),
+    //       attributes: { nodeType: "branch" },
+    //       children: [
+    //         {
+    //           name: "trading",
+    //           id: getTokenNode("trading", "Finance.DBNS.eth"),
+    //           attributes: { nodeType: "leaf" },
+    //         },
+    //         {
+    //           name: "Margin",
+    //           id: getTokenNode("Margin", "Finance.DBNS.eth"),
+    //           attributes: { nodeType: "leaf" },
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       name: "Technology.DBNS.eth",
+    //       attributes: { nodeType: "branch" },
+    //       id: getTokenNode("Technology", parentName),
+    //       children: [
+    //         {
+    //           name: "AI.Technology.DBNS.eth",
+    //           id: getTokenNode("AI", "Technology.DBNS.eth"),
+    //           attributes: { nodeType: "branch" },
+    //           children: [
+    //             {
+    //               name: "ML.AI.Technology.DBNS.eth",
+    //               id: getTokenNode("ML", "ML.AI.Technology.DBNS.eth"),
+    //               attributes: { nodeType: "leaf" },
+    //             },
+    //             {
+    //               name: "DeepLearning.AI.Technology.DBNS.eth",
+    //               id: getTokenNode("DL", "DL.AI.Technology.DBNS.eth"),
+    //               attributes: { nodeType: "leaf" },
+    //             },
+    //           ],
+    //         },
+    //         {
+    //           name: "P2P.Technology.DBNS.eth",
+    //           id: getTokenNode("P2P", "Technology.DBNS.eth"),
+    //           attributes: { nodeType: "leaf" },
+    //           children: [
+    //             {
+    //               name: "ML.AI.Technology.DBNS.eth",
+    //               id: getTokenNode("ML", "ML.AI.Technology.DBNS.eth"),
+    //               attributes: { nodeType: "leaf" },
+    //             },
+    //             {
+    //               name: "DeepLearning.AI.Technology.DBNS.eth",
+    //               id: getTokenNode("DL", "DL.AI.Technology.DBNS.eth"),
+    //               attributes: { nodeType: "leaf" },
+    //             },
+    //           ],
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // };
 
     // Extract immediate children of the root node as categories
     const categories = exampleData.children.map(
@@ -171,42 +160,6 @@ const SpacesGraph = () => {
     }
     // If no category is selected, return the entire tree data
     return exampleData;
-  };
-
-  // Function to generate token node
-  const getTokenNode = (_parentNode, characterName) => {
-    const abi = new ethers.utils.AbiCoder();
-    const parentNode = ethers.utils.namehash(_parentNode);
-    let subNodeBytes = stringToBytes(characterName);
-    const LabelHash = ethers.utils.keccak256(subNodeBytes);
-    console.log(
-      " Node:",
-      ethers.utils.keccak256(
-        abi.encode(
-          ["bytes32", "bytes32"],
-          [
-            ethers.utils.namehash("eth"),
-            ethers.utils.keccak256(stringToBytes("dscdsc")),
-          ],
-        ),
-      ),
-    );
-
-    let newSubNodeBytes = abi.encode(
-      ["bytes32", "bytes32"],
-      [parentNode, LabelHash],
-    );
-    const newSubNode = ethers.utils.keccak256(newSubNodeBytes);
-    return newSubNode;
-  };
-
-  // Function to convert string to bytes
-  const stringToBytes = (str) => {
-    let bytes = Buffer.from(str);
-    return (
-      "0x" +
-      bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "")
-    );
   };
 
   // Function to find the node for the selected category
@@ -357,27 +310,7 @@ const SpacesGraph = () => {
             </Box>
           )}
         </Flex>
-        <Modal isOpen={isOpen} onClose={onClose} isCentered>
-          <ModalOverlay />
-          <ModalContent bg="black" color="white" borderRadius="md">
-            <ModalHeader>Create New Subnode</ModalHeader>
-            <ModalBody>
-              <Input
-                placeholder="Enter subnode name"
-                value={newNodeName}
-                onChange={(e) => setNewNodeName(e.target.value)}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={handleCreate}>
-                Create
-              </Button>
-              <Button variant="ghost" onClick={onClose}>
-                Cancel
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <CreateSubSpaceModal isOpen={isOpen} onClose={onClose} />
       </Box>
     </Container>
   );

@@ -28,8 +28,6 @@
 
 <details>
   <summary>Architecture Diagrams</summary>
-
-
 </details>
 
 ## 🧑‍💻Technologies Used 🤖
@@ -42,13 +40,11 @@
 
 ### FLEEK 🌐
 
-
 ### ENS 🔮
 
 ## Smart Contracts
 
 ### Conclusion and Future Plans 🚀🌐
-
 
 #### Key Elements:
 

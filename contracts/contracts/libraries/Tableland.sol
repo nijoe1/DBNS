@@ -21,7 +21,7 @@ abstract contract Tableland {
     string internal constant DBSPACES_TABLE_PREFIX = "db_spaces";
 
     string internal constant DBSPACES_SCHEMA =
-        "DBSpaceID text, DBSubSpaceOfID text, DBSpaceName text, DBSubSpaceOfName text";
+        "DBSpaceID text, DBSubSpaceOfID text, DBSubSpaceName text";
 
     string internal constant DBSPACES_INSTANCES_TABLE_PREFIX =
         "db_spaces_instances";
@@ -123,23 +123,20 @@ abstract contract Tableland {
     function spaceInsertion(
         bytes32 DBSpaceID,
         bytes32 DBSubSpaceOfID,
-        string memory DBSpaceName,
-        string memory DBSubSpaceOfName
+        string memory DBSubSpaceName
     ) internal {
         mutate(
             tableIDs[0],
             SQLHelpers.toInsert(
                 DBSPACES_TABLE_PREFIX,
                 tableIDs[0],
-                "DBSpaceID, DBSubSpaceOfID, DBSpaceName, DBSubSpaceOfName",
+                "DBSpaceID, DBSubSpaceOfID, DBSubSpaceName",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(DBSpaceID)),
                     ",",
                     SQLHelpers.quote(bytes32ToString(DBSubSpaceOfID)),
                     ",",
-                    SQLHelpers.quote(DBSpaceName),
-                    ",",
-                    SQLHelpers.quote(DBSubSpaceOfName)
+                    SQLHelpers.quote(DBSubSpaceName)
                 )
             )
         );

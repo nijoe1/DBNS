@@ -158,8 +158,8 @@ function buildChildren(parentID, parentHierarchy) {
       const childChildren = buildChildren(node.DBSpaceID, childHierarchy);
       const nodeType = childChildren.length ? "branch" : "leaf"; // Determine node type
       const childObject = {
-        name: childHierarchy+".dbns.eth",
-        id: getTokenNode(node.DBSpaceName,parentHierarchy),
+        name: childHierarchy + ".dbns.eth",
+        id: getTokenNode(node.DBSpaceName, parentHierarchy),
         attributes: { nodeType: nodeType },
         children: childChildren,
       };

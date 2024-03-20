@@ -6,7 +6,7 @@
 
 @layer base {
   html {
-    /* @apply bg-gradient-to-b from-gray-400  to-gray-400; */
+    /* @apply bg-black; */
   }
 }
 

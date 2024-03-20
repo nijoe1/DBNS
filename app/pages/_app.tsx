@@ -53,10 +53,12 @@ export default function App({ Component, pageProps }: AppProps) {
               })}
               modalSize="compact"
             >
+              {/* <div className="bg-black"> */}
               <Navbar />
               <Component {...pageProps} />
               <div className="flex flex-grow mt-[20%]"></div>
               <Footer />
+              {/* </div> */}
             </RainbowKitProvider>
           </QueryClientProvider>
         </ReduxProvider>

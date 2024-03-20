@@ -27,13 +27,13 @@ abstract contract Tableland {
         "db_spaces_instances";
 
     string internal constant DBSPACES_INSTANCES_SCHEMA =
-        "InstanceID text, instanceOfSpace text, instanceType text, metadataCID text, chatID text, IPNS text, gatedContract text, price text, lock text, creator text";
+        "InstanceID text, instanceOfSpace text, instanceType text, metadataCID text, chatID text, IPNS text, IPNSEncryptedKey text, gatedContract text, price text, lock text, creator text";
 
     string internal constant DB_INSTANCES_CODES_TABLE_PREFIX =
         "instances_codes";
 
     string internal constant DB_INSTANCES_CODES_SCHEMA =
-        "InstanceID text, codeID text, name text, about text, chatID text, codeIPNS text, creator text";
+        "InstanceID text, codeID text, name text, about text, chatID text, IPNS text, IPNSEncryptedKey text, creator text";
 
     string internal constant SUBSCRIPTIONS_TABLE_PREFIX = "subscriptions";
 
@@ -171,7 +171,7 @@ abstract contract Tableland {
             SQLHelpers.toInsert(
                 DBSPACES_INSTANCES_TABLE_PREFIX,
                 tableIDs[1],
-                "InstanceID, instanceOfSpace, instanceType, metadataCID, chatID, IPNS, gatedContract, price, lock, creator",
+                "InstanceID, instanceOfSpace, instanceType, metadataCID, chatID, IPNS, IPNSEncryptedKey, gatedContract, price, lock, creator",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(_instanceID)),
                     ",",
@@ -221,7 +221,7 @@ abstract contract Tableland {
             SQLHelpers.toInsert(
                 DB_INSTANCES_CODES_TABLE_PREFIX,
                 tableIDs[2],
-                "InstanceID, codeID, name, about, chatID, codeIPNS, creator",
+                "InstanceID, codeID, name, about, chatID, IPNS, IPNSEncryptedKey, creator",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(_instanceID)),
                     ",",

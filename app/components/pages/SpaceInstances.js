@@ -8,9 +8,12 @@ import {
   Button,
   Grid,
   GridItem,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { Container } from "@/components//ui/container";
+import { Container } from "@/components/ui/container";
 import { useRouter } from "next/router";
+import CreateNewInstance from "../contracts/createNewInstance";
+import { createName } from "@/utils/IPFS";
 
 // Sample data for database instances
 const instancesData = [
@@ -43,6 +46,9 @@ const instancesData = [
 
 const SingleSpacePage = () => {
   const router = useRouter();
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const navigateToHashRoute = (hashRoute) => {
     if (hashRoute == "/") {
       router.push({
@@ -55,9 +61,16 @@ const SingleSpacePage = () => {
       });
     }
   };
-
+  const handleNewClick = async () => {
+    onOpen();
+    console.log("Create new instance");
+    console.log(isOpen);
+    await createName();
+  };
   return (
     <Container>
+      <Button onClick={handleNewClick}>Create New Instance</Button>
+      <CreateNewInstance onClose={onClose} isOpen={isOpen} spaceID={"1"} />
       <Flex justify="center" align="center" mt="4">
         <Grid
           templateColumns={["1fr", "1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr 1fr"]}
@@ -102,6 +115,7 @@ const SingleSpacePage = () => {
           ))}
         </Grid>
       </Flex>
+      <createNewInstance onClose={onClose} isOpen={isOpen} spaceID={"1"} />
     </Container>
   );
 };

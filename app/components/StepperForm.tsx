@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-
-import { signMessage } from "@wagmi/core";
 import lighthouse from "@lighthouse-web3/sdk";
-
 import axios from "axios";
-import { generateLighthouseJWT } from "@/utils/lighthouse";
+import { generateLighthouseJWT } from "@/utils/IPFS";
 import usePush from "@/hooks/usePush";
 import { useWalletClient } from "wagmi";
 

@@ -5,7 +5,7 @@ import Tree from "react-d3-tree";
 import { useRouter } from "next/router";
 import { getTokenNode } from "@/utils/fns";
 import CreateSubSpaceModal from "@/components/contracts/createSubSpace";
-import {constructObject} from "@/utils/tableland";
+import { constructObject } from "@/utils/tableland";
 const parentName = "dbns.eth";
 
 const SpacesGraph = () => {
@@ -69,80 +69,7 @@ const SpacesGraph = () => {
   // Generate tree data for the selected category or entire tree if no category is selected
   const generateTreeData = (selectedCategory) => {
     // Replace this with your actual data for the "dbns.eth" category
-    const exampleData = constructObject()
-    // {
-    //   name: parentName,
-    //   id: parentName,
-    //   attributes: { nodeType: "root" },
-    //   children: [
-    //     {
-    //       name: "Medical.DBNS.eth",
-    //       attributes: { nodeType: "branch" },
-    //       children: [
-    //         { name: "Subcategory 1", attributes: { nodeType: "leaf" } },
-    //         { name: "Subcategory 2", attributes: { nodeType: "leaf" } },
-    //       ],
-    //     },
-    //     {
-    //       name: "Finance.DBNS.eth",
-    //       id: getTokenNode("Finance", parentName),
-    //       attributes: { nodeType: "branch" },
-    //       children: [
-    //         {
-    //           name: "trading",
-    //           id: getTokenNode("trading", "Finance.DBNS.eth"),
-    //           attributes: { nodeType: "leaf" },
-    //         },
-    //         {
-    //           name: "Margin",
-    //           id: getTokenNode("Margin", "Finance.DBNS.eth"),
-    //           attributes: { nodeType: "leaf" },
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       name: "Technology.DBNS.eth",
-    //       attributes: { nodeType: "branch" },
-    //       id: getTokenNode("Technology", parentName),
-    //       children: [
-    //         {
-    //           name: "AI.Technology.DBNS.eth",
-    //           id: getTokenNode("AI", "Technology.DBNS.eth"),
-    //           attributes: { nodeType: "branch" },
-    //           children: [
-    //             {
-    //               name: "ML.AI.Technology.DBNS.eth",
-    //               id: getTokenNode("ML", "ML.AI.Technology.DBNS.eth"),
-    //               attributes: { nodeType: "leaf" },
-    //             },
-    //             {
-    //               name: "DeepLearning.AI.Technology.DBNS.eth",
-    //               id: getTokenNode("DL", "DL.AI.Technology.DBNS.eth"),
-    //               attributes: { nodeType: "leaf" },
-    //             },
-    //           ],
-    //         },
-    //         {
-    //           name: "P2P.Technology.DBNS.eth",
-    //           id: getTokenNode("P2P", "Technology.DBNS.eth"),
-    //           attributes: { nodeType: "leaf" },
-    //           children: [
-    //             {
-    //               name: "ML.AI.Technology.DBNS.eth",
-    //               id: getTokenNode("ML", "ML.AI.Technology.DBNS.eth"),
-    //               attributes: { nodeType: "leaf" },
-    //             },
-    //             {
-    //               name: "DeepLearning.AI.Technology.DBNS.eth",
-    //               id: getTokenNode("DL", "DL.AI.Technology.DBNS.eth"),
-    //               attributes: { nodeType: "leaf" },
-    //             },
-    //           ],
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // };
+    const exampleData = constructObject();
 
     // Extract immediate children of the root node as categories
     const categories = exampleData.children.map(

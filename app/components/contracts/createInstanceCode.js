@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Input,
   Modal,
@@ -12,53 +12,72 @@ import {
 } from "@chakra-ui/react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { CONTRACT_ABI, CONTRACT_ADDRESSES } from "@/constants/contracts";
-const createNewInstance = ({
-  isOpen = { isOpen },
-  onClose = { onClose },
-}) => {
+
+const CreateNewInstanceModal = ({ isOpen, onClose }) => {
   const toast = useToast();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const [newNodeName, setNewNodeName] = useState("");
+  const [formData, setFormData] = useState({
+    nodeName: "",
+    price: "",
+    members: [],
+    metadataName: "", // Added metadataName field
+    metadataCID: "",
+    chatID: "",
+    IPNS: "",
+  });
 
-  function handleCreate() {
-    console.log("Creating new node with name: ", newNodeName);
-    onClose();
-  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-  const createNewSpaceInstance = async () => {
+  const handleCreate = async () => {
     try {
+      // Create space instance
       const data = await publicClient?.simulateContract({
         account,
         address: CONTRACT_ADDRESSES,
         abi: CONTRACT_ABI,
         functionName: "createSpaceInstance",
-        args: [],
+        args: [
+          formData.nodeName,
+          formData.price,
+          formData.members,
+          `${formData.metadataName} ${formData.metadataCID}`, // Concatenating metadataName and metadataCID
+          formData.chatID,
+          formData.IPNS,
+        ],
       });
-      console.log(data);
+
       if (!walletClient) {
         console.log("Wallet client not found");
         return;
       }
-      // @ts-ignore
+
       const hash = await walletClient.writeContract(data.request);
-      console.log("Transaction Sent");
+
+      // Wait for transaction receipt
       const transaction = await publicClient.waitForTransactionReceipt({
-        hash: hash,
+        hash,
       });
-      await toast({
+
+      // Display success toast
+      toast({
         title: "Subspace Created",
         description: "Subspace created successfully",
         status: "success",
         duration: 9000,
         isClosable: true,
       });
+
       console.log(transaction);
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
@@ -66,10 +85,24 @@ const createNewInstance = ({
         <ModalHeader>Create New Subnode</ModalHeader>
         <ModalBody bg={"#333333"}>
           <Input
+            name="nodeName"
             placeholder="Enter subnode name"
-            value={newNodeName}
-            onChange={(e) => setNewNodeName(e.target.value)}
+            value={formData.nodeName}
+            onChange={handleChange}
           />
+          <Input
+            name="price"
+            placeholder="Enter price"
+            value={formData.price}
+            onChange={handleChange}
+          />
+          <Input
+            name="metadataName"
+            placeholder="Enter metadata name"
+            value={formData.metadataName}
+            onChange={handleChange}
+          />
+          {/* Other input fields for members, chatID, IPNS */}
         </ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={handleCreate}>
@@ -84,4 +117,4 @@ const createNewInstance = ({
   );
 };
 
-export default createNewInstance;
+export default CreateNewInstanceModal;

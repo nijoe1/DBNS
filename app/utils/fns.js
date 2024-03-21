@@ -6,18 +6,6 @@ export const getTokenNode = (_parentNode, characterName) => {
   const parentNode = ethers.utils.namehash(_parentNode);
   let subNodeBytes = stringToBytes(characterName);
   const LabelHash = ethers.utils.keccak256(subNodeBytes);
-  console.log(
-    " Node:",
-    ethers.utils.keccak256(
-      abi.encode(
-        ["bytes32", "bytes32"],
-        [
-          ethers.utils.namehash("eth"),
-          ethers.utils.keccak256(stringToBytes("dscdsc")),
-        ],
-      ),
-    ),
-  );
 
   let newSubNodeBytes = abi.encode(
     ["bytes32", "bytes32"],
@@ -34,4 +22,13 @@ export const stringToBytes = (str) => {
     "0x" +
     bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "")
   );
+};
+
+export const getInstanceID = (instanceID, IPNS) => {
+  const abi = new ethers.utils.AbiCoder();
+  console.log(ethers.utils.namehash("fil"));
+
+  let newInstanceID = abi.encode(["bytes32", "string"], [instanceID, IPNS]);
+  const _newInstanceID = ethers.utils.keccak256(newInstanceID);
+  return _newInstanceID;
 };

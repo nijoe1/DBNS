@@ -47,10 +47,11 @@ abstract contract Core is FNS, Gated, Tableland, Unlock {
         address _registry,
         address _registrar,
         address _publicResolver,
+        bytes32 _baseNode,
         address _UnlockContract,
         address _gatedImplementation
     )
-        FNS(_registry, _registrar, _publicResolver)
+        FNS(_registry, _registrar, _publicResolver, _baseNode)
         Gated(_gatedImplementation)
         Tableland()
         Unlock(_UnlockContract)

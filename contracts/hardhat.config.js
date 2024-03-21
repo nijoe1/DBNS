@@ -17,13 +17,13 @@ module.exports = {
       viaIR: true,
     },
   },
-  defaultNetwork: "sepolia",
-  // defaultNetwork: "calibration",
+  // defaultNetwork: "sepolia",
+  defaultNetwork: "calibration",
 
   networks: {
     sepolia: {
       chainId: 11155111,
-      url: "https://ethereum-sepolia.blockpi.network/v1/rpc/public	",
+      url: "https://ethereum-sepolia-rpc.publicnode.com",
       accounts: [PRIVATE_KEY],
     },
     calibration: {
@@ -48,5 +48,6 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+    scripts: "./scripts",
   },
 };

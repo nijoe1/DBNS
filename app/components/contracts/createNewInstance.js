@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Input,
   Modal,
@@ -12,7 +12,11 @@ import {
 } from "@chakra-ui/react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { CONTRACT_ABI, CONTRACT_ADDRESSES } from "@/constants/contracts";
-
+import { useSelector } from "react-redux";
+import usePush from "@/hooks/usePush";
+import { useRouter } from "next/router";
+import { getRules } from "@/constants/push";
+import { createIPNSName } from "@/utils/IPFS";
 const CreateNewInstance = ({
   isOpen = { isOpen },
   onClose = { onClose },
@@ -21,6 +25,7 @@ const CreateNewInstance = ({
   const toast = useToast();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
+  const chainID = publicClient?.getChainId();
   const { data: walletClient } = useWalletClient();
   const [formData, setFormData] = useState({
     name: "",
@@ -31,7 +36,55 @@ const CreateNewInstance = ({
     metadataCID: "",
     chatID: "",
     IPNS: "",
+    IPNSEncryptedKey: "",
   });
+  const { initializePush } = usePush();
+  const router = useRouter();
+  const pushSign = useSelector((state) => state.push.pushSign);
+  console.log(pushSign);
+  const { address } = useAccount();
+
+  useEffect(() => {
+    async function initialize() {
+      await initializePush();
+    }
+    if (Object.keys(pushSign).length === 0) {
+      initialize();
+    }
+  }, [router]);
+
+  const createGroup = async () => {
+    const deterministicAddress = await publicClient?.readContract({
+      address: CONTRACT_ADDRESSES,
+      abi: CONTRACT_ABI,
+      functionName: "getDeterministicAddress",
+      args: [spaceID],
+    });
+    console.log(deterministicAddress);
+    const createdGroup = await pushSign.chat.group.create(formData.name, {
+      description: "Token gated web3 native chat example", // provide short description of group
+      image: "data:image/png;base64,iVBORw0K...", // provide base64 encoded image
+      members: [], // not needed, rules define this, can omit
+      admins: [], // not needed as per problem statement, can omit
+      private: true,
+      rules: getRules(chainID, deterministicAddress),
+    });
+  };
+
+  const createIPNS = async () => {
+    let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
+    let jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
+
+    // cid, apiKey, address, jwt, spaceID
+    const ipnsName = await createIPNSName(
+      "bafybeig2ygg4yzyoprroumzmuwm72qxtorgell7hipvpoyqdmfqoxupyay",
+      key,
+      address,
+      jwt,
+      spaceID,
+    );
+    console.log(ipnsName);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,9 +103,10 @@ const CreateNewInstance = ({
           spaceID,
           formData.price,
           formData.members,
-          `${formData.metadataCID}`, // Concatenating metadataName and metadataCID
+          formData.metadataCID, // Concatenating metadataName and metadataCID
           formData.chatID,
           formData.IPNS,
+          formData.IPNSEncryptedKey,
         ],
       });
 
@@ -116,7 +170,7 @@ const CreateNewInstance = ({
           {/* Other input fields for members, chatID, IPNS */}
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="white" mr={3} onClick={onClose}>
+          <Button colorScheme="white" mr={3} onClick={createIPNS}>
             Create
           </Button>
           <Button variant="white" onClick={onClose}>

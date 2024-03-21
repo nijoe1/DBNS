@@ -151,7 +151,7 @@ abstract contract Tableland {
      * @param {string} img - Image of the instance.
      * @param {string} chatID - Chat ID of the instance.
      * @param {string} IPNS - IPNS of the instance.
-     * @param {address} creator - Creator of the instance.
+     * @param {string} IPNSEncryptedKey - Creator of the instance.
      */
 
     function instanceInsertion(
@@ -164,7 +164,7 @@ abstract contract Tableland {
         string memory metadataCID,
         string memory chatID,
         string memory IPNS,
-        address creator
+        string memory IPNSEncryptedKey
     ) internal {
         mutate(
             tableIDs[1],
@@ -185,13 +185,15 @@ abstract contract Tableland {
                     ",",
                     SQLHelpers.quote(IPNS),
                     ",",
+                    SQLHelpers.quote(IPNSEncryptedKey),
+                    ",",
                     SQLHelpers.quote(Strings.toHexString(_gatedContract)),
                     ",",
                     SQLHelpers.quote(Strings.toString(price)),
                     ",",
                     SQLHelpers.quote(Strings.toHexString(_lock)),
                     ",",
-                    SQLHelpers.quote(Strings.toHexString(creator))
+                    SQLHelpers.quote(Strings.toHexString(msg.sender))
                 )
             )
         );
@@ -204,7 +206,7 @@ abstract contract Tableland {
      * @param {string} about - About of the instance code.
      * @param {string} chatID - Chat ID of the instance code.
      * @param {string} codeIPNS - IPNS of the instance code.
-     * @param {address} creator - Creator of the instance code.
+     * @param {string} IPNSEncryptedKey - Creator of the instance code.
      */
 
     function InsertInstanceCode(
@@ -214,7 +216,7 @@ abstract contract Tableland {
         string memory about,
         string memory chatID,
         string memory codeIPNS,
-        address creator
+        string memory IPNSEncryptedKey
     ) internal {
         mutate(
             tableIDs[2],
@@ -235,7 +237,9 @@ abstract contract Tableland {
                     ",",
                     SQLHelpers.quote(codeIPNS),
                     ",",
-                    SQLHelpers.quote(Strings.toHexString(creator))
+                    SQLHelpers.quote(IPNSEncryptedKey),
+                    ",",
+                    SQLHelpers.quote(Strings.toHexString(msg.sender))
                 )
             )
         );

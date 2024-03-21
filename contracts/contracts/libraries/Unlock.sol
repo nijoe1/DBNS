@@ -131,10 +131,11 @@ abstract contract Unlock is Ownable {
         bytes32 _instanceID,
         address _subscriber
     ) public view returns (bool) {
+        address _lockAddress = instanceLock[_instanceID].lockAddress;
         return
-            IPublicLockV12(instanceLock[_instanceID].lockAddress).balanceOf(
-                _subscriber
-            ) > 0;
+            _lockAddress == address(0)
+                ? false
+                : IPublicLockV12(_lockAddress).balanceOf(_subscriber) > 0;
     }
 
     function getRemainingSubscriptionTime(

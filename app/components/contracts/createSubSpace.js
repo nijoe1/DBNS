@@ -15,6 +15,8 @@ import { CONTRACT_ABI, CONTRACT_ADDRESSES } from "@/constants/contracts";
 const CreateSubSpaceModal = ({
   isOpen = { isOpen },
   onClose = { onClose },
+  isRoot,
+  clickedID,
 }) => {
   const toast = useToast();
 
@@ -23,41 +25,75 @@ const CreateSubSpaceModal = ({
   const { data: walletClient } = useWalletClient();
   const [newNodeName, setNewNodeName] = useState("");
 
-  function handleCreate() {
+  async function handleCreate() {
     console.log("Creating new node with name: ", newNodeName);
+    await createNewSubSpace();
     onClose();
   }
 
   const createNewSubSpace = async () => {
-    try {
-      const data = await publicClient?.simulateContract({
-        account,
-        address: CONTRACT_ADDRESSES,
-        abi: CONTRACT_ABI,
-        functionName: "createSubspace",
-        args: [],
-      });
-      console.log(data);
-      if (!walletClient) {
-        console.log("Wallet client not found");
-        return;
+    if (isRoot) {
+      try {
+        const data = await publicClient?.simulateContract({
+          account,
+          address: CONTRACT_ADDRESSES,
+          abi: CONTRACT_ABI,
+          functionName: "createDBSpace",
+          args: [newNodeName],
+        });
+        console.log(data);
+        if (!walletClient) {
+          console.log("Wallet client not found");
+          return;
+        }
+        // @ts-ignore
+        const hash = await walletClient.writeContract(data.request);
+        console.log("Transaction Sent");
+        const transaction = await publicClient.waitForTransactionReceipt({
+          hash: hash,
+        });
+        toast({
+          title: "Subspace Created",
+          description: "Subspace created successfully",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(transaction);
+      } catch (error) {
+        console.log(error);
       }
-      // @ts-ignore
-      const hash = await walletClient.writeContract(data.request);
-      console.log("Transaction Sent");
-      const transaction = await publicClient.waitForTransactionReceipt({
-        hash: hash,
-      });
-      toast({
-        title: "Subspace Created",
-        description: "Subspace created successfully",
-        status: "success",
-        duration: 9000,
-        isClosable: true,
-      });
-      console.log(transaction);
-    } catch (error) {
-      console.log(error);
+    } else {
+      try {
+        const data = await publicClient?.simulateContract({
+          account,
+          address: CONTRACT_ADDRESSES,
+          abi: CONTRACT_ABI,
+          functionName: "createDBSubSpace",
+          args: [clickedID, newNodeName],
+        });
+        console.log(data);
+        if (!walletClient) {
+          console.log("Wallet client not found");
+          return;
+        }
+        // @ts-ignore
+        const hash = await walletClient.writeContract(data.request);
+        console.log("Transaction Sent");
+        const transaction = await publicClient.waitForTransactionReceipt({
+          hash: hash,
+        });
+        toast({
+          title: "Subspace Created",
+          description: "Subspace created successfully",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        console.log(transaction);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   return (

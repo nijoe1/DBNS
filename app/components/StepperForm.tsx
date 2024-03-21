@@ -24,6 +24,7 @@ const StepperForm: React.FC<{
     }
 
     let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
+
     if (!key) {
       const verificationMessage = (
         await axios.get(

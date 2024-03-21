@@ -10,10 +10,11 @@ import {
 } from "@lighthouse-web3/kavach";
 import { fromString as uint8ArrayFromString } from "uint8arrays/from-string";
 import { toString as uint8ArrayToString } from "uint8arrays/to-string";
-
+import { CONTRACT_ADDRESSES } from "@/constants/contracts";
+import { getInstanceID } from "./fns";
 const LighthouseChains = {
-  80001: {
-    name: "Mumbai",
+  11155111: {
+    name: "Sepolia",
   },
   314159: {
     name: "Calibration",
@@ -57,19 +58,42 @@ export const createName = async () => {
   console.log("Resolved value:", name.toString());
 };
 
-export const createIPNSName = async (cid, apiKey, address, jwt) => {
+export const resolveIPNSName = async (IPNS) => {
+  const name = Name.parse(IPNS);
+  const revision = await Name.resolve(name);
+  console.log("Resolved value:", revision.value);
+  return revision.value;
+};
+
+export const createIPNSName = async (cid, apiKey, address, jwt, spaceID) => {
   // https://www.npmjs.com/package/w3name
   const name = await Name.create();
   console.log("created new name: ", name.toString());
-
+  const instanceID = getInstanceID(spaceID, name.toString());
   const revision = await Name.v0(name, cid);
   await Name.publish(revision, name.key);
-  console.log(name.key.bytes);
+  const KEY = await encryptIPNSKey(name.key.bytes, apiKey, address, jwt);
+  console.log("KEY", KEY.Hash);
+  let ecid = await applyAccessConditions(
+    KEY[0].Hash,
+    314159,
+    instanceID,
+    address,
+    jwt,
+    "0x573Ddd3536cF4eF58d5386D6829c9e38cbe977e0",
+  );
 
-  const cid = await encryptIPNSKey(name.key.bytes, apiKey, address, jwt);
+  // const jsonBlob = await decrypt(ecid, address, jwt)
+  // const jsonFile = new File([jsonBlob], `type.json`, {
+  //   type: "application/json",
+  // });
+
+  // const key = JSON.parse(await jsonFile.text());
+  // console.log(key)
   return {
+    instanceID: instanceID,
     name: name.toString(),
-    cid: cid.Hash,
+    cid: ecid,
   };
 };
 
@@ -78,7 +102,7 @@ export const renewIPNSName = async (
   EncryptedKeyCID,
   cid,
   address,
-  jwt
+  jwt,
 ) => {
   const name = Name.parse(IPNS);
 
@@ -135,7 +159,7 @@ export const uploadFile = async (file, apiKey, setUploadProgress) => {
     false,
     null,
     progressCallback,
-    dealParams
+    dealParams,
   );
   let RAAS_Response = await registerCIDtoRAAS(output.data.Hash);
 
@@ -164,7 +188,7 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
     jwt,
     null,
     null,
-    dealParams
+    dealParams,
   );
 
   const { masterKey, keyShards } = await generate();
@@ -173,7 +197,7 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
     address,
     output.data[0].cid,
     jwt,
-    keyShards
+    keyShards,
   );
 
   await registerCIDtoRAAS(output.data[0].cid);
@@ -195,7 +219,7 @@ export const uploadFolder = async (files, type, apiKey, setUploadProgress) => {
     true,
     null,
     progressCallback,
-    dealParams
+    dealParams,
   );
   for (const file of output.data) {
     if (file.Name != "") {
@@ -224,7 +248,7 @@ export const uploadFolder = async (files, type, apiKey, setUploadProgress) => {
     false,
     null,
     progressCallback,
-    dealParams
+    dealParams,
   );
   return [jsonCID.data.Hash];
 };
@@ -251,7 +275,7 @@ export const jsonCIDsUpload = async (apiKey, type, CIDs) => {
     false,
     null,
     null,
-    dealParams
+    dealParams,
   );
   return [jsonCID.data.Hash];
 };
@@ -262,7 +286,7 @@ export const uploadFileEncrypted = async (
   apiKey,
   address,
   jwt,
-  setUploadProgress
+  setUploadProgress,
 ) => {
   const progressCallback = (progressData) => {
     const percentageDone =
@@ -276,7 +300,7 @@ export const uploadFileEncrypted = async (
     jwt,
     null,
     progressCallback,
-    dealParams
+    dealParams,
   );
 
   const { masterKey, keyShards } = await generate();
@@ -285,7 +309,7 @@ export const uploadFileEncrypted = async (
     address,
     output.data[0].cid,
     jwt,
-    keyShards
+    keyShards,
   );
 
   await registerCIDtoRAAS(output.data[0].cid);
@@ -309,7 +333,7 @@ const registerCIDtoRAAS = async (cid) => {
   try {
     const response = await axios.post(
       "https://calibration.lighthouse.storage/api/register_job",
-      formData
+      formData,
     );
     return response.data;
   } catch (error) {
@@ -324,7 +348,7 @@ export const getDealStatusByCID = async (cid) => {
     const response = await fetch(endpoint);
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch deal status. Status: ${response.status}`
+        `Failed to fetch deal status. Status: ${response.status}`,
       );
     }
 
@@ -366,24 +390,24 @@ export const decrypt = async (cid, address, jwt) => {
 export const applyAccessConditions = async (
   cid,
   chainID,
-  uid,
+  instanceID,
   address,
   jwt,
-  resolver
+  DBNS,
 ) => {
   const conditions = [
     {
       id: 1,
       chain: LighthouseChains[chainID].name,
-      method: "hasAccess",
+      method: "hasViewAccess",
       standardContractType: "Custom",
-      contractAddress: resolver,
+      contractAddress: DBNS,
       returnValueTest: {
         comparator: "==",
         value: "true",
       },
-      parameters: [":userAddress", uid],
-      inputArrayType: ["address", "bytes32"],
+      parameters: [instanceID, ":userAddress"],
+      inputArrayType: ["bytes32", "address"],
       outputType: "bool",
     },
   ];
@@ -394,10 +418,10 @@ export const applyAccessConditions = async (
     cid,
     jwt,
     conditions,
-    aggregator
+    aggregator,
   );
 
-  let RAAS_Response = await registerCIDtoRAAS(cid);
+  // let RAAS_Response = await registerCIDtoRAAS(cid);
 
   const { masterKey, keyShards } = await generate();
 
@@ -405,7 +429,7 @@ export const applyAccessConditions = async (
     address,
     response.data.cid,
     jwt,
-    keyShards
+    keyShards,
   );
-  return response;
+  return response.data.cid;
 };

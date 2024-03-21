@@ -3,24 +3,24 @@ import { Box, Flex, Select, useDisclosure } from "@chakra-ui/react";
 import { Container } from "@/components//ui/container";
 import Tree from "react-d3-tree";
 import { useRouter } from "next/router";
-import { getTokenNode } from "@/utils/fns";
 import CreateSubSpaceModal from "@/components/contracts/createSubSpace";
 import { constructObject } from "@/utils/tableland";
 const parentName = "dbns.eth";
 
 const SpacesGraph = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [newNodeName, setNewNodeName] = useState("");
-
   const router = useRouter();
   const [treeData, setTreeData] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [tempTreeData, setTempTreeData] = useState(null);
+
+  const [selectedCategory, setSelectedCategory] = useState();
   const [windowDimensions, setWindowDimensions] = useState({
     width: undefined,
     height: undefined,
   });
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const [isRoot, setIsRoot] = useState();
+  const [clickedID, setClickedID] = useState();
 
   const navigateToHashRoute = (hashRoute) => {
     if (hashRoute == "/") {
@@ -34,7 +34,9 @@ const SpacesGraph = () => {
       });
     }
   };
-
+  useEffect(() => {
+    console.log(clickedID);
+  }, [isRoot, clickedID]);
   useEffect(() => {
     const handleResize = () => {
       setWindowDimensions({
@@ -55,38 +57,37 @@ const SpacesGraph = () => {
 
   useEffect(() => {
     // Generate tree data for the selected category or entire tree if no category is selected
-    const initialTreeData = generateTreeData();
-    setTreeData(initialTreeData);
-    let node = getTokenNode("fsdfsdfsdfdf", "eth");
+    generateTreeData();
   }, []);
 
   useEffect(() => {
     // Generate tree data for the selected category or entire tree if no category is selected
-    const treeData = generateTreeData(selectedCategory);
-    setTreeData(treeData);
+    generateTreeData(selectedCategory);
   }, [selectedCategory]);
 
   // Generate tree data for the selected category or entire tree if no category is selected
-  const generateTreeData = (selectedCategory) => {
-    // Replace this with your actual data for the "dbns.eth" category
-    const exampleData = constructObject();
-
-    // Extract immediate children of the root node as categories
-    const categories = exampleData.children.map(
-      (child) => child.name.split(".")[0],
-    );
-
-    // Set categories as options
-    setCategoryOptions(
-      categories.map((category) => ({ value: category, label: category })),
-    );
-
+  const generateTreeData = async (selectedCategory) => {
     // If a category is selected, find its subtree and return it
     if (selectedCategory) {
-      return findCategoryNode(exampleData, selectedCategory);
+      setTreeData(findCategoryNode(tempTreeData, selectedCategory));
+    } else {
+      // Replace this with your actual data for the "dbns.eth" category
+      const exampleData = await constructObject();
+
+      // Extract immediate children of the root node as categories
+      const categories = exampleData.children.map(
+        (child) => child.name.split(".")[0],
+      );
+
+      // Set categories as options
+      setCategoryOptions(
+        categories.map((category) => ({ value: category, label: category })),
+      );
+      // If no category is selected, return the entire tree data
+      // return exampleData;
+      setTreeData(exampleData);
+      setTempTreeData(exampleData);
     }
-    // If no category is selected, return the entire tree data
-    return exampleData;
   };
 
   // Function to find the node for the selected category
@@ -117,15 +118,9 @@ const SpacesGraph = () => {
   };
 
   const handleNewClick = (nodeDatum, toggleNode) => {
+    setIsRoot(nodeDatum.attributes.nodeType == "root");
+    setClickedID(nodeDatum.id);
     onOpen();
-  };
-
-  const handleCreate = () => {
-    // Validate newNodeName
-    // Add your validation logic here to ensure it's not equal to any existing children node names
-
-    // Close the modal after creating the new subnode
-    onClose();
   };
 
   // Custom node and label rendering function
@@ -237,7 +232,12 @@ const SpacesGraph = () => {
             </Box>
           )}
         </Flex>
-        <CreateSubSpaceModal isOpen={isOpen} onClose={onClose} />
+        <CreateSubSpaceModal
+          isOpen={isOpen}
+          onClose={onClose}
+          isRoot={isRoot}
+          clickedID={clickedID}
+        />
       </Box>
     </Container>
   );

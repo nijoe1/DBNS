@@ -28,7 +28,8 @@
     "pages/index.jsx",
     "components/layout/navbar.js",
     "pages/CsvViewer.js",
-    "components/pages/instance.js"
+    "components/pages/instance.js",
+    "utils/IPFS.js"
   ],
   "exclude": ["node_modules"]
 }

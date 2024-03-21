@@ -70,7 +70,13 @@ const SingleSpacePage = () => {
   return (
     <Container>
       <Button onClick={handleNewClick}>Create New Instance</Button>
-      <CreateNewInstance onClose={onClose} isOpen={isOpen} spaceID={"1"} />
+      <CreateNewInstance
+        onClose={onClose}
+        isOpen={isOpen}
+        spaceID={
+          "0x726d4f081a188bae99c1fc67b9c281d628040d90dddab3d6f7dbdd06b3a89868"
+        }
+      />
       <Flex justify="center" align="center" mt="4">
         <Grid
           templateColumns={["1fr", "1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr 1fr"]}

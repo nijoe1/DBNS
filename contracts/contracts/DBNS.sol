@@ -17,6 +17,7 @@ contract DBNS is Core {
         address _registry,
         address _registrar,
         address _publicResolver,
+        bytes32 _baseNode,
         address _unlockContract,
         address _gateImplementation
     )
@@ -24,6 +25,7 @@ contract DBNS is Core {
             _registry,
             _registrar,
             _publicResolver,
+            _baseNode,
             _unlockContract,
             _gateImplementation
         )
@@ -33,9 +35,7 @@ contract DBNS is Core {
      * @dev Create a new space under the given node
      * @param _name The name of the new space
      */
-    function createDBSpace(
-        string calldata _name
-    ) public {
+    function createDBSpace(string calldata _name) public {
         bytes32 _newDBSpace = createSubNode(DBNS_NODE, _name);
 
         isType[_newDBSpace] = Types.SUBNODE;
@@ -78,7 +78,8 @@ contract DBNS is Core {
         address[] calldata _members,
         string calldata _metadataCID,
         string calldata _chatID,
-        string calldata _IPNS
+        string calldata _IPNS,
+        string calldata _IPNSEncryptedKey
     ) external {
         require(isType[_node] == Types.SUBNODE, "DBNS: Node is not a subnode");
 
@@ -89,7 +90,7 @@ contract DBNS is Core {
         }
         address _gatedContract;
         if (_members.length > 0) {
-            _gatedContract = createGatedContract(_members);
+            _gatedContract = createGatedContract(_members, _newDBInstance);
             _insertMembers(_newDBInstance, _members);
         }
 
@@ -115,7 +116,7 @@ contract DBNS is Core {
             _metadataCID,
             _chatID,
             _IPNS,
-            msg.sender
+            _IPNSEncryptedKey
         );
     }
 
@@ -132,7 +133,8 @@ contract DBNS is Core {
         string calldata _name,
         string calldata _about,
         string calldata _chatID,
-        string calldata _codeIPNS
+        string calldata _codeIPNS,
+        string calldata _IPNSEncryptedKey
     ) external {
         if (!hasMutateAccess(_instance, msg.sender)) {
             revert NoInstanceAccess();
@@ -155,7 +157,7 @@ contract DBNS is Core {
             _about,
             _chatID,
             _codeIPNS,
-            msg.sender
+            _IPNSEncryptedKey
         );
     }
 
@@ -193,41 +195,17 @@ contract DBNS is Core {
         if (codeOwner[_codeID] != msg.sender) {
             revert NoCodeOwner();
         }
-
-        // UpdateInstanceCode(
-        //     _codeID,
-        //     _name,
-        //     _about,
-        //     _chatID,
-        //     _codeIPNS,
-        //     msg.sender
-        // );
+        updateInstanceCode(_codeID, _name, _about);
     }
 
     function updateInstance(
-        bytes32 _instance,
-        uint256 _hatID,
-        uint256 _price,
-        string calldata _name,
-        string calldata _about,
-        string calldata _img,
-        string calldata _chatID,
-        string calldata _IPNS
+        bytes32 _instanceID,
+        string calldata _metadataCID
     ) external {
-        if (instances[_instance].creator != msg.sender) {
-            revert NoInstanceAccess();
+        if (instances[_instanceID].creator != msg.sender) {
+            // revert NoInstanceAccess();
+            revert("DBNS: No instance access");
         }
-
-        // UpdateInstance(
-        //     _instance,
-        //     _hatID,
-        //     _price,
-        //     _name,
-        //     _about,
-        //     _img,
-        //     _chatID,
-        //     _IPNS,
-        //     msg.sender
-        // );
+        updateInstanceMetadata(_instanceID, _metadataCID);
     }
 }

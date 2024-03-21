@@ -15,16 +15,14 @@ import {IFNSResolver, IFNS, IFNSRegistrar} from "../interfaces/IENSResolver.sol"
  */
 
 abstract contract FNS is IERC721Receiver {
-
     IFNS public immutable REGISTRY;
     IFNSRegistrar public immutable REGISTRAR;
     IFNSResolver public immutable PUBLIC_RESOLVER;
 
     bytes32 public DBNS_NODE;
-    bytes32 private constant ETH_NODE =
-        0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
-    bytes32 private constant ROOT_NODE =
-        0x0000000000000000000000000000000000000000000000000000000000000000;
+    bytes32 private immutable BASE_NODE;
+    uint256 public DOMAIN_ID;
+
     error NoInstanceAccess();
     error InvalidTokenAmount();
     error InvalidTokenSender();
@@ -32,11 +30,13 @@ abstract contract FNS is IERC721Receiver {
     constructor(
         address _registry,
         address _registrar,
-        address _publicResolver
+        address _publicResolver,
+        bytes32 _baseNode
     ) {
         REGISTRY = IFNS(_registry);
         REGISTRAR = IFNSRegistrar(_registrar);
         PUBLIC_RESOLVER = IFNSResolver(_publicResolver);
+        BASE_NODE = _baseNode;
     }
 
     /*
@@ -51,18 +51,18 @@ abstract contract FNS is IERC721Receiver {
     ) internal returns (bytes32 newSubNode) {
         bytes32 label = keccak256(bytes(subNode));
 
-        REGISTRY.setSubnodeRecord(
-            // Gaming character subnode
-            parentNode,
-            // Character tokenID as sub.subdomain to the gaming character subdomain
-            label,
-            // Owner
-            address(this),
-            // Resolver
-            address(PUBLIC_RESOLVER),
-            // TTL
-            0
-        );
+        // REGISTRY.setSubnodeRecord(
+        //     // Gaming character subnode
+        //     parentNode,
+        //     // Character tokenID as sub.subdomain to the gaming character subdomain
+        //     label,
+        //     // Owner
+        //     address(this),
+        //     // Resolver
+        //     address(PUBLIC_RESOLVER),
+        //     // TTL
+        //     0
+        // );
 
         newSubNode = _makeNode(parentNode, label);
     }
@@ -78,7 +78,8 @@ abstract contract FNS is IERC721Receiver {
         }
 
         if (DBNS_NODE == bytes32(0)) {
-            DBNS_NODE = _makeNode(ETH_NODE, bytes32(tokenId));
+            DOMAIN_ID = tokenId;
+            DBNS_NODE = _makeNode(BASE_NODE, bytes32(tokenId));
         }
         return IERC721Receiver.onERC721Received.selector;
     }
@@ -88,17 +89,5 @@ abstract contract FNS is IERC721Receiver {
         bytes32 labelhash
     ) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(node, labelhash));
-    }
-
-
-    // NEEDS TO GET REMOVED ONLY FOR TESTING
-    function transferDomain(address recipient) public {
-        PUBLIC_RESOLVER.setAddr(DBNS_NODE, recipient);
-        REGISTRAR.reclaim(uint256(DBNS_NODE), recipient);
-        REGISTRAR.safeTransferFrom(
-            address(this),
-            recipient,
-            uint256(DBNS_NODE)
-        );
     }
 }

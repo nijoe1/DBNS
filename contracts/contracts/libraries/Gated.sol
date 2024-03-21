@@ -20,10 +20,11 @@ abstract contract Gated {
 
     // Function to create a new OptimisticResolver contract and associate it with a schema
     function createGatedContract(
-        address[] memory _members
+        address[] memory _members,
+        bytes32 salt
     ) internal returns (address accessControlClone) {
         // Create new resolver contract
-        accessControlClone = Clones.clone(implementation);
+        accessControlClone = Clones.cloneDeterministic(implementation, salt);
 
         (bool success, ) = accessControlClone.call(
             abi.encodeWithSignature("initialize(address[])", _members)
@@ -32,10 +33,19 @@ abstract contract Gated {
         require(success, "error deploying");
     }
 
+    function getDeterministicAddress(
+        bytes32 _salt
+    ) public view returns (address) {
+        return Clones.predictDeterministicAddress(implementation, _salt);
+    }
+
     function getAccess(
         address _sender,
         address _gatedContract
     ) public view returns (bool) {
-        return IERC721(_gatedContract).balanceOf(_sender) > 0;
+        return
+            _gatedContract == address(0)
+                ? false
+                : IERC721(_gatedContract).balanceOf(_sender) > 0;
     }
 }

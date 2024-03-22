@@ -27,8 +27,8 @@ const config = getDefaultConfig({
   projectId: "ad9d4173328447d73a95b113fec565eb",
   chains: [filecoin, sepolia],
   transports: {
-    [sepolia.id]: http(),
     [filecoinCalibration.id]: http(),
+    [sepolia.id]: http(),
   },
 });
 
@@ -56,7 +56,7 @@ export default function App({ Component, pageProps }: AppProps) {
               {/* <div className="bg-black"> */}
               <Navbar />
               <Component {...pageProps} />
-              <div className="flex flex-grow mt-[20%]"></div>
+              <div className="flex flex-grow mt-[28%]"></div>
               <Footer />
               {/* </div> */}
             </RainbowKitProvider>

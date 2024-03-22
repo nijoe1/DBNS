@@ -27,7 +27,7 @@ abstract contract Tableland {
         "db_spaces_instances";
 
     string internal constant DBSPACES_INSTANCES_SCHEMA =
-        "InstanceID text, instanceOfSpace text, instanceType text, metadataCID text, chatID text, IPNS text, IPNSEncryptedKey text, gatedContract text, price text, lock text, creator text";
+        "InstanceID text, instanceOfSpace text, instanceType text, metadataCID text, chatID text, IPNS text, IPNSEncryptedKey text, gatedContract text, price text, creator text";
 
     string internal constant DB_INSTANCES_CODES_TABLE_PREFIX =
         "instances_codes";
@@ -38,7 +38,7 @@ abstract contract Tableland {
     string internal constant SUBSCRIPTIONS_TABLE_PREFIX = "subscriptions";
 
     string internal constant SUBSCRIPTIONS_SCHEMA =
-        "InstanceID text, subscriber text, tokenID text, endsAt text";
+        "InstanceID text, subscriber text, endsAt text";
 
     string internal constant DB_INSTANCES_MEMBERS_TABLE_PREFIX = "members";
 
@@ -155,7 +155,6 @@ abstract contract Tableland {
      */
 
     function instanceInsertion(
-        address _lock,
         bytes32 _instanceID,
         uint8 _lockType,
         bytes32 _instanceOfSpace,
@@ -171,7 +170,7 @@ abstract contract Tableland {
             SQLHelpers.toInsert(
                 DBSPACES_INSTANCES_TABLE_PREFIX,
                 tableIDs[1],
-                "InstanceID, instanceOfSpace, instanceType, metadataCID, chatID, IPNS, IPNSEncryptedKey, gatedContract, price, lock, creator",
+                "InstanceID, instanceOfSpace, instanceType, metadataCID, chatID, IPNS, IPNSEncryptedKey, gatedContract, price, creator",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(_instanceID)),
                     ",",
@@ -190,8 +189,6 @@ abstract contract Tableland {
                     SQLHelpers.quote(Strings.toHexString(_gatedContract)),
                     ",",
                     SQLHelpers.quote(Strings.toString(price)),
-                    ",",
-                    SQLHelpers.quote(Strings.toHexString(_lock)),
                     ",",
                     SQLHelpers.quote(Strings.toHexString(msg.sender))
                 )
@@ -297,7 +294,6 @@ abstract contract Tableland {
     function insertSubscription(
         bytes32 InstanceID,
         address subscriber,
-        uint256 tokenID,
         uint256 endsAt
     ) internal {
         mutate(
@@ -305,13 +301,11 @@ abstract contract Tableland {
             SQLHelpers.toInsert(
                 SUBSCRIPTIONS_TABLE_PREFIX,
                 tableIDs[3],
-                "InstanceID, subscriber, tokenID, endsAt",
+                "InstanceID, subscriber, endsAt",
                 string.concat(
                     SQLHelpers.quote(bytes32ToString(InstanceID)),
                     ",",
                     SQLHelpers.quote(Strings.toHexString(subscriber)),
-                    ",",
-                    SQLHelpers.quote(Strings.toString(tokenID)),
                     ",",
                     SQLHelpers.quote(Strings.toString(endsAt))
                 )

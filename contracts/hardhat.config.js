@@ -2,10 +2,11 @@ require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-deploy");
 require("hardhat-deploy-ethers");
 require("dotenv").config();
-require("@unlock-protocol/hardhat-plugin");
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-/** @type import('hardhat/config').HardhatUserConfig */
+/**
+ * @type import('hardhat/config').HardhatUserConfig
+ */
 module.exports = {
   solidity: {
     version: "0.8.20",

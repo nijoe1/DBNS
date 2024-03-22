@@ -35,7 +35,6 @@ const SpacesGraph = () => {
     }
   };
   useEffect(() => {
-    console.log(clickedID);
   }, [isRoot, clickedID]);
   useEffect(() => {
     const handleResize = () => {

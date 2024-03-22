@@ -16,7 +16,6 @@ export default function usePush() {
       const user = await PushAPI.initialize(signer, {
         env: CONSTANTS.ENV.STAGING,
       });
-
       if (user.errors.length > 0)
         throw new Error("Error initializing push protocol");
 

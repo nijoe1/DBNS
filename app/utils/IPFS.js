@@ -65,7 +65,9 @@ export const resolveIPNSName = async (IPNS) => {
   return revision.value;
 };
 
-export const createIPNSName = async (cid, apiKey, address, jwt, spaceID) => {
+export const createIPNSName = async (file, apiKey, address, jwt, spaceID) => {
+  const cid = (await uploadFile(file, apiKey)).Hash;
+  console.log("CID", cid);
   // https://www.npmjs.com/package/w3name
   const name = await Name.create();
   console.log("created new name: ", name.toString());
@@ -135,33 +137,16 @@ export const getIpfsCID = (ipfsCIDLink) => {
   return ipfsCIDLink.replace(LIGHTHOUSE_IPFS_GATEWAY, "");
 };
 
-export const getUserDataInfo = async (address, apiKey) => {
-  const balance = await lighthouse.getBalance(address);
-  let uploads;
-  try {
-    uploads = await lighthouse.getUploads(apiKey);
-  } catch {
-    return { balance: balance.data, uploads: [] };
-  }
-
-  return { balance: balance.data, uploads: uploads.data.fileList };
-};
-
-export const uploadFile = async (file, apiKey, setUploadProgress) => {
-  const progressCallback = (progressData) => {
-    const percentageDone =
-      100 - (progressData?.total / progressData?.uploaded)?.toFixed(2);
-    setUploadProgress(percentageDone); // Update the progress state
-  };
+export const uploadFile = async (file, apiKey) => {
   const output = await lighthouse.upload(
-    file,
+    [file],
     apiKey,
     false,
     null,
-    progressCallback,
+    null,
     dealParams,
   );
-  let RAAS_Response = await registerCIDtoRAAS(output.data.Hash);
+  await registerCIDtoRAAS(output.data.Hash);
 
   return output.data;
 };
@@ -203,81 +188,6 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
   await registerCIDtoRAAS(output.data[0].cid);
 
   return output.data;
-};
-
-export const uploadFolder = async (files, type, apiKey, setUploadProgress) => {
-  const progressCallback = (progressData) => {
-    const percentageDone =
-      100 - (progressData?.total / progressData?.uploaded)?.toFixed(2);
-    setUploadProgress(percentageDone); // Update the progress state
-  };
-  let CIDs = [];
-
-  const output = await lighthouse.upload(
-    files,
-    apiKey,
-    true,
-    null,
-    progressCallback,
-    dealParams,
-  );
-  for (const file of output.data) {
-    if (file.Name != "") {
-      CIDs.push(file.Hash);
-      let RAAS_Response = await registerCIDtoRAAS(file.Hash);
-    }
-  }
-  // Create JSON object
-  const json = {
-    type: type,
-    CIDs: CIDs,
-  };
-
-  const jsonBlob = new Blob([JSON.stringify(json)], {
-    type: "application/json",
-  });
-
-  // Create a File object from the Blob
-  const jsonFile = new File([jsonBlob], `type.json`, {
-    type: "application/json",
-  });
-
-  const jsonCID = await lighthouse.upload(
-    [jsonFile],
-    apiKey,
-    false,
-    null,
-    progressCallback,
-    dealParams,
-  );
-  return [jsonCID.data.Hash];
-};
-
-export const jsonCIDsUpload = async (apiKey, type, CIDs) => {
-  // Create JSON object
-  const json = {
-    type: type,
-    CIDs: CIDs,
-  };
-
-  const jsonBlob = new Blob([JSON.stringify(json)], {
-    type: "application/json",
-  });
-
-  // Create a File object from the Blob
-  const jsonFile = new File([jsonBlob], `type.json`, {
-    type: "application/json",
-  });
-
-  const jsonCID = await lighthouse.upload(
-    [jsonFile],
-    apiKey,
-    false,
-    null,
-    null,
-    dealParams,
-  );
-  return [jsonCID.data.Hash];
 };
 
 /* Deploy file along with encryption */

@@ -110,13 +110,6 @@ export function Hero(): JSX.Element {
                     className="h-[65px]  scale-90 rounded-md"
                   />
                 </li>
-                <li>
-                  <img
-                    src="/images/unlock.png"
-                    alt="unlock"
-                    className="h-[60px] rounded-md  scale-90"
-                  />
-                </li>
               </ul>
             </div>
           </div>

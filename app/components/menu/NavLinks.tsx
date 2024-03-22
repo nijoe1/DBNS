@@ -10,7 +10,7 @@ export type link = {
   text: string;
   href: string;
 };
-import { Button } from "@chakra-ui/react";
+import { Button ,Text} from "@chakra-ui/react";
 function NavLink({ text, href }: link): JSX.Element {
   const router = useRouter();
   const navigateToHashRoute = (hashRoute: any) => {
@@ -25,7 +25,6 @@ function NavLink({ text, href }: link): JSX.Element {
       });
     }
   };
-  console.log("href", router);
 
   return (
     <Button
@@ -35,7 +34,7 @@ function NavLink({ text, href }: link): JSX.Element {
         navigateToHashRoute(href);
       }}
     >
-      <li>{text}</li>
+      <Text>{text}</Text>
     </Button>
   );
 }
@@ -65,14 +64,14 @@ function ResponsiveNavLink({
   };
   return (
     <div
-      className={`hover:bg-black/20 transition-all w-full text-center py-3 cursor-pointer`} // Ensure consistent class names
+      className={`hover:bg-black/20 text-gray transition-all w-full text-center py-3 cursor-pointer`} // Ensure consistent class names
       onClick={(e) => {
         e.preventDefault();
         navigateToHashRoute(href);
         setIsSidebarOpen(false);
       }}
     >
-      {text}
+      <Text className="hover:text-white text-gray">{text?text:""}</Text>
     </div>
   );
 }

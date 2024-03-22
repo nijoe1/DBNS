@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Flex,
   Box,
@@ -9,45 +9,64 @@ import {
   Grid,
   GridItem,
   useDisclosure,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
+import { FaEllipsisV } from "react-icons/fa";
 import { Container } from "@/components/ui/container";
 import { useRouter } from "next/router";
 import CreateNewInstance from "../contracts/createNewInstance";
-import { createName } from "@/utils/IPFS";
-
-// Sample data for database instances
-const instancesData = [
-  {
-    id: 1,
-    name: "Instance 1",
-    about: "About Instance 1",
-    imageUrl: "https://via.placeholder.com/150",
-  },
-  {
-    id: 2,
-    name: "Instance 2",
-    about: "About Instance 2",
-    imageUrl: "https://via.placeholder.com/150",
-  },
-  {
-    id: 3,
-    name: "Instance 3",
-    about: "About Instance 3",
-    imageUrl: "https://via.placeholder.com/150",
-  },
-  {
-    id: 4,
-    name: "Instance 4",
-    about: "About Instance 4",
-    imageUrl: "https://via.placeholder.com/150",
-  },
-  // Add more instances as needed
-];
+import { createName, getIpfsGatewayUri } from "@/utils/IPFS";
+import { getSpaceInstances } from "@/utils/tableland";
+import axios from "axios";
 
 const SingleSpacePage = () => {
   const router = useRouter();
-
+  const spaceID = router.asPath.replace("/#/SingleSpacePage?id=", "");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [instances, setInstances] = useState({
+    openInstances: [],
+    openPrivateInstances: [],
+    paidInstances: [],
+    paidPrivateInstances: [],
+  });
+
+  async function getMetadataCID(data) {
+    const temp = [];
+    for (const item of data) {
+      const metadataCIDLink = getIpfsGatewayUri(item.metadataCID);
+      const res = await axios(metadataCIDLink);
+      item.metadata = res.data; // obj that contains => name about imageUrl
+      temp.push(item); // Push fetched JSON metadata directly
+    }
+    return temp;
+  }
+
+  async function fetchInstances() {
+    const data = (await getSpaceInstances(spaceID))[0].instances;
+    const dataObj = {}; // Initialize data object
+    for (const key in data) {
+      if (
+        key === "openInstances" ||
+        key === "openPrivateInstances" ||
+        key === "paidInstances" ||
+        key === "paidPrivateInstances"
+      ) {
+        const instancesArray = data[key].map(JSON.parse); // Parse each stringified JSON object
+        dataObj[key] = await getMetadataCID(instancesArray);
+      }
+    }
+    return dataObj;
+  }
+
+  useEffect(() => {
+    fetchInstances().then((resp) => {
+      setInstances(resp);
+    });
+  }, [spaceID]);
 
   const navigateToHashRoute = (hashRoute) => {
     if (hashRoute == "/") {
@@ -61,67 +80,134 @@ const SingleSpacePage = () => {
       });
     }
   };
+
   const handleNewClick = async () => {
     onOpen();
-    console.log("Create new instance");
-    console.log(isOpen);
     await createName();
   };
+
   return (
     <Container>
-      <Button onClick={handleNewClick}>Create New Instance</Button>
-      <CreateNewInstance
-        onClose={onClose}
-        isOpen={isOpen}
-        spaceID={
-          "0x726d4f081a188bae99c1fc67b9c281d628040d90dddab3d6f7dbdd06b3a89868"
-        }
-      />
-      <Flex justify="center" align="center" mt="4">
+      <Button onClick={handleNewClick} colorScheme="blue" my="4">
+        Create Dataset
+      </Button>
+      <CreateNewInstance onClose={onClose} isOpen={isOpen} spaceID={spaceID} />
+      <Flex justify="center">
         <Grid
-          templateColumns={["1fr", "1fr 1fr", "1fr 1fr 1fr", "1fr 1fr 1fr 1fr"]}
+          templateColumns={[
+            "1fr",
+            "repeat(2, 1fr)",
+            "repeat(3, 1fr)",
+            "repeat(4, 1fr)",
+          ]}
           gap={6}
           width="100%"
           className="flex md:justify-between lg:grid lg:px-3 relative"
         >
-          {instancesData.map((instance) => (
-            <GridItem key={instance.id}>
-              <Box
-                p="4"
-                borderWidth="1px"
-                borderRadius="lg"
-                overflow="hidden"
-                boxShadow="md"
-                bg="#333333"
-                className="flex flex-col items-center"
-              >
-                <Image src={instance.imageUrl} alt={instance.name} />
-                <Badge colorScheme="green" mt="2">
-                  Open
-                </Badge>
-                <Text fontWeight="semibold" mt="2" color="white">
-                  {instance.name}
-                </Text>
-                <Text mt="2" color="white">
-                  {instance.about}
-                </Text>
-                <Button
-                  className="bg-white text-black border border-black"
-                  mt="2"
-                  size="sm"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigateToHashRoute("/instance");
-                  }}
+          {Object.entries(instances).map(([type, instanceArray]) =>
+            instanceArray.map((instance) => (
+              <GridItem key={instance.InstanceID}>
+                <Box
+                  pb="4"
+                  px="2"
+                  pt="2"
+                  bg="#333333"
+                  borderRadius="md"
+                  boxShadow="md"
+                  position="relative"
+                  cursor="pointer"
                 >
-                  Go to Instance
-                </Button>
-              </Box>
-            </GridItem>
-          ))}
+                  <Box
+                    position="relative"
+                    borderRadius="md"
+                    overflow="hidden"
+                    mb="10%"
+                    height="120px"
+                  >
+                    <Image
+                      src={
+                        instance.metadata.imageUrl
+                          ? instance.metadata.imageUrl
+                          : "https://via.placeholder.com/150"
+                      }
+                      alt="Profile Image"
+                      width="100%"
+                      aspectRatio={2 / 1}
+                      objectFit="cover"
+                      onClick={() =>
+                        navigateToHashRoute("/instance?id=" + instance.InstanceID)
+                      }
+                    />
+                    <Box
+                      display="flex"
+                      justifyContent="flex-start"
+                      alignItems="flex-start"
+                      position="absolute"
+                      top="0"
+                      right="0"
+                      zIndex="1"
+                    >
+                      <Badge
+                      mt="1.5"
+                        colorScheme={
+                          type === "openInstances" ||
+                          type === "openPrivateInstances"
+                            ? "green"
+                            : "red"
+                        }
+                      >
+                        {type === "openInstances" ||
+                        type === "openPrivateInstances"
+                          ? "Open"
+                          : "Paid"}
+                      </Badge>
+                      <Menu zIndex="2" >
+                        <MenuButton
+                          as={IconButton}
+                          icon={<FaEllipsisV />}
+                          aria-label="Options"
+                          variant="ghost"
+                          color="black"
+                          size="sm"
+                          mb="3"
+                        />
+                        <MenuList                       zIndex="3"
+>
+                          <MenuItem
+                            onClick={() => console.log("Download dataset")}
+                          >
+                            Download Dataset
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => console.log("Fork instance")}
+                          >
+                            Fork Instance
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
+                    </Box>
+                  </Box>
+                  <Box                     height="50px"
+>
+                    <Text
+                      fontWeight="semibold"
+                      fontSize="sm"
+                      noOfLines={1}
+                      color="white"
+                      mb="1"
+                    >
+                      {instance.metadata.name.slice(0, 30)}
+                    </Text>
+                    <Text fontSize="xs" noOfLines={2} color="white" mb="1">
+                      {instance.metadata.about.slice(0, 50)}
+                    </Text>
+                  </Box>
+                </Box>
+              </GridItem>
+            ))
+          )}
         </Grid>
       </Flex>
-      <createNewInstance onClose={onClose} isOpen={isOpen} spaceID={"1"} />
     </Container>
   );
 };

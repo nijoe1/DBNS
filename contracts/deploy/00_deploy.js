@@ -1,7 +1,7 @@
 require("hardhat-deploy");
 require("hardhat-deploy-ethers");
 
-const { ethers, unlock } = require("hardhat");
+const { ethers } = require("hardhat");
 const { Console } = require("console");
 const { get } = require("http");
 
@@ -12,16 +12,11 @@ module.exports = async ({ deployments }) => {
   const { deploy } = deployments;
   console.log("Wallet+ Ethereum Address:", wallet.address);
 
-  // deploy the Unlock contract
-  // const ul = await unlock.deployProtocol(12,12,0);
-  // console.log("Unlock Address:", ul);
-
-  // Calibration Testnet
+  // // Calibration Testnet
   const ENS = "0x331e3228ca613F52B8E6a0F1EFD7000Cb6DFA581";
   const PUBLIC_RESOLVER = "0x55608172cD23E7e1c2BD939f1C3210027EbD031a";
   const REGISTRAR = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
-  const UNLOCK = "0xa4E2E8c8A18bd0641cb3288Bf7a55fb3A2F1880F";
-  // PUBLICLOCK > deployed to : 0xa6E4BAB853c696BC9eE1eB6f1Ea09365E50B4038
+
   const BASENODE =
     "0x78f6b1389af563cc5c91f234ea46b055e49658d8b999eeb9e0baef7dbbc93fdb";
 
@@ -29,7 +24,6 @@ module.exports = async ({ deployments }) => {
   // const ENS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
   // const PUBLIC_RESOLVER = "0x8FADE66B79cC9f707aB26799354482EB93a5B7dD";
   // const REGISTRAR = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
-  // const UNLOCK = "0x36b34e10295cCE69B652eEB5a8046041074515Da";
   // const BASENODE =
   //   "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae";
 
@@ -45,7 +39,6 @@ module.exports = async ({ deployments }) => {
       REGISTRAR,
       PUBLIC_RESOLVER,
       BASENODE,
-      UNLOCK,
       IMPLEMENTATION.address,
     ],
     log: true,
@@ -72,14 +65,11 @@ module.exports = async ({ deployments }) => {
   // let tx = await DBNS.tables(0)
   // console.log(tx);
 
-  tx = await DBNS.createDBSpace("nick", { gasLimit: 40000000 });
+  tx = await DBNS.createDBSpace("nick5", { gasLimit: 40000000 });
 
-  // await tx.wait();
+  await tx.wait();
 
   // console.log(tx);
-
-  // tx = await DBNS.transferDomain(wallet.address,{gasLimit: 4000000});
-  // await tx.wait();
 
   // console.log(tx);
 

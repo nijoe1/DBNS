@@ -16,7 +16,7 @@ const Home = () => {
       {(router.asPath === "/#/" ||
         (router.pathname === "/" && router.asPath === "/")) && <LandingPage />}
       {router.asPath.includes("/#/SingleSpacePage") && <SingleSpacePage />}
-      {router.asPath === "/#/instance" && <InstanceDetailsPage />}
+      {router.asPath.includes("/#/instance") && <InstanceDetailsPage />}
     </div>
   );
 };

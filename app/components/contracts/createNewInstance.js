@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Input,
   Modal,
@@ -9,6 +9,14 @@ import {
   ModalFooter,
   Button,
   useToast,
+  Stack,
+  FormControl,
+  FormLabel,
+  InputGroup,
+  InputRightElement,
+  Icon,
+  Flex,
+  Text,
 } from "@chakra-ui/react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { CONTRACT_ABI, CONTRACT_ADDRESSES } from "@/constants/contracts";
@@ -16,7 +24,11 @@ import { useSelector } from "react-redux";
 import usePush from "@/hooks/usePush";
 import { useRouter } from "next/router";
 import { getRules } from "@/constants/push";
-import { createIPNSName } from "@/utils/IPFS";
+import { createIPNSName, uploadFile } from "@/utils/IPFS";
+import ChakraTagInput from "@/components/ui/TagsInput";
+import { isAddress } from "viem";
+import { FaFileUpload, FaImage } from "react-icons/fa";
+
 const CreateNewInstance = ({
   isOpen = { isOpen },
   onClose = { onClose },
@@ -27,22 +39,26 @@ const CreateNewInstance = ({
   const publicClient = usePublicClient();
   const chainID = publicClient?.getChainId();
   const { data: walletClient } = useWalletClient();
+
   const [formData, setFormData] = useState({
     name: "",
     about: "",
-    price: "",
+    image: null,
+    price: 0,
     members: [],
     metadataName: "", // Added metadataName field
     metadataCID: "",
     chatID: "",
     IPNS: "",
     IPNSEncryptedKey: "",
+    file: null,
+    instanceID: "",
   });
   const { initializePush } = usePush();
   const router = useRouter();
   const pushSign = useSelector((state) => state.push.pushSign);
-  console.log(pushSign);
   const { address } = useAccount();
+  const [tags, setTags] = useState([]);
 
   useEffect(() => {
     async function initialize() {
@@ -53,6 +69,37 @@ const CreateNewInstance = ({
     }
   }, [router]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    handleChange({
+      target: {
+        name: "file",
+        value: file,
+      },
+    });
+  };
+
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    let base64 = await convertFileToBase64(file);
+    console.log(base64);
+    handleChange({
+      target: {
+        name: "image",
+        value: base64,
+      },
+    });
+  };
+
   const createGroup = async () => {
     const deterministicAddress = await publicClient?.readContract({
       address: CONTRACT_ADDRESSES,
@@ -60,15 +107,16 @@ const CreateNewInstance = ({
       functionName: "getDeterministicAddress",
       args: [spaceID],
     });
-    console.log(deterministicAddress);
+    const rules = getRules(chainID, deterministicAddress);
     const createdGroup = await pushSign.chat.group.create(formData.name, {
       description: "Token gated web3 native chat example", // provide short description of group
       image: "data:image/png;base64,iVBORw0K...", // provide base64 encoded image
-      members: [], // not needed, rules define this, can omit
+      members: tags, // not needed, rules define this, can omit
       admins: [], // not needed as per problem statement, can omit
       private: true,
-      rules: getRules(chainID, deterministicAddress),
+      // rules: rules,
     });
+    return createdGroup.chatId;
   };
 
   const createIPNS = async () => {
@@ -76,22 +124,94 @@ const CreateNewInstance = ({
     let jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
 
     // cid, apiKey, address, jwt, spaceID
-    const ipnsName = await createIPNSName(
-      "bafybeig2ygg4yzyoprroumzmuwm72qxtorgell7hipvpoyqdmfqoxupyay",
+    const response = await createIPNSName(
+      formData.file,
       key,
       address,
       jwt,
-      spaceID,
+      spaceID
     );
-    console.log(ipnsName);
+    return response;
+  };
+
+  const uploadMetadata = async () => {
+    let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
+
+    const metadata = {
+      name: formData.name,
+      about: formData.about,
+      imageUrl: formData.image,
+    };
+    const jsonBlob = new Blob([JSON.stringify(metadata)], {
+      type: "application/json",
+    });
+
+    // Create a File object from the Blob
+    const jsonFile = new File([jsonBlob], `type.json`, {
+      type: "application/json",
+    });
+    const metadataCID = await uploadFile(jsonFile, key);
+    // setFormData({ ...formData, metadataCID: metadataCID.Hash });
+    return metadataCID.Hash;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+  const handleTagsChange = useCallback(
+    (event, tags) => {
+      const { value } = event.target;
+
+      // Convert all addresses to lowercase
+      const lowercaseTags = tags.map((tag) => {
+        // Lowercase each tag
+        if (tag !== "" && tag) {
+          return tag?.toLowerCase();
+        }
+        return;
+      });
+
+      // Check if the new address is a valid Ethereum address
+      if (value && !isAddress(value)) {
+        toast({
+          title: "Invalid Address",
+          description: "Not a valid Ethereum address",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // Check if the new address is already in the tags array
+      const count = lowercaseTags.filter(
+        (tag) => tag === value?.toLowerCase()
+      ).length;
+      if (count > 1) {
+        toast({
+          title: "Duplicate Address",
+          description: "This address is already added",
+          status: "warning",
+          duration: 2000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // Include only distinct addresses
+      const distinctTags = [...new Set([...lowercaseTags])];
+
+      // Update the state with distinct addresses
+      setTags(distinctTags);
+    },
+    [setTags]
+  );
 
   const handleCreate = async () => {
+    let metadataCID = await uploadMetadata();
+    let res = await createIPNS();
+    let chatID = await createGroup();
     try {
       // Create space instance
       const data = await publicClient?.simulateContract({
@@ -101,12 +221,12 @@ const CreateNewInstance = ({
         functionName: "createSpaceInstance",
         args: [
           spaceID,
-          formData.price,
-          formData.members,
-          formData.metadataCID, // Concatenating metadataName and metadataCID
-          formData.chatID,
-          formData.IPNS,
-          formData.IPNSEncryptedKey,
+          BigInt(formData.price * 10 ** 18),
+          tags,
+          metadataCID, // Concatenating metadataName and metadataCID
+          chatID,
+          res.name,
+          res.cid,
         ],
       });
 
@@ -121,6 +241,8 @@ const CreateNewInstance = ({
       const transaction = await publicClient.waitForTransactionReceipt({
         hash,
       });
+
+      onClose();
 
       // Display success toast
       toast({
@@ -141,36 +263,108 @@ const CreateNewInstance = ({
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent bg="#333333" color="white" borderRadius="md">
-        <ModalHeader>Create New Subnode</ModalHeader>
-        <ModalBody bg={"#333333"}>
-          <Input
-            name="name"
-            placeholder="Enter instance name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-          <Input
-            name="about"
-            placeholder="Enter instance about"
-            value={formData.about}
-            onChange={handleChange}
-          />
-          <Input
-            name="price"
-            placeholder="Enter price"
-            value={formData.price}
-            onChange={handleChange}
-          />
-          <Input
-            name="metadataName"
-            placeholder="Enter metadata name"
-            value={formData.metadataName}
-            onChange={handleChange}
-          />
-          {/* Other input fields for members, chatID, IPNS */}
+        <ModalHeader>Create New Dataset</ModalHeader>
+        <ModalBody>
+          <Stack spacing="4">
+            <FormControl>
+              <FormLabel>Name</FormLabel>
+              <Input
+                name="name"
+                placeholder="Enter instance name"
+                value={formData.name}
+                onChange={handleChange}
+                bg="#424242"
+                color="white"
+                borderRadius="md"
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>About</FormLabel>
+              <Input
+                name="about"
+                placeholder="Enter instance about"
+                value={formData.about}
+                onChange={handleChange}
+                bg="#424242"
+                color="white"
+                borderRadius="md"
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Image</FormLabel>
+              <InputGroup>
+                <Input
+                  type="file"
+                  onChange={handleImageChange}
+                  display="none"
+                  id="image-upload"
+                />
+                <InputRightElement>
+                  <label htmlFor="image-upload">
+                    <Icon as={FaImage} cursor="pointer" />
+                  </label>
+                </InputRightElement>
+              </InputGroup>
+              <Text
+                cursor="pointer"
+                color="white"
+                ml="2"
+                onClick={() => document.getElementById("image-upload").click()}
+              >
+                Upload Image
+              </Text>
+            </FormControl>
+            <FormControl>
+              <FormLabel>File</FormLabel>
+              <InputGroup>
+                <Input
+                  type="file"
+                  onChange={handleFileChange}
+                  display="none"
+                  id="file-upload"
+                />
+                <InputRightElement>
+                  <label htmlFor="file-upload">
+                    <Icon as={FaFileUpload} cursor="pointer" />
+                  </label>
+                </InputRightElement>
+              </InputGroup>
+              <Text
+                cursor="pointer"
+                color="white"
+                ml="2"
+                onClick={() => document.getElementById("file-upload").click()}
+              >
+                Upload Dataset
+              </Text>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Price</FormLabel>
+              <Input
+                name="price"
+                placeholder="Enter price"
+                value={formData.price}
+                onChange={handleChange}
+                bg="#424242"
+                color="white"
+                borderRadius="md"
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Members optional</FormLabel>
+              <ChakraTagInput
+                tags={tags}
+                onTagsChange={handleTagsChange}
+                wrapProps={{ direction: "column", align: "start" }}
+                wrapItemProps={(isInput) =>
+                  isInput ? { alignSelf: "stretch" } : null
+                }
+              />
+            </FormControl>
+          </Stack>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="white" mr={3} onClick={createIPNS}>
+          <Button colorScheme="white" mr={3} onClick={handleCreate}>
             Create
           </Button>
           <Button variant="white" onClick={onClose}>
@@ -181,5 +375,4 @@ const CreateNewInstance = ({
     </Modal>
   );
 };
-
 export default CreateNewInstance;

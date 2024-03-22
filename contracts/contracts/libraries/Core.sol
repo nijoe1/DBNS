@@ -5,9 +5,9 @@ import {FNS} from "./FNS.sol";
 
 import {Gated, IGated} from "./Gated.sol";
 
-import {Unlock} from "./Unlock.sol";
-
 import {Tableland} from "./Tableland.sol";
+
+import {Subscriptions} from "./Subscriptions.sol";
 
 /**
  * @title Core
@@ -16,7 +16,7 @@ import {Tableland} from "./Tableland.sol";
  * Tableland SQL in solidity for the databases and subspaces
  */
 
-abstract contract Core is FNS, Gated, Tableland, Unlock {
+abstract contract Core is FNS, Gated, Tableland, Subscriptions {
     enum Types {
         NULL,
         PAID_PRIVATE_INSTANCE,
@@ -48,13 +48,11 @@ abstract contract Core is FNS, Gated, Tableland, Unlock {
         address _registrar,
         address _publicResolver,
         bytes32 _baseNode,
-        address _UnlockContract,
         address _gatedImplementation
     )
         FNS(_registry, _registrar, _publicResolver, _baseNode)
         Gated(_gatedImplementation)
         Tableland()
-        Unlock(_UnlockContract)
     {}
 
     /**
@@ -66,15 +64,15 @@ abstract contract Core is FNS, Gated, Tableland, Unlock {
     function createInstanceType(
         bytes32 _newDBInstance,
         address _gatedContract,
-        uint256 _price
-    ) internal returns (address _lock) {
+        uint _price
+    ) internal  {
         bool _isPrivate = _gatedContract != address(0);
-        if (_price > 0) {
+        if (!_isPrivate && _price > 0) {
             isType[_newDBInstance] = Types.PAID_INSTANCE;
-            _lock = createLock(_price, "DBNS", _newDBInstance);
+            createSubscription(_price,  _newDBInstance);
         } else if (_isPrivate && _price > 0) {
             isType[_newDBInstance] = Types.PAID_PRIVATE_INSTANCE;
-            _lock = createLock(_price, "DBNS", _newDBInstance);
+            createSubscription(_price, _newDBInstance);
         } else if (_isPrivate) {
             isType[_newDBInstance] = Types.OPEN_PRIVATE_INSTANCE;
         } else {

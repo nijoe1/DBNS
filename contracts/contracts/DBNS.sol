@@ -18,7 +18,6 @@ contract DBNS is Core {
         address _registrar,
         address _publicResolver,
         bytes32 _baseNode,
-        address _unlockContract,
         address _gateImplementation
     )
         Core(
@@ -26,7 +25,6 @@ contract DBNS is Core {
             _registrar,
             _publicResolver,
             _baseNode,
-            _unlockContract,
             _gateImplementation
         )
     {}
@@ -74,7 +72,7 @@ contract DBNS is Core {
      */
     function createSpaceInstance(
         bytes32 _node,
-        uint256 _price,
+        uint _price,
         address[] calldata _members,
         string calldata _metadataCID,
         string calldata _chatID,
@@ -100,14 +98,13 @@ contract DBNS is Core {
             msg.sender
         );
 
-        address _lock = createInstanceType(
+        createInstanceType(
             _newDBInstance,
             _gatedContract,
             _price
         );
 
         instanceInsertion(
-            _lock,
             _newDBInstance,
             uint8(isType[_newDBInstance]),
             _node,
@@ -164,12 +161,11 @@ contract DBNS is Core {
     function purchaseInstanceSubscription(
         bytes32 _instanceID
     ) external payable {
-        uint256 _tokenID = purchaseSubscription(_instanceID);
+        purchaseSubscription(_instanceID);
         insertSubscription(
             _instanceID,
             msg.sender,
-            _tokenID,
-            block.timestamp + MONTH
+            getTime() + MONTH
         );
     }
 
@@ -178,11 +174,10 @@ contract DBNS is Core {
             _instanceID,
             msg.sender
         );
-        uint256 _tokenID = extendSubscription(_instanceID);
+        extendSubscription(_instanceID);
         insertSubscription(
             _instanceID,
             msg.sender,
-            _tokenID,
             remaining + MONTH
         );
     }

@@ -1,6 +1,6 @@
 {
   "name": "dbns",
-  "version": "0.3.0",
+  "version": "3.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,6 +14,7 @@
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.1",
     "@chakra-ui/system": "^2.6.2",
+    "@datalayer/jupyter-react": "^0.9.5",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@lighthouse-web3/kavach": "^0.1.5",

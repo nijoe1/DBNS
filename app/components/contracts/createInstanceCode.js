@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Input,
   Modal,
@@ -9,24 +9,126 @@ import {
   ModalFooter,
   Button,
   useToast,
+  Stack,
+  FormControl,
+  FormLabel,
+  InputGroup,
+  InputRightElement,
+  Icon,
+  Flex,
+  Text,
 } from "@chakra-ui/react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { CONTRACT_ABI, CONTRACT_ADDRESSES } from "@/constants/contracts";
+import { useSelector } from "react-redux";
+import usePush from "@/hooks/usePush";
+import { useRouter } from "next/router";
+import { getRules } from "@/constants/push";
+import { createIPNSName, uploadFile } from "@/utils/IPFS";
+import { FaFileUpload, FaImage } from "react-icons/fa";
 
-const CreateNewInstanceModal = ({ isOpen, onClose }) => {
+const CreateNewInstanceCode = ({
+  isOpen = { isOpen },
+  onClose = { onClose },
+  spaceID,
+}) => {
   const toast = useToast();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
+  const chainID = publicClient?.getChainId();
   const { data: walletClient } = useWalletClient();
+
   const [formData, setFormData] = useState({
-    nodeName: "",
-    price: "",
+    name: "",
+    about: "",
+
     members: [],
-    metadataName: "", // Added metadataName field
-    metadataCID: "",
     chatID: "",
     IPNS: "",
+    IPNSEncryptedKey: "",
+    file: null,
+    instanceID: "",
   });
+  const { initializePush } = usePush();
+  const router = useRouter();
+  const pushSign = useSelector((state) => state.push.pushSign);
+  const { address } = useAccount();
+  const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    async function initialize() {
+      await initializePush();
+    }
+    if (Object.keys(pushSign).length === 0) {
+      initialize();
+    }
+  }, [router]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    handleChange({
+      target: {
+        name: "file",
+        value: file,
+      },
+    });
+  };
+
+
+  const createCode = async () => {
+    const deterministicAddress = await publicClient?.readContract({
+      address: CONTRACT_ADDRESSES,
+      abi: CONTRACT_ABI,
+      functionName: "getDeterministicAddress",
+      args: [spaceID],
+    });
+    const rules = getRules(chainID, deterministicAddress);
+    const createdGroup = await pushSign.chat.group.create(formData.name, {
+      description: "Token gated web3 native chat example", // provide short description of group
+      image: "data:image/png;base64,iVBORw0K...", // provide base64 encoded image
+      members: tags, // not needed, rules define this, can omit
+      admins: [], // not needed as per problem statement, can omit
+      private: true,
+      // rules: rules,
+    });
+    return createdGroup.chatId;
+  };
+
+  const createIPNS = async () => {
+    let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
+    let jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
+
+    // cid, apiKey, address, jwt, spaceID
+    const response = await createIPNSName(
+      formData.file,
+      key,
+      address,
+      jwt,
+      spaceID
+    );
+    return response;
+  };
+
+  const uploadMetadata = async () => {
+    let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
+
+    const metadata = {
+      name: formData.name,
+      about: formData.about,
+      imageUrl: formData.image,
+    };
+    const jsonBlob = new Blob([JSON.stringify(metadata)], {
+      type: "application/json",
+    });
+
+    // Create a File object from the Blob
+    const jsonFile = new File([jsonBlob], `type.json`, {
+      type: "application/json",
+    });
+    const metadataCID = await uploadFile(jsonFile, key);
+    // setFormData({ ...formData, metadataCID: metadataCID.Hash });
+    return metadataCID.Hash;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,20 +136,22 @@ const CreateNewInstanceModal = ({ isOpen, onClose }) => {
   };
 
   const handleCreate = async () => {
+    let res = await createIPNS();
+    let chatID = await createCode();
     try {
       // Create space instance
       const data = await publicClient?.simulateContract({
         account,
         address: CONTRACT_ADDRESSES,
         abi: CONTRACT_ABI,
-        functionName: "createSpaceInstance",
+        functionName: "createInstanceCode",
         args: [
-          formData.nodeName,
-          formData.price,
-          formData.members,
-          `${formData.metadataName} ${formData.metadataCID}`, // Concatenating metadataName and metadataCID
-          formData.chatID,
-          formData.IPNS,
+          spaceID,
+          formData.name,
+          formData.about,
+          chatID,
+          res.name,
+          res.cid,
         ],
       });
 
@@ -62,6 +166,8 @@ const CreateNewInstanceModal = ({ isOpen, onClose }) => {
       const transaction = await publicClient.waitForTransactionReceipt({
         hash,
       });
+
+      onClose();
 
       // Display success toast
       toast({
@@ -82,33 +188,64 @@ const CreateNewInstanceModal = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent bg="#333333" color="white" borderRadius="md">
-        <ModalHeader>Create New Subnode</ModalHeader>
-        <ModalBody bg={"#333333"}>
-          <Input
-            name="nodeName"
-            placeholder="Enter subnode name"
-            value={formData.nodeName}
-            onChange={handleChange}
-          />
-          <Input
-            name="price"
-            placeholder="Enter price"
-            value={formData.price}
-            onChange={handleChange}
-          />
-          <Input
-            name="metadataName"
-            placeholder="Enter metadata name"
-            value={formData.metadataName}
-            onChange={handleChange}
-          />
-          {/* Other input fields for members, chatID, IPNS */}
+        <ModalHeader>Create New Code</ModalHeader>
+        <ModalBody>
+          <Stack spacing="4">
+            <FormControl>
+              <FormLabel>Name</FormLabel>
+              <Input
+                name="name"
+                placeholder="Enter instance name"
+                value={formData.name}
+                onChange={handleChange}
+                bg="#424242"
+                color="white"
+                borderRadius="md"
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>About</FormLabel>
+              <Input
+                name="about"
+                placeholder="Enter instance about"
+                value={formData.about}
+                onChange={handleChange}
+                bg="#424242"
+                color="white"
+                borderRadius="md"
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Code</FormLabel>
+              <InputGroup>
+                <Input
+                  type="file"
+                  onChange={handleFileChange}
+                  display="none"
+                  id="file-upload"
+                />
+                <InputRightElement>
+                  <label htmlFor="file-upload">
+                    <Icon as={FaFileUpload} cursor="pointer" />
+                  </label>
+                </InputRightElement>
+              </InputGroup>
+              <Text
+                cursor="pointer"
+                color="white"
+                ml="2"
+                onClick={() => document.getElementById("file-upload").click()}
+              >
+                Upload Model Code
+              </Text>
+            </FormControl>
+          </Stack>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleCreate}>
+          <Button colorScheme="white" mr={3} onClick={handleCreate}>
             Create
           </Button>
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="white" onClick={onClose}>
             Cancel
           </Button>
         </ModalFooter>
@@ -116,5 +253,4 @@ const CreateNewInstanceModal = ({ isOpen, onClose }) => {
     </Modal>
   );
 };
-
-export default CreateNewInstanceModal;
+export default CreateNewInstanceCode;

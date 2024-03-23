@@ -74,7 +74,6 @@ const CreateNewInstanceCode = ({
     });
   };
 
-
   const createCode = async () => {
     const deterministicAddress = await publicClient?.readContract({
       address: CONTRACT_ADDRESSES,
@@ -104,7 +103,7 @@ const CreateNewInstanceCode = ({
       key,
       address,
       jwt,
-      spaceID
+      spaceID,
     );
     return response;
   };

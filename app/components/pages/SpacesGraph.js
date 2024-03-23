@@ -5,6 +5,8 @@ import Tree from "react-d3-tree";
 import { useRouter } from "next/router";
 import CreateSubSpaceModal from "@/components/contracts/createSubSpace";
 import { constructObject } from "@/utils/tableland";
+import Loading from "@/components/Animation/Loading";
+
 const parentName = "dbns.eth";
 
 const SpacesGraph = () => {
@@ -12,6 +14,7 @@ const SpacesGraph = () => {
   const router = useRouter();
   const [treeData, setTreeData] = useState(null);
   const [tempTreeData, setTempTreeData] = useState(null);
+  const [fetched, setFetched] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState();
   const [windowDimensions, setWindowDimensions] = useState({
@@ -34,8 +37,7 @@ const SpacesGraph = () => {
       });
     }
   };
-  useEffect(() => {
-  }, [isRoot, clickedID]);
+  useEffect(() => {}, [isRoot, clickedID]);
   useEffect(() => {
     const handleResize = () => {
       setWindowDimensions({
@@ -86,6 +88,7 @@ const SpacesGraph = () => {
       // return exampleData;
       setTreeData(exampleData);
       setTempTreeData(exampleData);
+      setFetched(true);
     }
   };
 
@@ -168,77 +171,85 @@ const SpacesGraph = () => {
   );
 
   return (
-    <Container>
-      <Box
-        p="4"
-        borderWidth="3px"
-        borderColor={"black"}
-        borderRadius="lg"
-        overflow="hidden"
-        boxShadow="md"
-        height="calc(100vh - 150px)" // Adjust height dynamically
-        display="flex"
-        alignItems="center"
-        className="mx-[3%] "
-      >
-        <Flex
-          direction="column"
-          align="center"
-          justify="center"
-          height="100%"
-          width="100%"
-        >
-          {/* Category dropdown */}
-          <Select
-            placeholder="All categories..."
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            mb={4}
-            mt="6%"
-            width={["90%", "70%", "50%"]} // Adjust width for different screen sizes
+    <div className="flex flex-col items-center">
+      {!fetched ? (
+        <div className="mx-auto mt-[10%]">
+          <Loading />
+        </div>
+      ) : (
+        <Container>
+          <Box
+            p="4"
+            borderWidth="3px"
+            borderColor={"black"}
+            borderRadius="lg"
+            overflow="hidden"
+            boxShadow="md"
+            height="calc(100vh - 150px)" // Adjust height dynamically
+            display="flex"
+            alignItems="center"
+            className="mx-[3%] "
           >
-            {categoryOptions.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-          </Select>
-          {/* Display tree */}
-          {treeData && (
-            <Box
-              id="treeWrapper"
+            <Flex
+              direction="column"
+              align="center"
+              justify="center"
+              height="100%"
               width="100%"
-              height="calc(100vh - 250px)" // Adjust height dynamically
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
             >
-              <Tree
-                data={treeData}
-                orientation="vertical"
-                rootNodeClassName="node__root"
-                branchNodeClassName="node__branch"
-                leafNodeClassName="node__leaf"
-                renderCustomNodeElement={renderCustomNodeElement}
-                translate={{
-                  x: windowDimensions.width / 3.0,
-                  y: windowDimensions.height / 7,
-                }}
-                zoom={1}
-                separation={{ siblings: 2, nonSiblings: 2 }}
-                initialDepth={1}
-              />
-            </Box>
-          )}
-        </Flex>
-        <CreateSubSpaceModal
-          isOpen={isOpen}
-          onClose={onClose}
-          isRoot={isRoot}
-          clickedID={clickedID}
-        />
-      </Box>
-    </Container>
+              {/* Category dropdown */}
+              <Select
+                placeholder="All categories..."
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                mb={4}
+                mt="6%"
+                width={["90%", "70%", "50%"]} // Adjust width for different screen sizes
+              >
+                {categoryOptions.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </Select>
+              {/* Display tree */}
+              {treeData && (
+                <Box
+                  id="treeWrapper"
+                  width="100%"
+                  height="calc(100vh - 250px)" // Adjust height dynamically
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Tree
+                    data={treeData}
+                    orientation="vertical"
+                    rootNodeClassName="node__root"
+                    branchNodeClassName="node__branch"
+                    leafNodeClassName="node__leaf"
+                    renderCustomNodeElement={renderCustomNodeElement}
+                    translate={{
+                      x: windowDimensions.width / 3.0,
+                      y: windowDimensions.height / 7,
+                    }}
+                    zoom={1}
+                    separation={{ siblings: 2, nonSiblings: 2 }}
+                    initialDepth={1}
+                  />
+                </Box>
+              )}
+            </Flex>
+            <CreateSubSpaceModal
+              isOpen={isOpen}
+              onClose={onClose}
+              isRoot={isRoot}
+              clickedID={clickedID}
+            />
+          </Box>
+        </Container>
+      )}
+    </div>
   );
 };
 

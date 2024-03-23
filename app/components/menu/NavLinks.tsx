@@ -1,16 +1,14 @@
 import { Dispatch, SetStateAction } from "react";
-
 import { RxCrossCircled } from "react-icons/rx";
-
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-
 import { useRouter } from "next/router";
+import { Button, Text } from "@chakra-ui/react";
 
 export type link = {
   text: string;
   href: string;
 };
-import { Button ,Text} from "@chakra-ui/react";
+
 function NavLink({ text, href }: link): JSX.Element {
   const router = useRouter();
   const navigateToHashRoute = (hashRoute: any) => {
@@ -28,11 +26,13 @@ function NavLink({ text, href }: link): JSX.Element {
 
   return (
     <Button
-      className={`hover:text-primary/70 transition-all rounded-xl px-3 py-1 `}
+      className={`hover:text-black/90 transition-all rounded-xl px-3 py-1 `}
       onClick={(e) => {
         e.preventDefault();
         navigateToHashRoute(href);
       }}
+      bg="#333333"
+      color="white"
     >
       <Text>{text}</Text>
     </Button>
@@ -52,16 +52,12 @@ function ResponsiveNavLink({
 }: ResponsiveNavLinkProps): JSX.Element {
   const router = useRouter();
   const navigateToHashRoute = (hashRoute: any) => {
-    // if (hashRoute === "/") {
-    //   window.location.hash = "/";
-    // } else {
-    //   window.location.hash = hashRoute;
-    // }
     router.push({
       pathname: "",
       hash: hashRoute,
     });
   };
+
   return (
     <div
       className={`hover:bg-black/20 text-gray transition-all w-full text-center py-3 cursor-pointer`} // Ensure consistent class names
@@ -71,7 +67,7 @@ function ResponsiveNavLink({
         setIsSidebarOpen(false);
       }}
     >
-      <Text className="hover:text-white text-gray">{text?text:""}</Text>
+      <Text className="hover:text-white text-gray">{text}</Text>
     </div>
   );
 }

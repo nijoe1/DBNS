@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
+  Button,
   Image,
   Text,
   Badge,
@@ -11,28 +12,52 @@ import {
   Tab,
 } from "@chakra-ui/react";
 
-import CsvViewer from "../ui/CsvViewer"; // Import CsvViewer component
-import InstanceCodes from "../ui/InstanceCodes"; // Import CodeViewer component
+import DatasetViewer from "@/components/ui/DatasetViewer"; // Import CsvViewer component
+import InstanceCodes from "@/components/ui/InstanceCodes"; // Import CodeViewer component
 import { useAccount } from "wagmi";
 import ChatComponent from "@/components/ui/ChatComponent";
 import { useSelector } from "react-redux";
 import usePush from "@/hooks/usePush";
 import { useRouter } from "next/router";
 import { Container } from "@/components//ui/container";
-
+import Profile from "@/components/ui/Profile";
+import { getInstance } from "@/utils/tableland";
+import { createName, getIpfsGatewayUri, resolveIPNS } from "@/utils/IPFS";
+import axios from "axios";
 const InstanceDetailsPage = () => {
   const { initializePush } = usePush();
   const router = useRouter();
   const pushSign = useSelector((state) => state.push.pushSign);
-  console.log(pushSign);
+  const instanceID = router.asPath.replace("/#/instance?id=", "");
+  const [instance, setInstance] = useState();
+  const [fetched, setFetched] = useState(false);
   const { address } = useAccount();
 
+  async function getInstanceMetadata(item) {
+    const metadataCIDLink = getIpfsGatewayUri(item.metadataCID);
+    const res = await axios(metadataCIDLink);
+    item.metadata = res.data; // obj that contains => name about imageUrl
+    item.cid = await resolveIPNS(item.IPNS);
+
+    return item;
+  }
+  async function initialize() {
+    await initializePush();
+  }
+  async function get() {
+    let data = await getInstance(instanceID);
+    data = await getInstanceMetadata(data[0]);
+    console.log(data);
+    setInstance(data);
+  }
+
   useEffect(() => {
-    async function initialize() {
-      await initializePush();
-    }
     if (Object.keys(pushSign).length === 0) {
       initialize();
+    }
+    if (!fetched) {
+      setFetched(true);
+      get();
     }
   }, [router]);
 
@@ -47,22 +72,7 @@ const InstanceDetailsPage = () => {
           boxShadow="md"
           mb="4"
         >
-          <Image
-            src="/path/to/image.jpg"
-            alt="Profile Image"
-            borderRadius="full"
-            boxSize={["120px", "150px"]}
-            mb="4"
-          />
-          <Text fontSize={["lg", "xl"]} fontWeight="bold" color="#f0f0f0">
-            John Doe
-          </Text>
-          <Text fontSize={["sm", "md"]} color="#f0f0f0">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </Text>
-          <Badge colorScheme="green" borderRadius="full" px="2" py="1" mt="2">
-            Open
-          </Badge>
+          <Profile onProfile={false} />
         </Box>
 
         <Tabs
@@ -79,12 +89,8 @@ const InstanceDetailsPage = () => {
           <TabPanels>
             <TabPanel>
               {/* Dataset Tab */}
-              <Box mt="4">
-                <button>Download Dataset</button>
-              </Box>
-              <Box minHeight="200px" overflow="auto">
-                <CsvViewer />
-              </Box>
+              <Box mt="4"></Box>
+              <DatasetViewer cid={instance?.cid} />
             </TabPanel>
             <TabPanel>
               {/* Chat Tab */}

@@ -56,7 +56,7 @@ export default function App({ Component, pageProps }: AppProps) {
               {/* <div className="bg-black"> */}
               <Navbar />
               <Component {...pageProps} />
-              <div className="flex flex-grow mt-[28%]"></div>
+              <div className="flex flex-grow mt-[33%]"></div>
               <Footer />
               {/* </div> */}
             </RainbowKitProvider>

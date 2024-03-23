@@ -129,7 +129,7 @@ const CreateNewInstance = ({
       key,
       address,
       jwt,
-      spaceID
+      spaceID,
     );
     return response;
   };
@@ -186,7 +186,7 @@ const CreateNewInstance = ({
 
       // Check if the new address is already in the tags array
       const count = lowercaseTags.filter(
-        (tag) => tag === value?.toLowerCase()
+        (tag) => tag === value?.toLowerCase(),
       ).length;
       if (count > 1) {
         toast({
@@ -205,7 +205,7 @@ const CreateNewInstance = ({
       // Update the state with distinct addresses
       setTags(distinctTags);
     },
-    [setTags]
+    [setTags],
   );
 
   const handleCreate = async () => {

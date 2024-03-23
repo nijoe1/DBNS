@@ -22,11 +22,13 @@ import CreateNewInstance from "../contracts/createNewInstance";
 import { createName, getIpfsGatewayUri } from "@/utils/IPFS";
 import { getSpaceInstances } from "@/utils/tableland";
 import axios from "axios";
+import Loading from "@/components/Animation/Loading";
 
 const SingleSpacePage = () => {
   const router = useRouter();
   const spaceID = router.asPath.replace("/#/SingleSpacePage?id=", "");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [fetched, setFetched] = useState(false);
   const [instances, setInstances] = useState({
     openInstances: [],
     openPrivateInstances: [],
@@ -65,6 +67,7 @@ const SingleSpacePage = () => {
   useEffect(() => {
     fetchInstances().then((resp) => {
       setInstances(resp);
+      setFetched(!fetched);
     });
   }, [spaceID]);
 
@@ -87,128 +90,140 @@ const SingleSpacePage = () => {
   };
 
   return (
-    <Container>
-      <Button onClick={handleNewClick} colorScheme="blue" my="4">
-        Create Dataset
-      </Button>
-      <CreateNewInstance onClose={onClose} isOpen={isOpen} spaceID={spaceID} />
-      <Flex justify="center">
-        <Grid
-          templateColumns={[
-            "1fr",
-            "repeat(2, 1fr)",
-            "repeat(3, 1fr)",
-            "repeat(4, 1fr)",
-          ]}
-          gap={6}
-          width="100%"
-          className="flex md:justify-between lg:grid lg:px-3 relative"
-        >
-          {Object.entries(instances).map(([type, instanceArray]) =>
-            instanceArray.map((instance) => (
-              <GridItem key={instance.InstanceID}>
-                <Box
-                  pb="4"
-                  px="2"
-                  pt="2"
-                  bg="#333333"
-                  borderRadius="md"
-                  boxShadow="md"
-                  position="relative"
-                  cursor="pointer"
-                >
-                  <Box
-                    position="relative"
-                    borderRadius="md"
-                    overflow="hidden"
-                    mb="10%"
-                    height="120px"
-                  >
-                    <Image
-                      src={
-                        instance.metadata.imageUrl
-                          ? instance.metadata.imageUrl
-                          : "https://via.placeholder.com/150"
-                      }
-                      alt="Profile Image"
-                      width="100%"
-                      aspectRatio={2 / 1}
-                      objectFit="cover"
-                      onClick={() =>
-                        navigateToHashRoute("/instance?id=" + instance.InstanceID)
-                      }
-                    />
+    <div className="flex flex-col items-center">
+      {!fetched ? (
+        <div className="mx-auto mt-[10%]">
+          <Loading />
+        </div>
+      ) : (
+        <Container>
+          <Button onClick={handleNewClick} colorScheme="blue" my="4">
+            Create Dataset
+          </Button>
+          <CreateNewInstance
+            onClose={onClose}
+            isOpen={isOpen}
+            spaceID={spaceID}
+          />
+          <Flex justify="center">
+            <Grid
+              templateColumns={[
+                "1fr",
+                "repeat(2, 1fr)",
+                "repeat(3, 1fr)",
+                "repeat(4, 1fr)",
+              ]}
+              gap={6}
+              width="100%"
+              className="flex md:justify-between lg:grid lg:px-3 relative"
+            >
+              {Object.entries(instances).map(([type, instanceArray]) =>
+                instanceArray.map((instance) => (
+                  <GridItem key={instance.InstanceID}>
                     <Box
-                      display="flex"
-                      justifyContent="flex-start"
-                      alignItems="flex-start"
-                      position="absolute"
-                      top="0"
-                      right="0"
-                      zIndex="1"
+                      pb="4"
+                      px="2"
+                      pt="2"
+                      bg="#333333"
+                      borderRadius="md"
+                      boxShadow="md"
+                      position="relative"
+                      cursor="pointer"
                     >
-                      <Badge
-                      mt="1.5"
-                        colorScheme={
-                          type === "openInstances" ||
-                          type === "openPrivateInstances"
-                            ? "green"
-                            : "red"
-                        }
+                      <Box
+                        position="relative"
+                        borderRadius="md"
+                        overflow="hidden"
+                        mb="10%"
+                        height="120px"
                       >
-                        {type === "openInstances" ||
-                        type === "openPrivateInstances"
-                          ? "Open"
-                          : "Paid"}
-                      </Badge>
-                      <Menu zIndex="2" >
-                        <MenuButton
-                          as={IconButton}
-                          icon={<FaEllipsisV />}
-                          aria-label="Options"
-                          variant="ghost"
-                          color="black"
-                          size="sm"
-                          mb="3"
+                        <Image
+                          src={
+                            instance.metadata.imageUrl
+                              ? instance.metadata.imageUrl
+                              : "https://via.placeholder.com/150"
+                          }
+                          alt="Profile Image"
+                          width="100%"
+                          aspectRatio={2 / 1}
+                          objectFit="cover"
+                          onClick={() =>
+                            navigateToHashRoute(
+                              "/instance?id=" + instance.InstanceID,
+                            )
+                          }
                         />
-                        <MenuList                       zIndex="3"
->
-                          <MenuItem
-                            onClick={() => console.log("Download dataset")}
+                        <Box
+                          display="flex"
+                          justifyContent="flex-start"
+                          alignItems="flex-start"
+                          position="absolute"
+                          top="0"
+                          right="0"
+                          zIndex="1"
+                        >
+                          <Badge
+                            mt="1.5"
+                            colorScheme={
+                              type === "openInstances" ||
+                              type === "openPrivateInstances"
+                                ? "green"
+                                : "red"
+                            }
                           >
-                            Download Dataset
-                          </MenuItem>
-                          <MenuItem
-                            onClick={() => console.log("Fork instance")}
-                          >
-                            Fork Instance
-                          </MenuItem>
-                        </MenuList>
-                      </Menu>
+                            {type === "openInstances" ||
+                            type === "openPrivateInstances"
+                              ? "Open"
+                              : "Paid"}
+                          </Badge>
+                          <Menu zIndex="2">
+                            <MenuButton
+                              as={IconButton}
+                              icon={<FaEllipsisV />}
+                              aria-label="Options"
+                              variant="ghost"
+                              color="black"
+                              size="sm"
+                              mb="3"
+                            />
+                            <MenuList zIndex="3">
+                              <MenuItem
+                                onClick={() => console.log("Download dataset")}
+                              >
+                                Download Dataset
+                              </MenuItem>
+                              <MenuItem
+                                onClick={() => console.log("Fork instance")}
+                              >
+                                Fork Instance
+                              </MenuItem>
+                            </MenuList>
+                          </Menu>
+                        </Box>
+                      </Box>
+                      <Box height="50px">
+                        <Text
+                          fontWeight="semibold"
+                          fontSize="sm"
+                          noOfLines={1}
+                          color="white"
+                          mb="1"
+                        >
+                          {instance.metadata.name.slice(0, 30)}
+                        </Text>
+                        <Text fontSize="xs" noOfLines={2} color="white" mb="1">
+                          {instance.metadata.about.slice(0, 50)}
+                        </Text>
+                      </Box>
                     </Box>
-                  </Box>
-                  <Box                     height="50px"
->
-                    <Text
-                      fontWeight="semibold"
-                      fontSize="sm"
-                      noOfLines={1}
-                      color="white"
-                      mb="1"
-                    >
-                      {instance.metadata.name.slice(0, 30)}
-                    </Text>
-                    <Text fontSize="xs" noOfLines={2} color="white" mb="1">
-                      {instance.metadata.about.slice(0, 50)}
-                    </Text>
-                  </Box>
-                </Box>
-              </GridItem>
-            ))
-          )}
-        </Grid>
-      </Flex>
-    </Container>
+                  </GridItem>
+                )),
+              )}
+            </Grid>
+          </Flex>
+        </Container>
+      )}
+    </div>
   );
 };
 

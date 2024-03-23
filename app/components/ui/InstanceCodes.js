@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Flex,
   Box,
@@ -135,8 +135,14 @@ const InstanceCodes = () => {
         </>
       ) : (
         <div>
-          <Button onClick={handleNewClick} colorScheme="blue" my="4">
-            Create Dataset
+          <Button
+            onClick={handleNewClick}
+            colorScheme="black"
+            ml="3"
+            className="bg-black/80 text-white"
+            my="4"
+          >
+            Create Code
           </Button>
           <CreateNewInstanceCode
             onClose={onClose}
@@ -165,13 +171,9 @@ const InstanceCodes = () => {
                     borderRadius="md"
                     boxShadow="md"
                     position="relative"
-                    cursor="pointer"
-                    onClick={() =>
-                      handleClick(instance)
-                    }
                   >
                     <Box height="80px">
-                    <Box
+                      <Box
                         display="flex"
                         justifyContent="flex-start"
                         alignItems="flex-start"
@@ -185,8 +187,8 @@ const InstanceCodes = () => {
                             as={IconButton}
                             icon={<FaEllipsisV />}
                             aria-label="Options"
-                            variant="ghost"
-                            color="black"
+                            variant="black"
+                            color="white"
                             size="sm"
                             mb="3"
                           />
@@ -210,10 +212,19 @@ const InstanceCodes = () => {
                         noOfLines={1}
                         color="white"
                         mb="1"
+                        cursor="pointer"
+                        onClick={() => handleClick(instance)}
                       >
                         {instance.name.slice(0, 30)}
                       </Text>
-                      <Text fontSize="xs" noOfLines={2} color="white" mb="1">
+                      <Text
+                        cursor="pointer"
+                        fontSize="xs"
+                        noOfLines={2}
+                        color="white"
+                        mb="1"
+                        onClick={() => handleClick(instance)}
+                      >
                         {instance.about.slice(0, 50)}
                       </Text>
                     </Box>

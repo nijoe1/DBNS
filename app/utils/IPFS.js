@@ -126,6 +126,12 @@ export const renewIPNSName = async (
   await Name.publish(nextRevision, nameKey.key);
 };
 
+export const resolveIPNS = async (IPNS) => {
+  const name = Name.parse(IPNS);
+  const revision = await Name.resolve(name);
+  return revision.value;
+};
+
 export const getIpfsGatewayUri = (cid) => {
   const LIGHTHOUSE_IPFS_GATEWAY =
     "https://gateway.lighthouse.storage/ipfs/{cid}";

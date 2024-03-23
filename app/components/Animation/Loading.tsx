@@ -1,13 +1,22 @@
-import Lottie from "lottie-react";
+import React, { useEffect, useState } from "react";
 import CoolLoading from "./cool.json";
+import dynamic from "next/dynamic";
 
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 export default function Loading() {
+  const [isBrowser, setIsBrowser] = useState(false);
+
+  useEffect(() => {
+    setIsBrowser(typeof window !== "undefined");
+  }, []);
+
+  if (!isBrowser) return null;
+
   return (
-    <div
-      style={{ height: "200px", width: "200px" }}
-      className="flex flex-col items-center "
-    >
-      <Lottie animationData={CoolLoading} />
+    <div>
+      <div className="md:rounded-tl-[80px]">
+        <Lottie animationData={CoolLoading} />
+      </div>
     </div>
   );
 }

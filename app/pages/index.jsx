@@ -4,7 +4,6 @@ import SingleSpacePage from "@/components/pages/SpaceInstances";
 import LandingPage from "@/components/pages/LandingPage";
 import ProfilePage from "@/components/pages/ProfilePage";
 import SpacesGraph from "@/components/pages/SpacesGraph";
-import DocsPage from "@/components/pages/docs";
 import { useRouter } from "next/router";
 
 const Home = () => {
@@ -18,7 +17,6 @@ const Home = () => {
         (router.pathname === "/" && router.asPath === "/")) && <LandingPage />}
       {router.asPath.includes("/#/SingleSpacePage") && <SingleSpacePage />}
       {router.asPath.includes("/#/instance") && <InstanceDetailsPage />}
-      {router.asPath == "/#/docs" && <DocsPage />}
     </div>
   );
 };

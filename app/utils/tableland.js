@@ -21,8 +21,7 @@ export const getSpaces = async () => {
   }
 };
 export const getSpaceInstances = async (spaceID) => {
-  const query =
-    `SELECT 
+  const query = `SELECT 
       json_object(
           'paidPrivateInstances', COALESCE((
             SELECT json_group_array(row_data) 
@@ -63,6 +62,19 @@ export const getSpaceInstances = async (spaceID) => {
     const fullUrl = `${TablelandGateway}${encodeURIComponent(query)}`;
 
     const result = await axios.get(fullUrl);
+    return result.data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+export const getInstance = async (instanceID) => {
+  const query = `SELECT * FROM ${tables.spaceInstances} WHERE InstanceID = '${instanceID}'`;
+  try {
+    const result = await axios.get(
+      TablelandGateway + encodeURIComponent(query),
+    );
     return result.data;
   } catch (err) {
     console.error(err);

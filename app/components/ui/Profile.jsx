@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Image,
-  Text,
-  Badge,
-  Tabs,
-  TabList,
-  TabPanels,
-  TabPanel,
-  Tab,
-  Center,
-} from "@chakra-ui/react";
+import { Box, Image, Text, Badge, Button } from "@chakra-ui/react";
 import { useAccount } from "wagmi";
 import { useSelector } from "react-redux";
 import usePush from "@/hooks/usePush";
 import UpdateProfile from "@/components/profile/UpdateProfile";
 
-const ProfilePage = () => {
+const Profile = ({ onProfile }) => {
   const { initializePush } = usePush();
   const pushSign = useSelector((state) => state.push.pushSign);
   const { address } = useAccount();
+  const [isOpen, setIsOpen] = useState(false);
 
+  const handleOpenModal = () => {
+    setIsOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsOpen(false);
+  };
   const [profileInfo, setProfileInfo] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
@@ -83,6 +80,19 @@ const ProfilePage = () => {
       console.error("Error fetching subscriptions:", error);
     }
   };
+  useEffect(() => {
+    async function initialize() {
+      await initializePush();
+    }
+
+    async function getProfile() {
+      await fetchProfileInfo();
+    }
+    if (Object.keys(pushSign).length === 0) {
+      initialize();
+    }
+    getProfile();
+  }, [profileInfo]);
 
   return (
     <div className="mt-[5%] max-w-[1200px] mx-auto">
@@ -117,35 +127,20 @@ const ProfilePage = () => {
           <Text fontSize={["sm", "md"]} color="white" mt="2">
             {profileInfo?.desc || "User Description"}
           </Text>
+          {onProfile && (
+            <div>
+              <Button onClick={handleOpenModal}>Open Profile Modal</Button>
+              <UpdateProfile
+                isOpen={isOpen}
+                onClose={handleCloseModal}
+                onUpdateProfile={updateProfileInfo}
+              />
+            </div>
+          )}
         </Box>
-
-        <Tabs isFitted variant="soft-rounded" colorScheme="gray" mb="4">
-          <TabList mb="4">
-            <Tab>Created Datasets</Tab>
-            <Tab>Update Profile Info</Tab>
-            <Tab>Notifications</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <Box minHeight="200px" overflow="auto">
-                {/* Render user created and subscribed datasets */}
-              </Box>
-            </TabPanel>
-            <TabPanel>
-              <Box minHeight="200px" overflow="auto">
-                <UpdateProfile onUpdateProfile={updateProfileInfo} />
-              </Box>
-            </TabPanel>
-            <TabPanel>
-              <Box minHeight="200px" overflow="auto">
-                {/* Render user notifications */}
-              </Box>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
       </Box>
     </div>
   );
 };
 
-export default ProfilePage;
+export default Profile;

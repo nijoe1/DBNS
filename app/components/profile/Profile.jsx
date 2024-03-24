@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Box, Image, Text, Badge, Button } from "@chakra-ui/react";
+import { Box, Image, Text, Badge, Button, IconButton } from "@chakra-ui/react";
 import { useAccount } from "wagmi";
 import { useSelector } from "react-redux";
 import usePush from "@/hooks/usePush";
 import UpdateProfile from "@/components/profile/UpdateProfile";
+import { FaEdit } from "react-icons/fa";
 
+// Inside your component:
 const Profile = ({ onProfile }) => {
   const { initializePush } = usePush();
   const pushSign = useSelector((state) => state.push.pushSign);
@@ -111,9 +113,28 @@ const Profile = ({ onProfile }) => {
             boxSize={["120px", "150px"]}
             mb="4"
           />
-          <Text fontSize={["lg", "xl"]} fontWeight="bold" color="white">
-            {profileInfo?.name || "User Name"}
-          </Text>
+          <div className="flex flex-wrap items-center">
+            <Text fontSize={["lg", "xl"]} fontWeight="bold" color="white">
+              {profileInfo?.name || "User Name"}
+            </Text>
+            {onProfile && (
+              <div>
+                <IconButton
+                  icon={<FaEdit />}
+                  aria-label="Open Profile Modal"
+                  colorScheme="ghost"
+                  ml="3"
+                  color="white"
+                  onClick={handleOpenModal}
+                />
+                <UpdateProfile
+                  isOpen={isOpen}
+                  onClose={handleCloseModal}
+                  onUpdateProfile={updateProfileInfo}
+                />
+              </div>
+            )}
+          </div>
           <Badge
             className="text-black bg-black"
             borderRadius="full"
@@ -127,23 +148,6 @@ const Profile = ({ onProfile }) => {
           <Text fontSize={["sm", "md"]} color="white" mt="2">
             {profileInfo?.desc || "User Description"}
           </Text>
-          {onProfile && (
-            <div>
-              <Button
-                colorScheme="black"
-                ml="3"
-                className="bg-black/80 text-white"
-                onClick={handleOpenModal}
-              >
-                Open Profile Modal
-              </Button>
-              <UpdateProfile
-                isOpen={isOpen}
-                onClose={handleCloseModal}
-                onUpdateProfile={updateProfileInfo}
-              />
-            </div>
-          )}
         </Box>
       </Box>
     </div>

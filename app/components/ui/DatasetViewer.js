@@ -18,18 +18,29 @@ import {
   IconButton,
   Icon,
   Select,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { FiDownload } from "react-icons/fi";
 import { MdMoreVert } from "react-icons/md";
 import Loading from "@/components/Animation/Loading";
 import { Container } from "@/components//ui/container";
+import UpdateIPNS from "@/components/ui/UpdateIPNS";
 
-const DatasetViewer = ({ cid }) => {
+const DatasetViewer = ({ cid, IPNS, EncryptedKeyCID }) => {
   const toast = useToast();
   const [csvData, setCsvData] = useState([]);
+  const [csvText, setCsvText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [fetched, setFetched] = useState(false);
+  const {
+    isOpen: isUpdateOpen,
+    onOpen: onUpdateOpen,
+    onClose: onUpdateClose,
+  } = useDisclosure();
+  const handleUpdateClick = async () => {
+    onUpdateOpen();
+  };
 
   useEffect(() => {
     if (cid) {
@@ -46,6 +57,7 @@ const DatasetViewer = ({ cid }) => {
         throw new Error("Failed to fetch CSV file");
       }
       const text = await response.text();
+      setCsvText(text);
       const parsedData = customCsvParser(text);
       if (parsedData) {
         setCsvData(parsedData);
@@ -124,43 +136,61 @@ const DatasetViewer = ({ cid }) => {
         <>
           <Center>
             <Container>
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  aria-label="Options"
-                  icon={<Icon as={MdMoreVert} />}
-                  colorScheme="black"
-                  className="bg-black/80 text-white"
-                  my={4}
-                  mr={5}
-                />
-                <MenuList
-                  colorScheme="black"
-                  className="bg-black/80 text-white"
-                >
-                  <MenuItem
+              <div className="flex flex-wrap items-center">
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label="Options"
+                    icon={<Icon as={MdMoreVert} />}
                     colorScheme="black"
                     className="bg-black/80 text-white"
-                    onClick={handleDownload}
-                    icon={<Icon as={FiDownload} />}
+                    my={4}
+                    mr={5}
+                  />
+                  <MenuList
+                    colorScheme="black"
+                    className="bg-black/80 text-white"
                   >
-                    Download
-                  </MenuItem>
-                  <MenuItem>
-                    <Select
-                      value={rowsPerPage}
-                      onChange={handleRowsPerPageChange}
-                      fontSize="sm"
+                    <MenuItem
+                      colorScheme="black"
+                      className="bg-black/80 text-white"
+                      onClick={handleDownload}
+                      icon={<Icon as={FiDownload} />}
                     >
-                      {[10, 20, 50, 100].map((value) => (
-                        <option key={value} value={value}>
-                          {value} Rows
-                        </option>
-                      ))}
-                    </Select>
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+                      Download
+                    </MenuItem>
+                    <MenuItem>
+                      <Select
+                        value={rowsPerPage}
+                        onChange={handleRowsPerPageChange}
+                        fontSize="sm"
+                      >
+                        {[10, 20, 50, 100].map((value) => (
+                          <option key={value} value={value}>
+                            {value} Rows
+                          </option>
+                        ))}
+                      </Select>
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+                <Button
+                  colorScheme="black"
+                  ml="3"
+                  className="bg-black/80 text-white"
+                  onClick={handleUpdateClick}
+                >
+                  Update Dataset
+                </Button>
+                <UpdateIPNS
+                  isOpen={isUpdateOpen}
+                  onClose={onUpdateClose}
+                  isDataset={true}
+                  IPNS={IPNS}
+                  EncryptedKeyCID={EncryptedKeyCID}
+                  currentCSV={csvText}
+                />
+              </div>
             </Container>
           </Center>
 

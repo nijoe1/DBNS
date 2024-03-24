@@ -82,6 +82,19 @@ export const getInstance = async (instanceID) => {
   }
 };
 
+export const getInstanceCodes = async (instanceID) => {
+  const query = `SELECT * FROM ${tables.codes} WHERE InstanceID = '${instanceID}'`;
+  try {
+    const result = await axios.get(
+      TablelandGateway + encodeURIComponent(query),
+    );
+    return result.data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
 // Function to recursively build children
 async function buildChildren(parentID, parentHierarchy, sampleSpacesData) {
   const children = [];

@@ -7,6 +7,8 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  useToast,
+  Image,
 } from "@chakra-ui/react";
 import NotebookPreviewer from "./NotebookPreviewer";
 import ForumComponent from "./ForumComponent";
@@ -14,7 +16,9 @@ import { useAccount } from "wagmi";
 import { useSelector } from "react-redux";
 
 import usePush from "@/hooks/usePush";
+import { Button } from "./Button";
 const CodeViewer = ({ code, onClose }) => {
+  const toast = useToast();
   const { initializePush } = usePush();
   const pushSign = useSelector((state) => state.push.pushSign);
   const { address } = useAccount();
@@ -31,6 +35,15 @@ const CodeViewer = ({ code, onClose }) => {
 
   const handleTabChange = (index) => {
     setTabIndex(index);
+  };
+
+  const handleToDo = () => {
+    toast({
+      title: "Comming soon sir 🚀",
+      status: "warning",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   return (
@@ -59,21 +72,31 @@ const CodeViewer = ({ code, onClose }) => {
         <TabList>
           <Tab>Notebook</Tab>
           <Tab>Discussions</Tab>
-          <Tab>Output</Tab>
+          <Tab>Compute Output</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
             <Box maxHeight="500px" overflowY="auto">
-              <NotebookPreviewer code={code} />
+              <NotebookPreviewer code={code.codeCID} />
             </Box>
           </TabPanel>
           <TabPanel>
             <Box maxHeight="500px" overflowY="auto">
-              <ForumComponent pushSign={pushSign} address={address} />
+              <ForumComponent
+                pushSign={pushSign}
+                address={address}
+                chatID={code.chatID}
+              />
             </Box>
           </TabPanel>
-          <TabPanel>{/* Input dataset content goes here */}</TabPanel>
-          <TabPanel>{/* Output content goes here */}</TabPanel>
+          <TabPanel>
+            <div className="flex flex-col items-center text-center p-5">
+              {/* Compute output */}
+              <Text>Compute output with Bacalhau</Text>
+              <Image src="/images/bacalhau.png" maxHeight="100" />{" "}
+              <Button onClick={handleToDo}>Compute Output</Button>
+            </div>
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </Box>

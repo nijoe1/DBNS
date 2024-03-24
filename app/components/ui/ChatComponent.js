@@ -5,21 +5,20 @@ import { FaDownload } from "react-icons/fa";
 import { RiImageAddFill, RiSendPlane2Fill } from "react-icons/ri";
 import makeBlockie from "ethereum-blockies-base64";
 import { MdAttachFile } from "react-icons/md";
+import Loading from "@/components/Animation/Loading";
 
-const ChatComponent = ({ pushSign, address }) => {
+const ChatComponent = ({ pushSign, address, chatID }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [file, setFile] = useState(null);
   const [fileType, setFileType] = useState("");
-
-  const recipient =
-    "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da";
-
+  const [fetched, setFetched] = useState(false);
   const fetchChatHistory = async () => {
     try {
-      const chatHistory = await pushSign.chat.history(recipient, {
+      const chatHistory = await pushSign.chat.history(chatID, {
         limit: "30",
       });
+      setFetched(true);
       setMessages(chatHistory);
     } catch (error) {
       console.error("Error fetching chat history:", error);
@@ -27,20 +26,21 @@ const ChatComponent = ({ pushSign, address }) => {
   };
 
   useEffect(() => {
-    fetchChatHistory();
-  }, []); // Fetch chat history on component mount
-
+    if (chatID) {
+      fetchChatHistory();
+    }
+  }, [chatID]);
   const sendMessage = async () => {
     try {
-      const groupPermissions = await pushSign.chat.group.permissions(recipient);
+      const groupPermissions = await pushSign.chat.group.permissions(chatID);
       if (groupPermissions.entry && groupPermissions.chat) {
-        const joinGroup = await pushSign.chat.group.join(recipient);
+        const joinGroup = await pushSign.chat.group.join(chatID);
       }
 
       if (file) {
         if (!fileType.includes("image")) {
           // Send a text message containing the information about the attached file
-          const fileInfoMessage = await pushSign.chat.send(recipient, {
+          const fileInfoMessage = await pushSign.chat.send(chatID, {
             type: "Text",
             content: `Attaching ${file.name}`,
           });
@@ -50,7 +50,7 @@ const ChatComponent = ({ pushSign, address }) => {
         // Send the actual file
         const base64File = await convertFileToBase64(file);
         const messageType = fileType.includes("image") ? "Image" : "File";
-        const sentMessage = await pushSign.chat.send(recipient, {
+        const sentMessage = await pushSign.chat.send(chatID, {
           type: messageType,
           content: base64File,
         });
@@ -65,7 +65,7 @@ const ChatComponent = ({ pushSign, address }) => {
         setFile(null);
         setFileType("");
       } else if (newMessage.trim() !== "") {
-        const sentMessage = await pushSign.chat.send(recipient, {
+        const sentMessage = await pushSign.chat.send(chatID, {
           type: "Text",
           content: newMessage,
         });
@@ -99,119 +99,127 @@ const ChatComponent = ({ pushSign, address }) => {
   };
 
   return (
-    <Box
-      maxHeight="500px"
-      overflowY="auto"
-      p="4"
-      borderRadius="md"
-      boxShadow="lg"
-      bg="#333333"
-      height="500px" // Set a fixed height for the chat container
-    >
-      <Flex mt={4} mb={4} className="flex items-center mx-auto">
-        <Input
-          value={newMessage}
-          className="text-white"
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
-          mr={2}
-          _focus={{
-            borderColor: "white",
-          }}
-        />
-        <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-          <MdAttachFile className="mr-2 mt-1" color="white" size={28} />
-          <input
-            type="file"
-            id="file-upload"
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
-        </label>
-        <Button
-          onClick={sendMessage}
-          bg="#edf2f7"
-          leftIcon={<RiSendPlane2Fill className="mx-[1%]" />}
+    <div>
+      {!fetched ? (
+        <div className="flex flex-col items-center mx-auto mt-[10%]">
+          <Loading />
+        </div>
+      ) : (
+        <Box
+          maxHeight="500px"
+          overflowY="auto"
+          p="4"
+          borderRadius="md"
+          boxShadow="lg"
+          bg="#333333"
+          height="500px" // Set a fixed height for the chat container
         >
-          Send
-        </Button>
-      </Flex>
-      {messages.map((message, index) => (
-        <Flex
-          key={index}
-          alignItems="center"
-          justifyContent={
-            message.fromDID.includes(address) ? "flex-end" : "flex-start"
-          }
-          p={2}
-          mb={2}
-        >
-          <Box
-            borderRadius="full"
-            boxSize="30px"
-            overflow="hidden"
-            mr={2}
-            bg="#333333"
-          >
-            <Image src={makeBlockie(address)} alt="Sender Avatar" />
-          </Box>
-          <Box borderWidth="1px" borderColor="black" p={2} rounded="md">
-            {message.messageType === "Image" ? (
-              <Box>
-                <Image
-                  src={message.messageObj.content}
-                  alt="Message"
-                  boxSize="100px"
-                  borderRadius="md"
-                />
-                <Text fontSize="sm" color="white" mt={1}>
-                  {new Date(message.timestamp).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
+          <Flex mt={4} mb={4} className="flex items-center mx-auto">
+            <Input
+              value={newMessage}
+              className="text-white"
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message..."
+              mr={2}
+              _focus={{
+                borderColor: "white",
+              }}
+            />
+            <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
+              <MdAttachFile className="mr-2 mt-1" color="white" size={28} />
+              <input
+                type="file"
+                id="file-upload"
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+              />
+            </label>
+            <Button
+              onClick={sendMessage}
+              bg="#edf2f7"
+              leftIcon={<RiSendPlane2Fill className="mx-[1%]" />}
+            >
+              Send
+            </Button>
+          </Flex>
+          {messages.map((message, index) => (
+            <Flex
+              key={index}
+              alignItems="center"
+              justifyContent={
+                message.fromDID.includes(address) ? "flex-end" : "flex-start"
+              }
+              p={2}
+              mb={2}
+            >
+              <Box
+                borderRadius="full"
+                boxSize="30px"
+                overflow="hidden"
+                mr={2}
+                bg="#333333"
+              >
+                <Image src={makeBlockie(address)} alt="Sender Avatar" />
               </Box>
-            ) : message.messageType === "File" ? (
-              <Flex align="center">
-                <Button
-                  as="a"
-                  href={message.messageObj.content}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  leftIcon={<BsFileText />}
-                  variant="link"
-                  fontWeight="bold"
-                  color="white"
-                  download
-                >
-                  <FaDownload />
-                  Download {fileType}
-                </Button>
-                <Text fontSize="sm" color="white" ml={2}>
-                  {new Date(message.timestamp).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
-              </Flex>
-            ) : (
-              <Box>
-                <Text fontSize="sm" color="white">
-                  {message.messageObj.content}
-                </Text>
-                <Text fontSize="sm" color="white" mt={1}>
-                  {new Date(message.timestamp).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
+              <Box borderWidth="1px" borderColor="black" p={2} rounded="md">
+                {message.messageType === "Image" ? (
+                  <Box>
+                    <Image
+                      src={message.messageObj.content}
+                      alt="Message"
+                      boxSize="100px"
+                      borderRadius="md"
+                    />
+                    <Text fontSize="sm" color="white" mt={1}>
+                      {new Date(message.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                  </Box>
+                ) : message.messageType === "File" ? (
+                  <Flex align="center">
+                    <Button
+                      as="a"
+                      href={message.messageObj.content}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      leftIcon={<BsFileText />}
+                      variant="link"
+                      fontWeight="bold"
+                      color="white"
+                      download
+                    >
+                      <FaDownload />
+                      Download {fileType}
+                    </Button>
+                    <Text fontSize="sm" color="white" ml={2}>
+                      {new Date(message.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                  </Flex>
+                ) : (
+                  <Box>
+                    <Text fontSize="sm" color="white">
+                      {message.messageObj.content}
+                    </Text>
+                    <Text fontSize="sm" color="white" mt={1}>
+                      {new Date(message.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                  </Box>
+                )}
               </Box>
-            )}
-          </Box>
-        </Flex>
-      ))}
-    </Box>
+            </Flex>
+          ))}
+        </Box>
+      )}
+    </div>
   );
 };
 

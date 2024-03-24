@@ -11,7 +11,7 @@ import {
   Tab,
   Center,
 } from "@chakra-ui/react";
-import Profile from "@/components/ui/Profile";
+import Profile from "@/components/profile/Profile";
 
 const ProfilePage = () => {
   return (

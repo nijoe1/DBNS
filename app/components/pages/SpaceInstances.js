@@ -84,9 +84,8 @@ const SingleSpacePage = () => {
     }
   };
 
-  const handleNewClick = async () => {
+  const handleNewClick = () => {
     onOpen();
-    await createName();
   };
 
   return (
@@ -155,7 +154,7 @@ const SingleSpacePage = () => {
                           objectFit="cover"
                           onClick={() =>
                             navigateToHashRoute(
-                              "/instance?id=" + instance.InstanceID
+                              "/instance?id=" + instance.InstanceID,
                             )
                           }
                         />
@@ -187,8 +186,8 @@ const SingleSpacePage = () => {
                               as={IconButton}
                               icon={<FaEllipsisV />}
                               aria-label="Options"
-                              colorScheme="black"
-                              className="bg-black/80 text-white"
+                              variant="ghost"
+                              color="black"
                               size="sm"
                               mb="3"
                             />
@@ -227,7 +226,7 @@ const SingleSpacePage = () => {
                       </Box>
                     </Box>
                   </GridItem>
-                ))
+                )),
               )}
             </Grid>
           </Flex>

@@ -20,229 +20,265 @@ import CodeViewer from "./CodeViewer"; // Import CodeViewer component
 import { useRouter } from "next/router";
 import CreateNewInstanceCode from "@/components/contracts/createInstanceCode";
 import { FaEllipsisV } from "react-icons/fa";
-import { getSpaceInstances } from "@/utils/tableland";
+import { getInstanceCodes } from "@/utils/tableland";
+import Loading from "@/components/Animation/Loading";
+import { getIpfsGatewayUri, resolveIPNS } from "@/utils/IPFS";
+import { FaArrowLeft } from "react-icons/fa";
+import UpdateIPNS from "@/components/ui/UpdateIPNS";
+import makeBlockie from "ethereum-blockies-base64";
 
-const type = "openInstances"; // Sample type for instance type
-
-// Sample data for database instances
-const instancesData = [
-  {
-    InstanceID: 1,
-    name: "Instance 1",
-    about: "About Instance 1",
-  },
-  {
-    InstanceID: 2,
-    name: "Instance 2",
-    about: "About Instance 2",
-  },
-  {
-    InstanceID: 3,
-    name: "Instance 3",
-    about: "About Instance 3",
-  },
-  {
-    InstanceID: 4,
-    name: "Instance 4",
-    about: "About Instance 4",
-  },
-  // Add more instances as needed
-];
-
-const InstanceCodes = () => {
-  const [selectedInstance, setSelectedInstance] = useState(null);
+const InstanceCodes = ({ pushSign }) => {
+  const [code, setCode] = useState(null);
   const [viewAllCodes, setViewAllCodes] = useState(true);
 
   const router = useRouter();
-  const spaceID = router.asPath.replace("/#/SingleSpacePage?id=", "");
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [instances, setInstances] = useState({
-    openInstances: [],
-    openPrivateInstances: [],
-    paidInstances: [],
-    paidPrivateInstances: [],
-  });
+  const spaceID = router.asPath.replace("/#/instance?id=", "");
+  const {
+    isOpen,
+    onOpen,
+    onClose,
+    isOpen: isUpdateOpen,
+    onOpen: onUpdateOpen,
+    onClose: onUpdateClose,
+  } = useDisclosure();
 
-  async function getMetadataCID(data) {
-    const temp = [];
-    for (const item of data) {
-      const metadataCIDLink = getIpfsGatewayUri(item.metadataCID);
-      const res = await axios(metadataCIDLink);
-      item.metadata = res.data; // obj that contains => name about imageUrl
-      temp.push(item); // Push fetched JSON metadata directly
-    }
-    return temp;
-  }
+  const [codes, setCodes] = useState([]);
+  const [fetched, setFetched] = useState(false);
 
-  async function fetchInstances() {
-    const data = (await getSpaceInstances(spaceID))[0].instances;
-    const dataObj = {}; // Initialize data object
+  async function fetchInstanceCodes() {
+    // const data = (await getSpaceInstances(spaceID))[0].instances;
+    const data = await getInstanceCodes(spaceID);
     for (const key in data) {
-      if (
-        key === "openInstances" ||
-        key === "openPrivateInstances" ||
-        key === "paidInstances" ||
-        key === "paidPrivateInstances"
-      ) {
-        const instancesArray = data[key].map(JSON.parse); // Parse each stringified JSON object
-        dataObj[key] = await getMetadataCID(instancesArray);
-      }
+      data[key].codeCID = getIpfsGatewayUri(await resolveIPNS(data[key].IPNS));
+      data[key].blockie = makeBlockie(data[key].creator);
+      data[key].profile = await getProfileInfo(data[key].creator);
     }
-    return dataObj;
+    console.log(data);
+    return data;
   }
 
-  useEffect(() => {
-    fetchInstances().then((resp) => {
-      setInstances(resp);
-    });
-  }, [spaceID]);
-
-  const navigateToHashRoute = (hashRoute) => {
-    if (hashRoute == "/") {
-      router.push({
-        pathname: hashRoute,
-      });
-    } else {
-      router.push({
-        pathname: "",
-        hash: hashRoute,
-      });
+  const getProfileInfo = async (address) => {
+    try {
+      const info = await pushSign.profile.info(`${address.toLowerCase()}`);
+      console.log(info);
+      return info;
+    } catch (error) {
+      console.error("Error updating profile info:", error);
     }
   };
+
+  useEffect(() => {
+    if (!fetched) {
+      fetchInstanceCodes().then((resp) => {
+        setCodes(resp);
+        setFetched(!fetched);
+      });
+    }
+  }, [spaceID]);
 
   const handleNewClick = async () => {
     onOpen();
   };
 
+  const handleUpdateClick = async () => {
+    onUpdateOpen();
+  };
+
   const handleClick = (instance) => {
-    setSelectedInstance(instance);
+    setCode(instance);
     setViewAllCodes(false);
   };
 
   const handleBack = () => {
-    setSelectedInstance(null);
+    setCode(null);
     setViewAllCodes(true);
   };
 
   return (
-    <Container>
-      {selectedInstance ? (
-        <>
-          <Button
-            colorScheme="black"
-            ml="3"
-            className="bg-black/80 text-white"
-            onClick={handleBack}
-            variant="outline"
-            mb="4"
-          >
-            Go back to All Codes
-          </Button>
-          <CodeViewer code={selectedInstance} onClose={handleBack} />
-        </>
-      ) : (
-        <div>
-          <Button
-            onClick={handleNewClick}
-            colorScheme="black"
-            ml="3"
-            className="bg-black/80 text-white"
-            my="4"
-          >
-            Create Code
-          </Button>
-          <CreateNewInstanceCode
-            onClose={onClose}
-            isOpen={isOpen}
-            spaceID={spaceID}
-          />
-          <Flex justify="center">
-            <Grid
-              templateColumns={[
-                "1fr",
-                "repeat(2, 1fr)",
-                "repeat(3, 1fr)",
-                "repeat(4, 1fr)",
-              ]}
-              gap={6}
-              width="100%"
-              className="flex md:justify-between lg:grid lg:px-3 relative"
-            >
-              {instancesData.map((instance) => (
-                <GridItem key={instance.InstanceID}>
-                  <Box
-                    pb="4"
-                    px="2"
-                    pt="2"
-                    bg="#333333"
-                    borderRadius="md"
-                    boxShadow="md"
-                    position="relative"
-                  >
-                    <Box height="80px">
-                      <Box
-                        display="flex"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
-                        position="absolute"
-                        top="0"
-                        right="0"
-                        zIndex="1"
-                      >
-                        <Menu zIndex="2">
-                          <MenuButton
-                            as={IconButton}
-                            icon={<FaEllipsisV />}
-                            aria-label="Options"
-                            variant="black"
-                            color="white"
-                            size="sm"
-                            mb="3"
-                          />
-                          <MenuList zIndex="15" scale={0.2}>
-                            <MenuItem
-                              onClick={() => console.log("Download dataset")}
-                            >
-                              Download Dataset
-                            </MenuItem>
-                            <MenuItem
-                              onClick={() => console.log("Fork instance")}
-                            >
-                              Fork Instance
-                            </MenuItem>
-                          </MenuList>
-                        </Menu>
-                      </Box>
-                      <Text
-                        fontWeight="semibold"
-                        fontSize="sm"
-                        noOfLines={1}
-                        color="white"
-                        mb="1"
-                        cursor="pointer"
-                        onClick={() => handleClick(instance)}
-                      >
-                        {instance.name.slice(0, 30)}
-                      </Text>
-                      <Text
-                        cursor="pointer"
-                        fontSize="xs"
-                        noOfLines={2}
-                        color="white"
-                        mb="1"
-                        onClick={() => handleClick(instance)}
-                      >
-                        {instance.about.slice(0, 50)}
-                      </Text>
-                    </Box>
-                  </Box>
-                </GridItem>
-              ))}
-            </Grid>
-          </Flex>
+    <div>
+      {!fetched ? (
+        <div className="flex flex-col items-center mx-auto mt-[10%]">
+          <Loading />
         </div>
+      ) : (
+        <Container>
+          {code ? (
+            <>
+              <div className="flex flex-wrap">
+                <IconButton
+                  icon={<FaArrowLeft />}
+                  aria-label="Go back to All Codes"
+                  variant="outline"
+                  mb="4"
+                  ml={"6%"}
+                  onClick={handleBack}
+                />
+                <Button
+                  colorScheme="black"
+                  ml="3"
+                  className="bg-black/80 text-white"
+                  onClick={handleUpdateClick}
+                >
+                  Update Notebook
+                </Button>
+                <UpdateIPNS
+                  isOpen={isUpdateOpen}
+                  onClose={onUpdateClose}
+                  isDataset={false}
+                  IPNS={code.IPNS}
+                  EncryptedKeyCID={code.IPNSEncryptedKey}
+                />
+              </div>
+
+              <CodeViewer code={code} onClose={handleBack} />
+            </>
+          ) : (
+            <div>
+              <Button
+                onClick={handleNewClick}
+                colorScheme="black"
+                ml="3"
+                className="bg-black/80 text-white"
+                my="4"
+              >
+                Create Code
+              </Button>
+              <CreateNewInstanceCode
+                onClose={onClose}
+                isOpen={isOpen}
+                spaceID={spaceID}
+              />
+              <Flex justify="center">
+                <Grid
+                  templateColumns={[
+                    "1fr",
+                    "repeat(2, 1fr)",
+                    "repeat(3, 1fr)",
+                    "repeat(4, 1fr)",
+                  ]}
+                  gap={6}
+                  width="100%"
+                  className="flex md:justify-between lg:grid lg:px-3 relative"
+                >
+                  {codes.map((code) => (
+                    <GridItem key={code.InstanceID}>
+                      <Box
+                        pb="4"
+                        px="2"
+                        pt="2"
+                        bg="#333333"
+                        borderRadius="md"
+                        boxShadow="md"
+                        position="relative"
+                      >
+                        <Box height="100px">
+                          <Box
+                            display="flex"
+                            justifyContent="flex-start"
+                            alignItems="flex-start"
+                            position="absolute"
+                            top="0"
+                            right="0"
+                            zIndex="1"
+                          >
+                            <Menu zIndex="2">
+                              <MenuButton
+                                as={IconButton}
+                                icon={<FaEllipsisV />}
+                                aria-label="Options"
+                                variant="black"
+                                color="white"
+                                size="sm"
+                                mb="3"
+                              />
+                              <MenuList zIndex="15" scale={0.2}>
+                                <MenuItem
+                                  onClick={() => console.log("Download code")}
+                                >
+                                  Download code{" "}
+                                </MenuItem>
+                                <MenuItem
+                                  onClick={() => console.log("View code")}
+                                >
+                                  View code{" "}
+                                </MenuItem>
+                              </MenuList>
+                            </Menu>
+                          </Box>
+                          <div className="flex flex-wrap items-center mb-2 rounded-md">
+                            <Box
+                              borderRadius="md"
+                              boxSize="35px"
+                              mr={2}
+                              bg="#333333"
+                              cursor={"pointer"}
+                            >
+                              <Image
+                                className=" rounded-md"
+                                src={
+                                  code.profile?.picture
+                                    ? code.profile?.picture
+                                    : makeBlockie(code.creator)
+                                }
+                                alt="Sender Avatar"
+                                onClick={() => {
+                                  router.push({
+                                    pathname: "",
+                                    hash: "/profile?address=" + code.creator,
+                                  });
+                                }}
+                              />
+                            </Box>
+                            <Text
+                              fontWeight="semibold"
+                              fontSize="sm"
+                              noOfLines={1}
+                              color="white"
+                              mb="1"
+                              cursor="pointer"
+                              onClick={() => {
+                                router.push({
+                                  pathname: "",
+                                  hash: "/profile?address=" + code.creator,
+                                });
+                              }}
+                            >
+                              {code.profile?.name}
+                            </Text>
+                          </div>
+
+                          <Text
+                            fontWeight="semibold"
+                            fontSize="sm"
+                            noOfLines={1}
+                            color="white"
+                            mb="1"
+                            cursor="pointer"
+                            onClick={() => handleClick(code)}
+                          >
+                            {code.name.slice(0, 30)}
+                          </Text>
+                          <Text
+                            cursor="pointer"
+                            fontSize="xs"
+                            noOfLines={2}
+                            color="white"
+                            mb="1"
+                            onClick={() => handleClick(code)}
+                          >
+                            {code.about.slice(0, 50)}
+                          </Text>
+                        </Box>
+                      </Box>
+                    </GridItem>
+                  ))}
+                </Grid>
+              </Flex>
+            </div>
+          )}
+        </Container>
       )}
-    </Container>
+    </div>
   );
 };
 

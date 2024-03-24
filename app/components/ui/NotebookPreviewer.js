@@ -10,15 +10,13 @@ const IpynbRenderer = dynamic(
 );
 import "react-ipynb-renderer/dist/styles/monokai.css";
 
-function NotebookPreviewer() {
+function NotebookPreviewer({ code }) {
   const [notebookData, setNotebookData] = useState(null);
 
   useEffect(() => {
     async function fetchNotebook() {
       try {
-        const response = await fetch(
-          "https://gateway.lighthouse.storage/ipfs/QmS3XEUCwbjfrLEDFTPseRUfaZcGvMKvsQXUe8jC5Q7U4H",
-        );
+        const response = await fetch(code);
         const data = await response.json();
         console.log(data);
         setNotebookData(data);

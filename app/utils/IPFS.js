@@ -74,8 +74,12 @@ export const createIPNSName = async (file, apiKey, address, jwt, spaceID) => {
   const instanceID = getInstanceID(spaceID, name.toString());
   const revision = await Name.v0(name, cid);
   await Name.publish(revision, name.key);
-  const KEY = await encryptIPNSKey(name.key.bytes, apiKey, address, jwt);
-  console.log("KEY", KEY.Hash);
+
+  const byteString = uint8ArrayToString(name.key.bytes, "base64");
+
+  const KEY = await encryptIPNSKey(byteString, apiKey, address, jwt);
+
+  console.log("KEY", KEY[0].Hash);
   let ecid = await applyAccessConditions(
     KEY[0].Hash,
     314159,
@@ -100,9 +104,9 @@ export const createIPNSName = async (file, apiKey, address, jwt, spaceID) => {
 };
 
 export const renewIPNSName = async (
+  cid,
   IPNS,
   EncryptedKeyCID,
-  cid,
   address,
   jwt,
 ) => {
@@ -116,12 +120,16 @@ export const renewIPNSName = async (
   });
 
   const key = JSON.parse(await jsonFile.text()).key;
+  console.log("KEY", key);
 
   const revision = await Name.resolve(name);
   console.log("Resolved value:", revision.value);
 
   let nextRevision = await Name.increment(revision, cid);
-  const nameKey = await Name.from(key);
+
+  const IPNSKey = uint8ArrayFromString(key, "base64");
+
+  const nameKey = await Name.from(IPNSKey);
 
   await Name.publish(nextRevision, nameKey.key);
 };

@@ -15,7 +15,6 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
-  Flex,
   Text,
 } from "@chakra-ui/react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
@@ -25,13 +24,9 @@ import usePush from "@/hooks/usePush";
 import { useRouter } from "next/router";
 import { getRules } from "@/constants/push";
 import { createIPNSName, uploadFile } from "@/utils/IPFS";
-import { FaFileUpload, FaImage } from "react-icons/fa";
+import { FaFileUpload } from "react-icons/fa";
 
-const CreateNewInstanceCode = ({
-  isOpen = { isOpen },
-  onClose = { onClose },
-  spaceID,
-}) => {
+const CreateNewInstanceCode = ({ isOpen, onClose, spaceID }) => {
   const toast = useToast();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
@@ -41,12 +36,11 @@ const CreateNewInstanceCode = ({
   const [formData, setFormData] = useState({
     name: "",
     about: "",
-
     members: [],
     chatID: "",
     IPNS: "",
     IPNSEncryptedKey: "",
-    file: null,
+    file: null, // Initialize file to null
     instanceID: "",
   });
   const { initializePush } = usePush();
@@ -65,13 +59,16 @@ const CreateNewInstanceCode = ({
   }, [router]);
 
   const handleFileChange = (e) => {
+    console.log("File Change Event:", e);
+    e.stopPropagation();
+    e.preventDefault();
+    e.persist();
     const file = e.target.files[0];
-    handleChange({
-      target: {
-        name: "file",
-        value: file,
-      },
-    });
+    console.log("Selected File:", file);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      file: file,
+    }));
   };
 
   const createCode = async () => {
@@ -97,9 +94,8 @@ const CreateNewInstanceCode = ({
     let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
     let jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
 
-    // cid, apiKey, address, jwt, spaceID
     const response = await createIPNSName(
-      formData.file,
+      formData.file, // Use formData.file here
       key,
       address,
       jwt,
@@ -108,37 +104,16 @@ const CreateNewInstanceCode = ({
     return response;
   };
 
-  const uploadMetadata = async () => {
-    let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
-
-    const metadata = {
-      name: formData.name,
-      about: formData.about,
-      imageUrl: formData.image,
-    };
-    const jsonBlob = new Blob([JSON.stringify(metadata)], {
-      type: "application/json",
-    });
-
-    // Create a File object from the Blob
-    const jsonFile = new File([jsonBlob], `type.json`, {
-      type: "application/json",
-    });
-    const metadataCID = await uploadFile(jsonFile, key);
-    // setFormData({ ...formData, metadataCID: metadataCID.Hash });
-    return metadataCID.Hash;
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleCreate = async () => {
-    let res = await createIPNS();
-    let chatID = await createCode();
     try {
-      // Create space instance
+      console.log(formData);
+      let res = await createIPNS();
+      let chatID = await createCode();
       const data = await publicClient?.simulateContract({
         account,
         address: CONTRACT_ADDRESSES,
@@ -161,14 +136,12 @@ const CreateNewInstanceCode = ({
 
       const hash = await walletClient.writeContract(data.request);
 
-      // Wait for transaction receipt
       const transaction = await publicClient.waitForTransactionReceipt({
         hash,
       });
 
       onClose();
 
-      // Display success toast
       toast({
         title: "Subspace Created",
         description: "Subspace created successfully",
@@ -227,10 +200,11 @@ const CreateNewInstanceCode = ({
                   type="file"
                   onChange={handleFileChange}
                   display="none"
-                  id="file-upload"
+                  id="_file-upload"
+                  accept="*"
                 />
                 <InputRightElement>
-                  <label htmlFor="file-upload">
+                  <label htmlFor="_file-upload">
                     <Icon as={FaFileUpload} cursor="pointer" />
                   </label>
                 </InputRightElement>
@@ -239,7 +213,7 @@ const CreateNewInstanceCode = ({
                 cursor="pointer"
                 color="white"
                 ml="2"
-                onClick={() => document.getElementById("file-upload").click()}
+                onClick={() => document.getElementById("_file-upload").click()}
               >
                 Upload Model Code
               </Text>
@@ -258,4 +232,5 @@ const CreateNewInstanceCode = ({
     </Modal>
   );
 };
+
 export default CreateNewInstanceCode;

@@ -7,12 +7,10 @@ import StepperForm from "../StepperForm";
 import { useAccount, useChainId } from "wagmi";
 import { useRouter } from "next/router";
 
-// Import statements remain the same
-
 export default function Navbar(): JSX.Element {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const { isConnected, address } = useAccount();
+  const { address } = useAccount(); // Removed isConnected
   const chainID = useChainId();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changeChain, setChangeChain] = useState(true);
@@ -43,7 +41,7 @@ export default function Navbar(): JSX.Element {
       }
     };
     check();
-  }, [address, isConnected]);
+  }, [address]); // Removed isConnected from dependency array
 
   useEffect(() => {
     let prevChain;
@@ -56,14 +54,14 @@ export default function Navbar(): JSX.Element {
       localStorage.setItem("prevChain", chainID.toString());
       window.location.href = "/";
     }
-  }, [chainID, address, isConnected]);
+  }, [chainID, address]); // Removed isConnected from dependency array
 
   useEffect(() => {
     let storedRoute;
     try {
       storedRoute = localStorage.getItem("route");
-    } catch {}
-    if (!storedRoute) {
+      window.location.hash = storedRoute?.toString() || "/";
+    } catch {
       window.location.hash = "/";
     }
   }, []);
@@ -71,7 +69,7 @@ export default function Navbar(): JSX.Element {
   return (
     <Container className="bg-black/80 rounded-md mt-4">
       <nav
-        className={`flex w-full mx-auto md:justify-between lg:grid lg:px-3 relative ${!isConnected ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}
+        className={`flex w-full mx-auto md:justify-between lg:grid lg:px-3 lg:grid-cols-3`}
       >
         <div className="absolute top-0 bottom-0 md:static flex items-center">
           <div className="lg:hidden">
@@ -96,8 +94,8 @@ export default function Navbar(): JSX.Element {
             </button>
             <div className={isSidebarOpen ? "" : "hidden"}>
               <NavLinksResponsive
-                isConnected={isConnected}
-                isSidebarOpen={isSidebarOpen} // Pass isSidebarOpen prop here
+                isConnected={true}
+                isSidebarOpen={isSidebarOpen}
                 setIsSidebarOpen={setIsSidebarOpen}
               />
             </div>
@@ -109,7 +107,7 @@ export default function Navbar(): JSX.Element {
         <div className="grow md:hidden flex justify-center">
           <Logo />
         </div>
-        {isConnected && <NavLinks />}
+        <NavLinks />
         <div className="hidden md:flex items-center justify-end gap-2">
           <ConnectButton showBalance={false} chainStatus={"icon"} />
         </div>

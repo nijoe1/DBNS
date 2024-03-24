@@ -39,7 +39,7 @@ const UpdateProfile = ({ isOpen, onClose, profileInfo, onUpdateProfile }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent bgGradient="linear(to-br, #333333, #222222)" color="white">
         <ModalHeader>Update Profile</ModalHeader>

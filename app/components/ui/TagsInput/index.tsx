@@ -135,6 +135,9 @@ export default forwardRef(function ChakraTagInput(
           onKeyDown={handleKeyDown}
           ref={ref}
           placeholder="add member address"
+          _focus={{
+            borderColor: "white",
+          }}
         />
       </WrapItem>
     </Wrap>

@@ -12,7 +12,7 @@ const Home = () => {
   return (
     <div>
       {router.asPath === "/#/spaces" && <SpacesGraph />}
-      {router.asPath === "/#/profile" && <ProfilePage />}
+      {router.asPath.includes("/#/profile") && <ProfilePage />}
       {(router.asPath === "/#/" ||
         (router.pathname === "/" && router.asPath === "/")) && <LandingPage />}
       {router.asPath.includes("/#/SingleSpacePage") && <SingleSpacePage />}

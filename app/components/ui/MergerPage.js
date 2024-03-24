@@ -58,6 +58,9 @@ function StructuredObjectDefinition({ structuredObject, onChange }) {
               placeholder="Description"
               value={description}
               onChange={(e) => handleChange(e, key, "description")}
+              _focus={{
+                borderColor: "white",
+              }}
             />
           </FormControl>
           <FormControl>
@@ -109,6 +112,9 @@ function StructuredObjectForm({ structuredObject, onSubmit }) {
             // @ts-ignore
             value={formData[key] || ""}
             onChange={(e) => handleChange(e, key)}
+            _focus={{
+              borderColor: "white",
+            }}
           />
         </FormControl>
       ))}

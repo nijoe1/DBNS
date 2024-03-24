@@ -129,7 +129,14 @@ const Profile = ({ onProfile }) => {
           </Text>
           {onProfile && (
             <div>
-              <Button onClick={handleOpenModal}>Open Profile Modal</Button>
+              <Button
+                colorScheme="black"
+                ml="3"
+                className="bg-black/80 text-white"
+                onClick={handleOpenModal}
+              >
+                Open Profile Modal
+              </Button>
               <UpdateProfile
                 isOpen={isOpen}
                 onClose={handleCloseModal}

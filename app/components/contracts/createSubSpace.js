@@ -106,6 +106,9 @@ const CreateSubSpaceModal = ({
             placeholder="Enter subnode name"
             value={newNodeName}
             onChange={(e) => setNewNodeName(e.target.value)}
+            _focus={{
+              borderColor: "white",
+            }}
           />
         </ModalBody>
         <ModalFooter>

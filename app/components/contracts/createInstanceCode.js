@@ -200,6 +200,9 @@ const CreateNewInstanceCode = ({
                 bg="#424242"
                 color="white"
                 borderRadius="md"
+                _focus={{
+                  borderColor: "white",
+                }}
               />
             </FormControl>
             <FormControl>
@@ -212,6 +215,9 @@ const CreateNewInstanceCode = ({
                 bg="#424242"
                 color="white"
                 borderRadius="md"
+                _focus={{
+                  borderColor: "white",
+                }}
               />
             </FormControl>
             <FormControl>

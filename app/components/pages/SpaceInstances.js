@@ -97,7 +97,13 @@ const SingleSpacePage = () => {
         </div>
       ) : (
         <Container>
-          <Button onClick={handleNewClick} colorScheme="blue" my="4">
+          <Button
+            onClick={handleNewClick}
+            colorScheme="black"
+            ml="3"
+            className="bg-black/80 text-white"
+            my="4"
+          >
             Create Dataset
           </Button>
           <CreateNewInstance
@@ -149,7 +155,7 @@ const SingleSpacePage = () => {
                           objectFit="cover"
                           onClick={() =>
                             navigateToHashRoute(
-                              "/instance?id=" + instance.InstanceID,
+                              "/instance?id=" + instance.InstanceID
                             )
                           }
                         />
@@ -181,18 +187,22 @@ const SingleSpacePage = () => {
                               as={IconButton}
                               icon={<FaEllipsisV />}
                               aria-label="Options"
-                              variant="ghost"
-                              color="black"
+                              colorScheme="black"
+                              className="bg-black/80 text-white"
                               size="sm"
                               mb="3"
                             />
                             <MenuList zIndex="3">
                               <MenuItem
+                                colorScheme="black"
+                                className="bg-black/80 text-white"
                                 onClick={() => console.log("Download dataset")}
                               >
                                 Download Dataset
                               </MenuItem>
                               <MenuItem
+                                colorScheme="black"
+                                className="bg-black/80 text-white"
                                 onClick={() => console.log("Fork instance")}
                               >
                                 Fork Instance
@@ -217,7 +227,7 @@ const SingleSpacePage = () => {
                       </Box>
                     </Box>
                   </GridItem>
-                )),
+                ))
               )}
             </Grid>
           </Flex>

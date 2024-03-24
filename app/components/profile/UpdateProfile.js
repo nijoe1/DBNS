@@ -52,6 +52,9 @@ const UpdateProfile = ({ isOpen, onClose, profileInfo, onUpdateProfile }) => {
             placeholder="Enter your name"
             mb="4"
             variant="outline"
+            _focus={{
+              borderColor: "white",
+            }}
           />
           <Text mb="2">Profile Description:</Text>
           <Input
@@ -60,6 +63,9 @@ const UpdateProfile = ({ isOpen, onClose, profileInfo, onUpdateProfile }) => {
             placeholder="Enter your description"
             mb="4"
             variant="outline"
+            _focus={{
+              borderColor: "white",
+            }}
           />
           <Text mb="2">Profile Image:</Text>
           <div className="flex flex-col items-center">
@@ -81,7 +87,13 @@ const UpdateProfile = ({ isOpen, onClose, profileInfo, onUpdateProfile }) => {
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={handleSubmit} colorScheme="blue" mr={3}>
+          <Button
+            onClick={handleSubmit}
+            colorScheme="black"
+            ml="3"
+            className="bg-black/80 text-white"
+            mr={3}
+          >
             Update Profile
           </Button>
           <Button onClick={onClose}>Cancel</Button>

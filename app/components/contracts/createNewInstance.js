@@ -276,6 +276,9 @@ const CreateNewInstance = ({
                 bg="#424242"
                 color="white"
                 borderRadius="md"
+                _focus={{
+                  borderColor: "white",
+                }}
               />
             </FormControl>
             <FormControl>
@@ -288,6 +291,9 @@ const CreateNewInstance = ({
                 bg="#424242"
                 color="white"
                 borderRadius="md"
+                _focus={{
+                  borderColor: "white",
+                }}
               />
             </FormControl>
             <FormControl>
@@ -348,6 +354,9 @@ const CreateNewInstance = ({
                 bg="#424242"
                 color="white"
                 borderRadius="md"
+                _focus={{
+                  borderColor: "white",
+                }}
               />
             </FormControl>
             <FormControl>

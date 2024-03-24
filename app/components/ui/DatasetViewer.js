@@ -129,13 +129,18 @@ const DatasetViewer = ({ cid }) => {
                   as={IconButton}
                   aria-label="Options"
                   icon={<Icon as={MdMoreVert} />}
-                  bg="#424242"
-                  color="white"
+                  colorScheme="black"
+                  className="bg-black/80 text-white"
                   my={4}
                   mr={5}
                 />
-                <MenuList>
+                <MenuList
+                  colorScheme="black"
+                  className="bg-black/80 text-white"
+                >
                   <MenuItem
+                    colorScheme="black"
+                    className="bg-black/80 text-white"
                     onClick={handleDownload}
                     icon={<Icon as={FiDownload} />}
                   >
@@ -146,7 +151,6 @@ const DatasetViewer = ({ cid }) => {
                       value={rowsPerPage}
                       onChange={handleRowsPerPageChange}
                       fontSize="sm"
-                      variant="filled"
                     >
                       {[10, 20, 50, 100].map((value) => (
                         <option key={value} value={value}>
@@ -201,16 +205,18 @@ const DatasetViewer = ({ cid }) => {
           <div>
             <SimpleGrid mt={4} columns={2} spacing={4}>
               <Button
-                bg="#424242"
-                color="white"
+                colorScheme="black"
+                ml="3"
+                className="bg-black/80 text-white"
                 disabled={currentPage === 1}
                 onClick={() => paginate(currentPage - 1)}
               >
                 Previous
               </Button>
               <Button
-                bg="#424242"
-                color="white"
+                colorScheme="black"
+                ml="3"
+                className="bg-black/80 text-white"
                 disabled={indexOfLastRow >= csvData.length}
                 onClick={() => paginate(currentPage + 1)}
               >

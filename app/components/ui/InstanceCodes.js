@@ -128,7 +128,14 @@ const InstanceCodes = () => {
     <Container>
       {selectedInstance ? (
         <>
-          <Button onClick={handleBack} variant="outline" mb="4">
+          <Button
+            colorScheme="black"
+            ml="3"
+            className="bg-black/80 text-white"
+            onClick={handleBack}
+            variant="outline"
+            mb="4"
+          >
             Go back to All Codes
           </Button>
           <CodeViewer code={selectedInstance} onClose={handleBack} />

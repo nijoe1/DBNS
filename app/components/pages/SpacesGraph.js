@@ -7,8 +7,6 @@ import CreateSubSpaceModal from "@/components/contracts/createSubSpace";
 import { constructObject } from "@/utils/tableland";
 import Loading from "@/components/Animation/Loading";
 
-const parentName = "dbns.eth";
-
 const SpacesGraph = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
@@ -111,7 +109,9 @@ const SpacesGraph = () => {
   // Handle click event on the label to navigate to the spaces page
   const handleLabelClick = (name) => {
     // Implement navigation logic here, for example:
-    navigateToHashRoute(`/SingleSpacePage?id=${name.id}`);
+    if (name.attributes?.nodeType !== "root") {
+      navigateToHashRoute(`/SingleSpacePage?id=${name.id}`);
+    }
   };
 
   // Handle click event on the circle to toggle nodes
@@ -143,30 +143,35 @@ const SpacesGraph = () => {
       >
         {nodeDatum.name}
       </text>
-      <rect
-        x="30"
-        y="4"
-        width="40"
-        height="20"
-        rx="5"
-        fill="gray"
-        stroke="black"
-        strokeWidth="1"
-        onClick={() => handleLabelClick(nodeDatum)}
-        style={{ cursor: "pointer" }}
-      />
-      <text
-        fill="black"
-        strokeWidth="1"
-        x="50"
-        y="15"
-        textAnchor="middle"
-        alignmentBaseline="middle"
-        onClick={() => handleNewClick(nodeDatum)}
-        style={{ cursor: "pointer" }}
-      >
-        {"new"}
-      </text>
+      {nodeDatum.attributes?.nodeType != "root" && (
+        <g>
+          {" "}
+          <rect
+            x="30"
+            y="4"
+            width="40"
+            height="20"
+            rx="5"
+            fill="gray"
+            stroke="black"
+            strokeWidth="1"
+            onClick={() => handleLabelClick(nodeDatum)}
+            style={{ cursor: "pointer" }}
+          />
+          <text
+            fill="black"
+            strokeWidth="1"
+            x="50"
+            y="15"
+            textAnchor="middle"
+            alignmentBaseline="middle"
+            onClick={() => handleNewClick(nodeDatum)}
+            style={{ cursor: "pointer" }}
+          >
+            {"new"}
+          </text>
+        </g>
+      )}
     </g>
   );
 
@@ -205,6 +210,9 @@ const SpacesGraph = () => {
                 mb={4}
                 mt="6%"
                 width={["90%", "70%", "50%"]} // Adjust width for different screen sizes
+                _focus={{
+                  borderColor: "white",
+                }}
               >
                 {categoryOptions.map((category) => (
                   <option key={category.value} value={category.value}>
@@ -230,9 +238,10 @@ const SpacesGraph = () => {
                     leafNodeClassName="node__leaf"
                     renderCustomNodeElement={renderCustomNodeElement}
                     translate={{
-                      x: windowDimensions.width / 3.0,
+                      x: (windowDimensions.width * 97) / 100 / 4.0,
                       y: windowDimensions.height / 7,
                     }}
+                    
                     zoom={1}
                     separation={{ siblings: 2, nonSiblings: 2 }}
                     initialDepth={1}

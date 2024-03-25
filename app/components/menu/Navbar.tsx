@@ -60,6 +60,7 @@ export default function Navbar(): JSX.Element {
     let storedRoute;
     try {
       storedRoute = localStorage.getItem("route");
+
       window.location.hash = storedRoute?.toString() || "/";
     } catch {
       window.location.hash = "/";
@@ -69,7 +70,7 @@ export default function Navbar(): JSX.Element {
   return (
     <Container className="bg-black/80 rounded-md mt-4">
       <nav
-        className={`flex w-full mx-auto md:justify-between lg:grid lg:px-3 lg:grid-cols-3`}
+        className={`flex w-full mx-auto md:justify-between lg:grid lg:px-3 relative ${!true ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}
       >
         <div className="absolute top-0 bottom-0 md:static flex items-center">
           <div className="lg:hidden">
@@ -109,7 +110,7 @@ export default function Navbar(): JSX.Element {
         </div>
         <NavLinks />
         <div className="hidden md:flex items-center justify-end gap-2">
-          <ConnectButton showBalance={false} chainStatus={"icon"} />
+          <ConnectButton showBalance={true} chainStatus={"icon"} />
         </div>
       </nav>
       <StepperForm

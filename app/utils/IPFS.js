@@ -65,8 +65,28 @@ export const resolveIPNSName = async (IPNS) => {
   return revision.value;
 };
 
-export const createIPNSName = async (file, apiKey, address, jwt, spaceID) => {
-  const cid = (await uploadFile(file, apiKey)).Hash;
+export const createIPNSName = async (
+  file,
+  apiKey,
+  address,
+  jwt,
+  spaceID,
+  isEncrypted
+) => {
+  let cid;
+  if (isEncrypted) {
+    cid = await uploadFileEncrypted(file, apiKey, address, jwt);
+    cid = await applyAccessConditions(
+      cid,
+      314159,
+      spaceID,
+      address,
+      jwt,
+      CONTRACT_ADDRESSES
+    );
+  } else {
+    cid = (await uploadFile(file, apiKey)).Hash;
+  }
   console.log("CID", cid);
   // https://www.npmjs.com/package/w3name
   const name = await Name.create();
@@ -86,16 +106,8 @@ export const createIPNSName = async (file, apiKey, address, jwt, spaceID) => {
     instanceID,
     address,
     jwt,
-    "0x573Ddd3536cF4eF58d5386D6829c9e38cbe977e0",
+    "0x573Ddd3536cF4eF58d5386D6829c9e38cbe977e0"
   );
-
-  // const jsonBlob = await decrypt(ecid, address, jwt)
-  // const jsonFile = new File([jsonBlob], `type.json`, {
-  //   type: "application/json",
-  // });
-
-  // const key = JSON.parse(await jsonFile.text());
-  // console.log(key)
   return {
     instanceID: instanceID,
     name: name.toString(),
@@ -108,7 +120,7 @@ export const renewIPNSName = async (
   IPNS,
   EncryptedKeyCID,
   address,
-  jwt,
+  jwt
 ) => {
   const name = Name.parse(IPNS);
 
@@ -158,7 +170,7 @@ export const uploadFile = async (file, apiKey) => {
     false,
     null,
     null,
-    dealParams,
+    dealParams
   );
   await registerCIDtoRAAS(output.data.Hash);
 
@@ -187,7 +199,7 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
     jwt,
     null,
     null,
-    dealParams,
+    dealParams
   );
 
   const { masterKey, keyShards } = await generate();
@@ -196,7 +208,7 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
     address,
     output.data[0].cid,
     jwt,
-    keyShards,
+    keyShards
   );
 
   await registerCIDtoRAAS(output.data[0].cid);
@@ -205,26 +217,15 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
 };
 
 /* Deploy file along with encryption */
-export const uploadFileEncrypted = async (
-  file,
-  apiKey,
-  address,
-  jwt,
-  setUploadProgress,
-) => {
-  const progressCallback = (progressData) => {
-    const percentageDone =
-      100 - (progressData?.total / progressData?.uploaded)?.toFixed(2);
-    setUploadProgress(percentageDone); // Update the progress state
-  };
+export const uploadFileEncrypted = async (file, apiKey, address, jwt) => {
   const output = await lighthouse.uploadEncrypted(
     file,
     apiKey,
     address,
     jwt,
     null,
-    progressCallback,
-    dealParams,
+    null,
+    dealParams
   );
 
   const { masterKey, keyShards } = await generate();
@@ -233,12 +234,12 @@ export const uploadFileEncrypted = async (
     address,
     output.data[0].cid,
     jwt,
-    keyShards,
+    keyShards
   );
 
   await registerCIDtoRAAS(output.data[0].cid);
 
-  return output.data;
+  return output.data[0].cid;
 };
 
 const registerCIDtoRAAS = async (cid) => {

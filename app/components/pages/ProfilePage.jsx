@@ -1,16 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Image,
-  Text,
-  Badge,
-  Tabs,
-  TabList,
-  TabPanels,
-  TabPanel,
-  Tab,
-  Center,
-} from "@chakra-ui/react";
+import React from "react";
+import { Box, Tabs, TabList, TabPanels, TabPanel, Tab } from "@chakra-ui/react";
 import Profile from "@/components/profile/Profile";
 
 const ProfilePage = () => {
@@ -18,7 +7,7 @@ const ProfilePage = () => {
     <div className="mt-[5%] max-w-[1200px] mx-auto">
       <Box
         p={["2", "4"]}
-        className="mx-[5%]"
+        mx="[5%]"
         bg="#333333"
         borderRadius="xl"
         boxShadow="md"

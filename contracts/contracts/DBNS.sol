@@ -9,7 +9,7 @@ import {Core} from "./libraries/Core.sol";
  * Where space and subSpaces can get created and anyone can
  * create instances inside a space and contribute to the public
  * this is possible by integrating tableland SQL in solidity
- * ENS system to support a decentralized Namespace of Database spaces
+ * FNS system to support a decentralized Namespace of Database spaces
  * IPNS and Push protocol for code and space discussions
  */
 contract DBNS is Core {
@@ -18,14 +18,16 @@ contract DBNS is Core {
         address _registrar,
         address _publicResolver,
         bytes32 _baseNode,
-        address _gateImplementation
+        address _gateImplementation,
+        address _subscriptionImplementation
     )
         Core(
             _registry,
             _registrar,
             _publicResolver,
             _baseNode,
-            _gateImplementation
+            _gateImplementation,
+            _subscriptionImplementation
         )
     {}
 
@@ -72,7 +74,7 @@ contract DBNS is Core {
      */
     function createSpaceInstance(
         bytes32 _node,
-        uint _price,
+        uint256 _price,
         address[] calldata _members,
         string calldata _metadataCID,
         string calldata _chatID,
@@ -98,11 +100,7 @@ contract DBNS is Core {
             msg.sender
         );
 
-        createInstanceType(
-            _newDBInstance,
-            _gatedContract,
-            _price
-        );
+        createInstanceType(_newDBInstance, _gatedContract, _price);
 
         instanceInsertion(
             _newDBInstance,
@@ -162,11 +160,7 @@ contract DBNS is Core {
         bytes32 _instanceID
     ) external payable {
         purchaseSubscription(_instanceID);
-        insertSubscription(
-            _instanceID,
-            msg.sender,
-            getTime() + MONTH
-        );
+        insertSubscription(_instanceID, msg.sender, getTime() + MONTH);
     }
 
     function extendInstanceSubscription(bytes32 _instanceID) external payable {
@@ -174,12 +168,10 @@ contract DBNS is Core {
             _instanceID,
             msg.sender
         );
+
         extendSubscription(_instanceID);
-        insertSubscription(
-            _instanceID,
-            msg.sender,
-            remaining + MONTH
-        );
+
+        updateSubscription(_instanceID, msg.sender, remaining + MONTH);
     }
 
     function updateCode(

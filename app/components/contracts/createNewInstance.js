@@ -130,6 +130,7 @@ const CreateNewInstance = ({
       address,
       jwt,
       spaceID,
+      formData.price > 0,
     );
     return response;
   };

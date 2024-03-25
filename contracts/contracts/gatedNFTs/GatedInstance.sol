@@ -17,7 +17,7 @@ contract GatedInstance is ERC721, Initializable {
         uint256 size = _members.length;
         for (uint256 i = 0; i < size; i++) {
             _tokenIds.increment();
-            _mint(_members[i], _tokenIds.current());
+            _mint(_members[i], uint256(keccak256(abi.encode(_members[i]))));
         }
     }
 

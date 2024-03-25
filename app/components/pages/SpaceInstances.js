@@ -19,7 +19,7 @@ import { FaEllipsisV } from "react-icons/fa";
 import { Container } from "@/components/ui/container";
 import { useRouter } from "next/router";
 import CreateNewInstance from "../contracts/createNewInstance";
-import { createName, getIpfsGatewayUri } from "@/utils/IPFS";
+import { getIpfsGatewayUri } from "@/utils/IPFS";
 import { getSpaceInstances } from "@/utils/tableland";
 import axios from "axios";
 import Loading from "@/components/Animation/Loading";
@@ -48,7 +48,7 @@ const SingleSpacePage = () => {
   }
 
   async function fetchInstances() {
-    const data = (await getSpaceInstances(spaceID))[0].instances;
+    const data = (await getSpaceInstances(spaceID))[0]?.instances;
     const dataObj = {}; // Initialize data object
     for (const key in data) {
       if (

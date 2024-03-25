@@ -100,7 +100,7 @@ const CreateSubSpaceModal = ({
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent bg="#333333" color="white" borderRadius="md">
-        <ModalHeader>Create New Subnode</ModalHeader>
+        <ModalHeader>Create New subspace</ModalHeader>
         <ModalBody bg={"#333333"}>
           <Input
             placeholder="Enter subnode name"
@@ -112,10 +112,10 @@ const CreateSubSpaceModal = ({
           />
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleCreate}>
+          <Button colorScheme="white" mr={3} onClick={handleCreate}>
             Create
           </Button>
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="white" onClick={onClose}>
             Cancel
           </Button>
         </ModalFooter>

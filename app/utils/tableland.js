@@ -82,6 +82,29 @@ export const getInstance = async (instanceID) => {
   }
 };
 
+export const getHasAccess = async (instanceID, address) => {
+  const query = `
+  SELECT MAX(hasAccess) AS hasAccess
+  FROM (
+      SELECT 1 AS hasAccess
+      FROM ${tables.subscriptions}
+      WHERE InstanceID = '${instanceID.toLowerCase()}' AND subscriber = '${address.toLowerCase()}'
+      UNION ALL
+      SELECT 1 AS hasAccess
+      FROM ${tables.members}
+      WHERE InstanceID = '${instanceID.toLowerCase()}' AND member = '${address.toLowerCase()}'
+  ) AS combinedAccess;`;
+  try {
+    const result = await axios.get(
+      TablelandGateway + encodeURIComponent(query),
+    );
+    return result.data[0].hasAccess === 1;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
 export const getInstanceCodes = async (instanceID) => {
   const query = `SELECT * FROM ${tables.codes} WHERE InstanceID = '${instanceID}'`;
   try {
@@ -98,6 +121,7 @@ export const getInstanceCodes = async (instanceID) => {
 // Function to recursively build children
 async function buildChildren(parentID, parentHierarchy, sampleSpacesData) {
   const children = [];
+  sampleSpacesData = sampleSpacesData ? sampleSpacesData : [];
   for (const node of sampleSpacesData) {
     if (node.DBSubSpaceOfID.toLowerCase() === parentID.toLowerCase()) {
       const childHierarchy = parentHierarchy

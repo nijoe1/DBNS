@@ -13,21 +13,20 @@ module.exports = async ({ deployments }) => {
   console.log("Wallet+ Ethereum Address:", wallet.address);
 
   // // Calibration Testnet
-  const ENS = "0x331e3228ca613F52B8E6a0F1EFD7000Cb6DFA581";
+  const FNS = "0x331e3228ca613F52B8E6a0F1EFD7000Cb6DFA581";
   const PUBLIC_RESOLVER = "0x55608172cD23E7e1c2BD939f1C3210027EbD031a";
   const REGISTRAR = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
 
   const BASENODE =
     "0x78f6b1389af563cc5c91f234ea46b055e49658d8b999eeb9e0baef7dbbc93fdb";
 
-  // sepolia Testnet
-  // const ENS = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
-  // const PUBLIC_RESOLVER = "0x8FADE66B79cC9f707aB26799354482EB93a5B7dD";
-  // const REGISTRAR = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
-  // const BASENODE =
-  //   "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae";
-
   const IMPLEMENTATION = await deploy("GatedInstance", {
+    from: wallet.address,
+    args: [],
+    log: true,
+  });
+
+  const SUBSCRIPTION_IMPLEMENTATION = await deploy("SubscriptionNFTs", {
     from: wallet.address,
     args: [],
     log: true,
@@ -35,11 +34,12 @@ module.exports = async ({ deployments }) => {
   const _DBNS = await deploy("DBNS", {
     from: wallet.address,
     args: [
-      ENS,
+      FNS,
       REGISTRAR,
       PUBLIC_RESOLVER,
       BASENODE,
       IMPLEMENTATION.address,
+      SUBSCRIPTION_IMPLEMENTATION.address,
     ],
     log: true,
   });
@@ -65,9 +65,9 @@ module.exports = async ({ deployments }) => {
   // let tx = await DBNS.tables(0)
   // console.log(tx);
 
-  tx = await DBNS.createDBSpace("nick5", { gasLimit: 40000000 });
+  // tx = await DBNS.createDBSpace("nick5", { gasLimit: 40000000 });
 
-  await tx.wait();
+  // await tx.wait();
 
   // console.log(tx);
 

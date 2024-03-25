@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import InstanceDetailsPage from "@/components/pages/instance";
 import SingleSpacePage from "@/components/pages/SpaceInstances";
 import LandingPage from "@/components/pages/LandingPage";
@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
 
 const Home = () => {
   const router = useRouter();
+
+  useEffect(() => {}, [router.asPath]);
 
   return (
     <div>

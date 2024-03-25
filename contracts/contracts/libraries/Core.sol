@@ -7,8 +7,6 @@ import {Gated, IGated} from "./Gated.sol";
 
 import {Tableland} from "./Tableland.sol";
 
-import {Subscriptions} from "./Subscriptions.sol";
-
 /**
  * @title Core
  * @dev Interface for the Ens system to support a decentralized Namespace of Database spaces
@@ -16,7 +14,7 @@ import {Subscriptions} from "./Subscriptions.sol";
  * Tableland SQL in solidity for the databases and subspaces
  */
 
-abstract contract Core is FNS, Gated, Tableland, Subscriptions {
+abstract contract Core is FNS, Gated, Tableland {
     enum Types {
         NULL,
         PAID_PRIVATE_INSTANCE,
@@ -48,10 +46,11 @@ abstract contract Core is FNS, Gated, Tableland, Subscriptions {
         address _registrar,
         address _publicResolver,
         bytes32 _baseNode,
-        address _gatedImplementation
+        address _gatedImplementation,
+        address _subscriptionImplementation
     )
         FNS(_registry, _registrar, _publicResolver, _baseNode)
-        Gated(_gatedImplementation)
+        Gated(_gatedImplementation, _subscriptionImplementation)
         Tableland()
     {}
 
@@ -65,11 +64,11 @@ abstract contract Core is FNS, Gated, Tableland, Subscriptions {
         bytes32 _newDBInstance,
         address _gatedContract,
         uint _price
-    ) internal  {
+    ) internal {
         bool _isPrivate = _gatedContract != address(0);
         if (!_isPrivate && _price > 0) {
             isType[_newDBInstance] = Types.PAID_INSTANCE;
-            createSubscription(_price,  _newDBInstance);
+            createSubscription(_price, _newDBInstance);
         } else if (_isPrivate && _price > 0) {
             isType[_newDBInstance] = Types.PAID_PRIVATE_INSTANCE;
             createSubscription(_price, _newDBInstance);

@@ -18,6 +18,10 @@
 
 - [nijoe1](https://github.com/nijoe1)
 
+**Gitbook**
+
+-[Gitbook](https://nicks-personal-organization-1.gitbook.io/dbns/)
+
 
 ## Flow & Architecture of the Application✨
 

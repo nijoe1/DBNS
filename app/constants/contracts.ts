@@ -1,4 +1,4 @@
-const DBNS = "0x1741F58771B02DF6448D2f4f62ACDbf0199Ecb6b";
+const DBNS = "0x5d97aD0083CaEB3741FAeA63cb701Db6003CEd04";
 
 const ADDRESS = DBNS;
 export const CONTRACT_ADDRESSES = ADDRESS;
@@ -27,12 +27,12 @@ export const CONTRACT_ABI = [
       },
       {
         internalType: "address",
-        name: "_unlockContract",
+        name: "_gateImplementation",
         type: "address",
       },
       {
         internalType: "address",
-        name: "_gateImplementation",
+        name: "_subscriptionImplementation",
         type: "address",
       },
     ],
@@ -74,35 +74,6 @@ export const CONTRACT_ABI = [
     inputs: [],
     name: "NoInstanceAccess",
     type: "error",
-  },
-  {
-    inputs: [],
-    name: "NoInstanceCreator",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "SubscribeToGainAccess",
-    type: "error",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "previousOwner",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
-    name: "OwnershipTransferred",
-    type: "event",
   },
   {
     inputs: [],
@@ -378,7 +349,7 @@ export const CONTRACT_ABI = [
       },
       {
         internalType: "address",
-        name: "_subscriber",
+        name: "_owner",
         type: "address",
       },
     ],
@@ -388,6 +359,25 @@ export const CONTRACT_ABI = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_salt",
+        type: "bytes32",
+      },
+    ],
+    name: "getSuscriptionDeterministicAddress",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -504,40 +494,21 @@ export const CONTRACT_ABI = [
         type: "bytes32",
       },
     ],
-    name: "instanceLock",
+    name: "instanceSubscription",
     outputs: [
+      {
+        internalType: "contract IGated",
+        name: "subscriptionContract",
+        type: "address",
+      },
       {
         internalType: "address",
         name: "creator",
         type: "address",
       },
       {
-        internalType: "address",
-        name: "lockAddress",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    name: "instanceSubscriptions",
-    outputs: [
-      {
         internalType: "uint256",
-        name: "",
+        name: "prize",
         type: "uint256",
       },
     ],
@@ -605,40 +576,6 @@ export const CONTRACT_ABI = [
         type: "address",
       },
       {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
-        internalType: "bytes",
-        name: "",
-        type: "bytes",
-      },
-    ],
-    name: "keyPurchasePrice",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "minKeyPrice",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
         internalType: "uint256",
         name: "tokenId",
         type: "uint256",
@@ -658,62 +595,6 @@ export const CONTRACT_ABI = [
       },
     ],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "from",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-      {
-        internalType: "bytes",
-        name: "",
-        type: "bytes",
-      },
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    name: "onKeyPurchase",
-    outputs: [],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "owner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -743,13 +624,6 @@ export const CONTRACT_ABI = [
       },
     ],
     name: "removeMembers",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "renounceOwnership",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -795,32 +669,6 @@ export const CONTRACT_ABI = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
-    ],
-    name: "transferDomain",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
-    name: "transferOwnership",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "bytes32",
         name: "_codeID",
         type: "bytes32",
@@ -855,26 +703,6 @@ export const CONTRACT_ABI = [
       },
     ],
     name: "updateInstance",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "withdraw",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "_instanceID",
-        type: "bytes32",
-      },
-    ],
-    name: "withdraw",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

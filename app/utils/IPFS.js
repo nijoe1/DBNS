@@ -25,44 +25,31 @@ const dealParams = {
   num_copies: 3,
 };
 
-export const createName = async () => {
-  // https://www.npmjs.com/package/w3name
-  const name = await Name.create();
-  console.log("created new name: ", name.toString());
-  // value is an IPFS path to the content we want to publish
-  const value = "/ipfs/QmaV4XFv7YqzC5USC51tVeHqEDQyJ4fsHFghGg9758Xhy4";
-  // since we don't have a previous revision, we use Name.v0 to create the initial revision
-  const revision = await Name.v0(name, value);
-  await Name.publish(revision, name.key);
-  console.log(name.key.bytes);
-  const byteString = uint8ArrayToString(name.key.bytes, "base64");
-
-  console.log(byteString);
-
-  const name3 = uint8ArrayFromString(byteString, "base64");
-  console.log(name3);
-  const name2 = await Name.from(name3);
-  const nextValue = "ipfs/QmaV4XFv7YqzC5USC51tVeHqEDQyJ4fsHFghGg9758Xhy4";
-
-  let nextRevision = await Name.increment(revision, nextValue);
-
-  await Name.publish(nextRevision, name2.key);
-
-  const name4 = Name.parse(name.toString());
-  const revision2 = await Name.resolve(name4);
-
-  nextRevision = await Name.increment(revision2, nextValue);
-
-  await Name.publish(nextRevision, name2.key);
-
-  console.log("Resolved value:", name.toString());
-};
-
 export const resolveIPNSName = async (IPNS) => {
   const name = Name.parse(IPNS);
   const revision = await Name.resolve(name);
   console.log("Resolved value:", revision.value);
   return revision.value;
+};
+
+
+export const UpdateIPNSNameEncrypted = async (
+  file,
+  apiKey,
+  address,
+  jwt,
+  spaceID
+) => {
+  let cid = await uploadFileEncrypted(file, apiKey, address, jwt);
+  cid = await applyAccessConditions(
+    cid,
+    314159,
+    spaceID,
+    address,
+    jwt,
+    CONTRACT_ADDRESSES
+  );
+  return cid;
 };
 
 export const createIPNSName = async (
@@ -219,7 +206,7 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
 /* Deploy file along with encryption */
 export const uploadFileEncrypted = async (file, apiKey, address, jwt) => {
   const output = await lighthouse.uploadEncrypted(
-    file,
+    [file],
     apiKey,
     address,
     jwt,
@@ -227,19 +214,20 @@ export const uploadFileEncrypted = async (file, apiKey, address, jwt) => {
     null,
     dealParams
   );
+  console.log("output", output.data[0].Hash);
 
   const { masterKey, keyShards } = await generate();
 
   const { isSuccess } = await saveShards(
     address,
-    output.data[0].cid,
+    output.data[0].Hash,
     jwt,
     keyShards
   );
 
-  await registerCIDtoRAAS(output.data[0].cid);
+  await registerCIDtoRAAS(output.data[0].Hash);
 
-  return output.data[0].cid;
+  return output.data[0].Hash;
 };
 
 const registerCIDtoRAAS = async (cid) => {

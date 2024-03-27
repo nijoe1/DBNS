@@ -21,7 +21,6 @@ import {
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { CONTRACT_ABI, CONTRACT_ADDRESSES } from "@/constants/contracts";
 import { useSelector } from "react-redux";
-import usePush from "@/hooks/usePush";
 import { useRouter } from "next/router";
 import { getRules } from "@/constants/push";
 import { createIPNSName, uploadFile } from "@/utils/IPFS";
@@ -54,19 +53,12 @@ const CreateNewInstance = ({
     file: null,
     instanceID: "",
   });
-  const { initializePush } = usePush();
   const router = useRouter();
   const pushSign = useSelector((state) => state.push.pushSign);
   const { address } = useAccount();
   const [tags, setTags] = useState([]);
 
   useEffect(() => {
-    async function initialize() {
-      await initializePush();
-    }
-    if (Object.keys(pushSign).length === 0) {
-      initialize();
-    }
   }, [router]);
 
   const handleFileChange = (e) => {

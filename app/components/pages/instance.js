@@ -14,11 +14,14 @@ import InstanceCodes from "@/components/ui/InstanceCodes";
 import { useAccount } from "wagmi";
 import ChatComponent from "@/components/ui/ChatComponent";
 import { useSelector } from "react-redux";
-import usePush from "@/hooks/usePush";
 import { useRouter } from "next/router";
 import { Container } from "@/components//ui/container";
 import CardItem from "@/components/profile/CardItem";
-import { getInstance, getHasAccess } from "@/utils/tableland";
+import {
+  getInstance,
+  getHasAccess,
+  getInstanceMembers,
+} from "@/utils/tableland";
 import { getIpfsGatewayUri, resolveIPNS } from "@/utils/IPFS";
 import Subscribe from "@/components/contracts/subscribe";
 import Loading from "@/components/Animation/Loading";
@@ -26,13 +29,13 @@ import Loading from "@/components/Animation/Loading";
 import axios from "axios";
 
 const InstanceDetailsPage = () => {
-  const { initializePush } = usePush();
   const router = useRouter();
   const pushSign = useSelector((state) => state.push.pushSign);
   const instanceID = router.asPath.replace("/#/instance?id=", "");
   const [instance, setInstance] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // State to manage loading
   const [hasAccess, setHasAccess] = useState(false); // State to manage access [true/false
+  const [instanceMembers, setInstanceMembers] = useState([]); // State to manage instance members [array]
   const { address } = useAccount();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -44,14 +47,19 @@ const InstanceDetailsPage = () => {
     return item;
   }
 
-  async function initialize() {
-    await initializePush();
-  }
-
   async function fetchData() {
     try {
       const data = await getInstance(instanceID);
+      let members = await getInstanceMembers(instanceID);
+      let temp = [];
+      temp.push(data[0].creator);
+      members.forEach((member) => {
+        temp.push(member.member.toLowerCase());
+      });
+      setInstanceMembers(temp);
+      console.log("Members:", temp);
       const instanceData = await getInstanceMetadata(data[0]);
+      console.log("Instance Data:", instanceData);
       const hasAccess = await getHasAccess(instanceID, address);
       setHasAccess(hasAccess);
       setInstance(instanceData);
@@ -63,9 +71,6 @@ const InstanceDetailsPage = () => {
   }
 
   useEffect(() => {
-    if (Object.keys(pushSign).length === 0) {
-      initialize();
-    }
     if (isLoading) {
       fetchData();
     }
@@ -94,29 +99,35 @@ const InstanceDetailsPage = () => {
                     desc: instance?.metadata?.about || "Instance Description",
                     picture:
                       instance?.metadata?.imageUrl || "/path/to/image.jpg",
+                    members: instanceMembers || [],
                   }}
+                  pushSign={pushSign}
                 />
-                {!hasAccess && (
-                  <div>
-                    <Button
-                      className="border-white border p-3 rounded-md "
-                      colorScheme="black"
-                      size="mb"
-                      mb={3}
-                      onClick={() => {
-                        onOpen();
-                      }}
-                    >
-                      Subscribe
-                    </Button>
-                    <Subscribe
-                      instanceID={instanceID}
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      price={instance?.price || 0}
-                    />
-                  </div>
-                )}
+                {!hasAccess ||
+                  !(instanceMembers.find(
+                    (member) =>
+                      member.toLowerCase() === address.toLowerCase()
+                  ) && (
+                    <div>
+                      <Button
+                        className="border-white border p-3 rounded-md "
+                        colorScheme="black"
+                        size="mb"
+                        mb={3}
+                        onClick={() => {
+                          onOpen();
+                        }}
+                      >
+                        Subscribe
+                      </Button>
+                      <Subscribe
+                        instanceID={instanceID}
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        price={instance?.price || 0}
+                      />
+                    </div>
+                  ))}
               </Box>
               {hasAccess && (
                 <Tabs
@@ -136,6 +147,8 @@ const InstanceDetailsPage = () => {
                         cid={instance?.cid}
                         IPNS={instance?.IPNS}
                         EncryptedKeyCID={instance?.IPNSEncryptedKey}
+                        isEncrypted={instance?.price > 0}
+                        spaceID={instanceID}
                       />
                     </TabPanel>
                     <TabPanel>

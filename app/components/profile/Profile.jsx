@@ -5,12 +5,14 @@ import { useSelector } from "react-redux";
 import usePush from "@/hooks/usePush";
 import UpdateProfile from "@/components/profile/UpdateProfile";
 import { FaEdit } from "react-icons/fa";
-
+import { useRouter } from "next/router";
 // Inside your component:
 const Profile = ({ onProfile }) => {
+  const router = useRouter();
   const { initializePush } = usePush();
   const pushSign = useSelector((state) => state.push.pushSign);
   const { address } = useAccount();
+  const userAddress = router.asPath.replace("/#/profile?address=", "");
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenModal = () => {
@@ -25,25 +27,24 @@ const Profile = ({ onProfile }) => {
   const [subscriptions, setSubscriptions] = useState([]);
 
   useEffect(() => {
-    async function initialize() {
-      await initializePush();
-    }
-
     async function getProfile() {
       await fetchProfileInfo();
       await fetchNotifications();
       await fetchSubscriptions();
     }
-    if (Object.keys(pushSign).length === 0) {
-      initialize();
-    }
     getProfile();
-  }, [profileInfo]);
+  }, [profileInfo, userAddress]);
 
   const fetchProfileInfo = async () => {
     try {
-      const response = await pushSign.profile.info();
-      setProfileInfo(response);
+      if (userAddress.toLowerCase() != address.toLowerCase()) {
+        console.log("Fetching profile info for:", userAddress);
+        const response = await pushSign.profile.info(userAddress);
+        setProfileInfo(response);
+      } else {
+        const response = await pushSign.profile.info(address);
+        setProfileInfo(response);
+      }
     } catch (error) {
       console.error("Error fetching profile info:", error);
     }
@@ -83,15 +84,8 @@ const Profile = ({ onProfile }) => {
     }
   };
   useEffect(() => {
-    async function initialize() {
-      await initializePush();
-    }
-
     async function getProfile() {
       await fetchProfileInfo();
-    }
-    if (Object.keys(pushSign).length === 0) {
-      initialize();
     }
     getProfile();
   }, [profileInfo]);

@@ -25,19 +25,23 @@ import { MdMoreVert } from "react-icons/md";
 import Loading from "@/components/Animation/Loading";
 import { Container } from "@/components//ui/container";
 import UpdateIPNS from "@/components/ui/UpdateIPNS";
+import { decrypt } from "@/utils/IPFS";
+import { useAccount } from "wagmi";
 
-const DatasetViewer = ({ cid, IPNS, EncryptedKeyCID }) => {
+const DatasetViewer = ({ cid, IPNS, EncryptedKeyCID, isEncrypted ,spaceID}) => {
   const toast = useToast();
   const [csvData, setCsvData] = useState([]);
   const [csvText, setCsvText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [fetched, setFetched] = useState(false);
+  const { address } = useAccount();
   const {
     isOpen: isUpdateOpen,
     onOpen: onUpdateOpen,
     onClose: onUpdateClose,
   } = useDisclosure();
+  console.log("DatasetViewer: ", IPNS, EncryptedKeyCID, isEncrypted, spaceID);
   const handleUpdateClick = async () => {
     onUpdateOpen();
   };
@@ -50,20 +54,50 @@ const DatasetViewer = ({ cid, IPNS, EncryptedKeyCID }) => {
 
   const fetchCsvData = async () => {
     try {
-      const response = await fetch(
-        "https://gateway.lighthouse.storage/ipfs/" + cid,
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch CSV file");
-      }
-      const text = await response.text();
-      setCsvText(text);
-      const parsedData = customCsvParser(text);
-      if (parsedData) {
-        setCsvData(parsedData);
-        setFetched(true);
+      if (!isEncrypted) {
+        const response = await fetch(
+          "https://gateway.lighthouse.storage/ipfs/" + cid
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch CSV file");
+        }
+        const text = await response.text();
+        setCsvText(text);
+        const parsedData = customCsvParser(text);
+        if (parsedData) {
+          setCsvData(parsedData);
+          setFetched(true);
+        } else {
+          throw new Error("Failed to parse CSV file");
+        }
       } else {
-        throw new Error("Failed to parse CSV file");
+        let JWT;
+        let blobResponse;
+        try {
+          JWT = localStorage.getItem(`lighthouse-jwt-${address}`);
+          blobResponse = await decrypt(cid, address, JWT);
+
+          // Convert the decrypted blob into a File object
+          const decryptedFile = new File([blobResponse], "decrypted.csv", {
+            type: "text/csv",
+          });
+
+          // Read the content of the decrypted File object
+          const decryptedText = await decryptedFile.text();
+
+          // Now you can parse the decrypted CSV data
+          const parsedData = customCsvParser(decryptedText);
+          console.log("Parsed Data:", parsedData);
+          
+          if (parsedData) {
+            setCsvData(parsedData);
+            setFetched(true);
+          } else {
+            throw new Error("Failed to parse decrypted CSV file");
+          }
+        } catch (error) {
+          throw new Error("Failed to decrypt CSV file: " + error.message);
+        }
       }
     } catch (error) {
       toast({
@@ -189,6 +223,8 @@ const DatasetViewer = ({ cid, IPNS, EncryptedKeyCID }) => {
                   IPNS={IPNS}
                   EncryptedKeyCID={EncryptedKeyCID}
                   currentCSV={csvText}
+                  spaceID={spaceID}
+                  isEncrypted={isEncrypted}
                 />
               </div>
             </Container>

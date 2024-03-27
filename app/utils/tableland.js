@@ -105,6 +105,20 @@ export const getHasAccess = async (instanceID, address) => {
   }
 };
 
+export const getInstanceMembers = async (instanceID) => {
+  const query = `SELECT ${tables.members}.member FROM ${tables.members} WHERE InstanceID = '${instanceID}'`;
+  try {
+    const result = await axios.get(
+      TablelandGateway + encodeURIComponent(query)
+    );
+    console.log(result.data);
+    return result.data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
 export const getInstanceCodes = async (instanceID) => {
   const query = `SELECT * FROM ${tables.codes} WHERE InstanceID = '${instanceID}'`;
   try {

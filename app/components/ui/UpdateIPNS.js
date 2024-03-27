@@ -19,7 +19,11 @@ import {
 } from "@chakra-ui/react";
 import { useAccount } from "wagmi";
 import { FaFileUpload } from "react-icons/fa";
-import { renewIPNSName, uploadFile } from "@/utils/IPFS";
+import {
+  renewIPNSName,
+  uploadFile,
+  UpdateIPNSNameEncrypted,
+} from "@/utils/IPFS";
 import { ObjectMatcher } from "@/utils/merge";
 
 const UpdateIPNS = ({
@@ -29,6 +33,8 @@ const UpdateIPNS = ({
   IPNS,
   EncryptedKeyCID,
   currentCSV,
+  isEncrypted,
+  spaceID,
 }) => {
   const { address } = useAccount();
   const toast = useToast();
@@ -41,8 +47,13 @@ const UpdateIPNS = ({
     let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
     let jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
     try {
-      const cid = (await uploadFile(file, key)).Hash;
-
+      let cid;
+      if (!isEncrypted) {
+        cid = (await uploadFile(file, key)).Hash;
+      } else {
+        cid = await UpdateIPNSNameEncrypted(file, key, address, jwt, spaceID);
+      }
+      console.log("CID:", cid);
       await renewIPNSName(cid, IPNS, EncryptedKeyCID, address, jwt);
       toast({
         title: "IPNS updated",

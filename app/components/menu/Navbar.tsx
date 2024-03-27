@@ -10,10 +10,11 @@ import { useRouter } from "next/router";
 export default function Navbar(): JSX.Element {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const { address } = useAccount(); // Removed isConnected
+  const { address,isConnected } = useAccount(); // Removed isOpen
   const chainID = useChainId();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changeChain, setChangeChain] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -30,18 +31,30 @@ export default function Navbar(): JSX.Element {
   useEffect(() => {
     const check = async () => {
       let prevAddress;
+      let JWT
+      let API_KEY
       try {
         prevAddress = localStorage.getItem("prevAddress");
+      } catch {}
+      try {
+        JWT = localStorage.getItem(`lighthouse-jwt-${address}`);
+      } catch {}
+      try {
+        API_KEY = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
       } catch {}
       if (address && address != prevAddress) {
         localStorage.setItem("prevAddress", address ? address : "".toString());
         localStorage.setItem("prevChain", chainID.toString());
         setChangeChain(false);
+        setIsOpen(true);
+        openModal();
+      }else if (!isOpen && isConnected) {
+        setIsOpen(true);
         openModal();
       }
     };
     check();
-  }, [address]); // Removed isConnected from dependency array
+  }, [address]); // Removed isOpen from dependency array
 
   useEffect(() => {
     let prevChain;
@@ -54,7 +67,7 @@ export default function Navbar(): JSX.Element {
       localStorage.setItem("prevChain", chainID.toString());
       window.location.href = "/";
     }
-  }, [chainID, address]); // Removed isConnected from dependency array
+  }, [chainID, address]); // Removed isOpen from dependency array
 
   useEffect(() => {
     let storedRoute;
@@ -95,7 +108,7 @@ export default function Navbar(): JSX.Element {
             </button>
             <div className={isSidebarOpen ? "" : "hidden"}>
               <NavLinksResponsive
-                isConnected={true}
+                isOpen={true}
                 isSidebarOpen={isSidebarOpen}
                 setIsSidebarOpen={setIsSidebarOpen}
               />

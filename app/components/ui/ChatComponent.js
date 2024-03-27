@@ -30,6 +30,12 @@ const ChatComponent = ({ pushSign, address, chatID }) => {
       fetchChatHistory();
     }
   }, [chatID]);
+
+  useEffect(() => {
+    if (chatID) {
+      fetchChatHistory();
+    }
+  }, [messages]);
   const sendMessage = async () => {
     try {
       const groupPermissions = await pushSign.chat.group.permissions(chatID);
@@ -44,7 +50,6 @@ const ChatComponent = ({ pushSign, address, chatID }) => {
             type: "Text",
             content: `Attaching ${file.name}`,
           });
-          setMessages([...messages, fileInfoMessage]);
         }
 
         // Send the actual file
@@ -61,7 +66,6 @@ const ChatComponent = ({ pushSign, address, chatID }) => {
               "e10af1ce34d46c8e644d0440e7ac57aa207fd6c5773f0229760a00d1fc8610da",
           },
         });
-        setMessages([...messages, sentMessage]);
         setFile(null);
         setFileType("");
       } else if (newMessage.trim() !== "") {
@@ -69,7 +73,6 @@ const ChatComponent = ({ pushSign, address, chatID }) => {
           type: "Text",
           content: newMessage,
         });
-        setMessages([...messages, sentMessage]);
         setNewMessage("");
       }
     } catch (error) {

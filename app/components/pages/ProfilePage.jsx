@@ -1,10 +1,11 @@
 import React from "react";
 import { Box, Tabs, TabList, TabPanels, TabPanel, Tab } from "@chakra-ui/react";
 import Profile from "@/components/profile/Profile";
-
+import UserInstances from "@/components/pages/UserInstances";
+import UserCodes from "@/components/ui/UserCodes";
 const ProfilePage = () => {
   return (
-    <div className="mt-[5%] max-w-[1200px] mx-auto">
+    <div className="mt-2 max-w-[1200px] mx-auto">
       <Box
         p={["2", "4"]}
         mx="[5%]"
@@ -14,20 +15,27 @@ const ProfilePage = () => {
       >
         <Profile onProfile={true} />
 
-        <Tabs isFitted variant="soft-rounded" colorScheme="gray" mb="4">
+        <Tabs
+          isFitted
+          variant="enclosed"
+          className="text-white"
+          colorScheme="white"
+          mb="4"
+        >
+          {" "}
           <TabList mb="4">
-            <Tab>Created Datasets</Tab>
-            <Tab>Notifications</Tab>
+            <Tab>Datasets</Tab>
+            <Tab>Created Codes</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
               <Box minHeight="200px" overflow="auto">
-                {/* Render user created and subscribed datasets */}
+                <UserInstances />
               </Box>
             </TabPanel>
             <TabPanel>
               <Box minHeight="200px" overflow="auto">
-                {/* Render user notifications */}
+                <UserCodes />
               </Box>
             </TabPanel>
           </TabPanels>

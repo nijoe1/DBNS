@@ -9,6 +9,7 @@ import {
   TabPanel,
   useToast,
   Image,
+  Badge,
 } from "@chakra-ui/react";
 import NotebookPreviewer from "./NotebookPreviewer";
 import ForumComponent from "./ForumComponent";
@@ -57,18 +58,41 @@ const CodeViewer = ({ code, onClose }) => {
       boxShadow="lg"
     >
       {/* Code creator profile */}
-      <Box mb={4}>
-        <Text fontWeight="bold">Code Creator Profile:</Text>
-        <Box mt={2}>
-          <Text>{code.creatorName}</Text>
-          <Text>{code.creatorAddress}</Text>
-          <Text>{code.creatorAbout}</Text>
+      <Box mb={4} className="text-white">
+        <div className="flex flex-wrap items-center gap-2 p-3">
+          <Text fontWeight="bold">Code Creator :</Text>
+
+          <Text>{code.profile.name}</Text>
+          <Image width={25} src={code.profile.picture} borderRadius="lg" />
+          <Badge
+            className="text-black bg-black"
+            borderRadius="full"
+            fontSize="sm"
+            cursor={"pointer"}
+            onClick={() => {
+              router.push({
+                pathname: "",
+                hash: "/profile?address=" + code.creator,
+              });
+            }}
+          >
+            {`${code.creator?.slice(0, 6)}...${code.creator?.slice(-6)}`}
+          </Badge>
+          <Text>{code.desc}</Text>
           {/* Add avatar here if available */}
-        </Box>
+        </div>
       </Box>
 
       {/* Tabs for notebook, discussions, input dataset, and output */}
-      <Tabs index={tabIndex} onChange={handleTabChange} variant="enclosed">
+      <Tabs
+        isFitted
+        variant="enclosed"
+        className="text-white"
+        index={tabIndex}
+        onChange={handleTabChange}
+        colorScheme="white"
+        mb="4"
+      >
         <TabList>
           <Tab>Notebook</Tab>
           <Tab>Discussions</Tab>

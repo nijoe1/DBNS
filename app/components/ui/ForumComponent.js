@@ -88,7 +88,7 @@ const ForumComponent = ({ pushSign, address, chatID }) => {
           p="4"
           borderRadius="md"
           boxShadow="md"
-          bg="#333333"
+          // bg="#333333"
           overflow="auto"
         >
           <Flex mt={4} mb={4}>

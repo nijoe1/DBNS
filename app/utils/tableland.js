@@ -69,6 +69,101 @@ export const getSpaceInstances = async (spaceID) => {
   }
 };
 
+export const getUserInstances = async (address) => {
+  const query = `
+  SELECT
+    json_object(
+        'createdInstances', COALESCE((
+            SELECT json_group_array(row_data)
+            FROM (
+                SELECT DISTINCT row_data
+                FROM (
+                    SELECT
+                        json_object(
+                            'InstanceID', s.InstanceID,
+                            'instanceOfSpace', s.instanceOfSpace,
+                            'IPNS', s.IPNS,
+                            'IPNSEncryptedKey', s.IPNSEncryptedKey,
+                            'chatID', s.chatID,
+                            'creator', s.creator,
+                            'gatedContract', s.gatedContract,
+                            'metadataCID', s.metadataCID,
+                            'price', s.price
+                        ) AS row_data
+                    FROM ${tables.spaceInstances} AS s
+                    WHERE s.creator = '${address?.toLowerCase()}'
+                ) AS subquery
+                WHERE row_data IS NOT NULL
+            )
+        ), '[]'),
+
+        'memberInstances', COALESCE((
+            SELECT json_group_array(row_data)
+            FROM (
+                SELECT DISTINCT row_data
+                FROM (
+                    SELECT
+                        json_object(
+                            'InstanceID', s.InstanceID,
+                            'instanceOfSpace', s.instanceOfSpace,
+                            'IPNS', s.IPNS,
+                            'IPNSEncryptedKey', s.IPNSEncryptedKey,
+                            'chatID', s.chatID,
+                            'creator', s.creator,
+                            'gatedContract', s.gatedContract,
+                            'metadataCID', s.metadataCID,
+                            'price', s.price
+                        ) AS row_data
+                    FROM ${tables.spaceInstances} AS s
+                    INNER JOIN ${tables.members} AS m ON s.InstanceID = m.InstanceID
+                    WHERE m.member = '${address?.toLowerCase()}'
+                ) AS subquery
+                WHERE row_data IS NOT NULL
+            )
+        ), '[]'),
+
+        'subscribedInstances', COALESCE((
+            SELECT json_group_array(row_data)
+            FROM (
+                SELECT DISTINCT row_data
+                FROM (
+                    SELECT
+                        json_object(
+                            'InstanceID', s.InstanceID,
+                            'instanceOfSpace', s.instanceOfSpace,
+                            'IPNS', s.IPNS,
+                            'IPNSEncryptedKey', s.IPNSEncryptedKey,
+                            'chatID', s.chatID,
+                            'creator', s.creator,
+                            'gatedContract', s.gatedContract,
+                            'metadataCID', s.metadataCID,
+                            'price', s.price
+                        ) AS row_data
+                    FROM ${tables.spaceInstances} AS s
+                    INNER JOIN ${tables.subscriptions} AS sub ON s.InstanceID = sub.InstanceID
+                    WHERE sub.subscriber = '${address?.toLowerCase()}'
+                ) AS subquery
+                WHERE row_data IS NOT NULL
+            )
+        ), '[]')
+    ) AS instances
+FROM
+    (SELECT DISTINCT instanceOfSpace FROM ${tables.spaceInstances}) AS unique_instances;
+
+`;
+
+  try {
+    const fullUrl = `${TablelandGateway}${encodeURIComponent(query)}`;
+
+    const result = await axios.get(fullUrl);
+    return result.data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+
 export const getInstance = async (instanceID) => {
   const query = `SELECT * FROM ${tables.spaceInstances} WHERE InstanceID = '${instanceID}'`;
   try {
@@ -131,6 +226,19 @@ export const getInstanceCodes = async (instanceID) => {
     return null;
   }
 };
+
+export const getUserCodes = async (address) => {  
+  const query = `SELECT * FROM ${tables.codes} WHERE creator = '${address?.toLowerCase()}'`;
+  try {
+    const result = await axios.get(
+      TablelandGateway + encodeURIComponent(query),
+    );
+    return result.data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
 
 // Function to recursively build children
 async function buildChildren(parentID, parentHierarchy, sampleSpacesData) {

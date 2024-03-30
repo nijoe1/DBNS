@@ -92,6 +92,7 @@ const InstanceDetailsPage = () => {
                 borderRadius="md"
                 boxShadow="md"
                 mb={4}
+                p={["2", "4"]}
               >
                 <CardItem
                   profileInfo={{
@@ -104,66 +105,88 @@ const InstanceDetailsPage = () => {
                   pushSign={pushSign}
                 />
                 {!hasAccess ||
-                  !(instanceMembers.find(
-                    (member) =>
-                      member.toLowerCase() === address.toLowerCase()
-                  ) && (
-                    <div>
-                      <Button
-                        className="border-white border p-3 rounded-md "
-                        colorScheme="black"
-                        size="mb"
-                        mb={3}
-                        onClick={() => {
-                          onOpen();
-                        }}
-                      >
-                        Subscribe
-                      </Button>
-                      <Subscribe
-                        instanceID={instanceID}
-                        isOpen={isOpen}
-                        onClose={onClose}
-                        price={instance?.price || 0}
-                      />
-                    </div>
-                  ))}
+                  !(
+                    instanceMembers.find(
+                      (member) =>
+                        member.toLowerCase() === address?.toLowerCase()
+                    ) && (
+                      <div>
+                        <Button
+                          className="border-white border p-3 rounded-md "
+                          colorScheme="black"
+                          size="mb"
+                          mb={3}
+                          onClick={() => {
+                            onOpen();
+                          }}
+                        >
+                          Subscribe
+                        </Button>
+                        <Subscribe
+                          instanceID={instanceID}
+                          isOpen={isOpen}
+                          onClose={onClose}
+                          price={instance?.price || 0}
+                        />
+                      </div>
+                    )
+                  )}
               </Box>
-              {hasAccess && (
-                <Tabs
-                  isFitted
-                  variant="soft-rounded"
-                  colorScheme="gray"
-                  minWidth={["150px", "200px"]}
-                >
-                  <TabList mb="4">
-                    <Tab>Dataset</Tab>
-                    <Tab>Discussion</Tab>
-                    <Tab>Code (2)</Tab>
-                  </TabList>
-                  <TabPanels>
-                    <TabPanel>
-                      <DatasetViewer
-                        cid={instance?.cid}
-                        IPNS={instance?.IPNS}
-                        EncryptedKeyCID={instance?.IPNSEncryptedKey}
-                        isEncrypted={instance?.price > 0}
-                        spaceID={instanceID}
-                      />
-                    </TabPanel>
-                    <TabPanel>
-                      <ChatComponent
-                        pushSign={pushSign}
-                        address={address}
-                        chatID={instance?.chatID}
-                      />
-                    </TabPanel>
-                    <TabPanel>
-                      <InstanceCodes pushSign={pushSign} />
-                    </TabPanel>
-                  </TabPanels>
-                </Tabs>
-              )}
+              <Box
+                bg="#333333"
+                borderRadius="md"
+                height={1000}
+                boxShadow="md"
+                mb={4}
+                p={["2", "4"]}
+              >
+                {(hasAccess ||
+                  instanceMembers.find(
+                    (member) => member.toLowerCase() === address.toLowerCase()
+                  )) && (
+                  // <Tabs
+                  //   isFitted
+                  //   variant="soft-rounded"
+                  //   colorScheme="gray"
+                  //   minWidth={["150px", "200px"]}
+                  // >
+                  <Tabs
+                    isFitted
+                    variant="enclosed"
+                    className="text-white"
+                    minWidth={["150px", "200px"]}
+                    colorScheme="white"
+                    mb="4"
+                  >
+                    <TabList mb="4">
+                      <Tab>Dataset</Tab>
+                      <Tab>Discussion</Tab>
+                      <Tab>Code (2)</Tab>
+                    </TabList>
+                    <TabPanels>
+                      <TabPanel>
+                        <DatasetViewer
+                          cid={instance?.cid}
+                          IPNS={instance?.IPNS}
+                          EncryptedKeyCID={instance?.IPNSEncryptedKey}
+                          isEncrypted={instance?.price > 0}
+                          spaceID={instanceID}
+                        />
+                      </TabPanel>
+                      <TabPanel>
+                        <ChatComponent
+                          pushSign={pushSign}
+                          address={address}
+                          chatID={instance?.chatID}
+                        />
+                      </TabPanel>
+                      <TabPanel>
+                        <InstanceCodes pushSign={pushSign} />
+                      </TabPanel>
+                    </TabPanels>
+                  </Tabs>
+                )}
+              </Box>
             </div>
           )}
         </div>

@@ -33,7 +33,7 @@ export const resolveIPNSName = async (IPNS) => {
 };
 
 
-export const UpdateIPNSNameEncrypted = async (
+export const UploadFileEncrypted = async (
   file,
   apiKey,
   address,

@@ -19,11 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { useAccount } from "wagmi";
 import { FaFileUpload } from "react-icons/fa";
-import {
-  renewIPNSName,
-  uploadFile,
-  UpdateIPNSNameEncrypted,
-} from "@/utils/IPFS";
+import { renewIPNSName, uploadFile, UploadFileEncrypted } from "@/utils/IPFS";
 import { ObjectMatcher } from "@/utils/merge";
 
 const UpdateIPNS = ({
@@ -51,7 +47,7 @@ const UpdateIPNS = ({
       if (!isEncrypted) {
         cid = (await uploadFile(file, key)).Hash;
       } else {
-        cid = await UpdateIPNSNameEncrypted(file, key, address, jwt, spaceID);
+        cid = await UploadFileEncrypted(file, key, address, jwt, spaceID);
       }
       console.log("CID:", cid);
       await renewIPNSName(cid, IPNS, EncryptedKeyCID, address, jwt);

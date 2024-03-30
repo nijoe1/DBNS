@@ -109,13 +109,13 @@ const ChatComponent = ({ pushSign, address, chatID }) => {
         </div>
       ) : (
         <Box
-          maxHeight="500px"
+        my={"auto"}
           overflowY="auto"
           p="4"
           borderRadius="md"
           boxShadow="lg"
           bg="#333333"
-          height="500px" // Set a fixed height for the chat container
+          height="800px" // Set a fixed height for the chat container
         >
           <Flex mt={4} mb={4} className="flex items-center mx-auto">
             <Input

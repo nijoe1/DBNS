@@ -184,8 +184,7 @@ const SpacesGraph = () => {
       ) : (
         <Container>
           <Box
-            p="4"
-            borderWidth="3px"
+            borderWidth="1px"
             borderColor={"black"}
             borderRadius="lg"
             overflow="hidden"
@@ -193,7 +192,6 @@ const SpacesGraph = () => {
             height="calc(100vh - 150px)" // Adjust height dynamically
             display="flex"
             alignItems="center"
-            className="mx-[3%] "
           >
             <Flex
               direction="column"

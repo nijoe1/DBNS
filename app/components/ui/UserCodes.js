@@ -18,21 +18,25 @@ import {
 import { Container } from "@/components//ui/container";
 import CodeViewer from "./CodeViewer"; // Import CodeViewer component
 import { useRouter } from "next/router";
-import CreateNewInstanceCode from "@/components/contracts/createInstanceCode";
 import { FaEllipsisV } from "react-icons/fa";
-import { getInstanceCodes } from "@/utils/tableland";
+import { getUserCodes } from "@/utils/tableland";
 import Loading from "@/components/Animation/Loading";
 import { getIpfsGatewayUri, resolveIPNS } from "@/utils/IPFS";
 import { FaArrowLeft } from "react-icons/fa";
 import UpdateIPNS from "@/components/ui/UpdateIPNS";
 import makeBlockie from "ethereum-blockies-base64";
+import { useAccount } from "wagmi";
+import { isAddress } from "viem";
+import { useSelector } from "react-redux";
 
-const InstanceCodes = ({ pushSign }) => {
+const UserCodes = () => {
+  const { address } = useAccount();
   const [code, setCode] = useState(null);
   const [viewAllCodes, setViewAllCodes] = useState(true);
+  const pushSign = useSelector((state) => state.push.pushSign);
 
   const router = useRouter();
-  const spaceID = router.asPath.replace("/#/instance?id=", "");
+  const userAddress = router.asPath.replace("/#/profile?address=", "");
   const {
     isOpen,
     onOpen,
@@ -46,12 +50,14 @@ const InstanceCodes = ({ pushSign }) => {
   const [fetched, setFetched] = useState(false);
 
   async function fetchInstanceCodes() {
-    // const data = (await getSpaceInstances(spaceID))[0].instances;
-    const data = await getInstanceCodes(spaceID);
+    let addr = isAddress(userAddress) ? userAddress : address;
+
+    const data = await getUserCodes(addr);
     for (const key in data) {
       data[key].codeCID = getIpfsGatewayUri(await resolveIPNS(data[key].IPNS));
       data[key].blockie = makeBlockie(data[key].creator);
       data[key].profile = await getProfileInfo(data[key].creator);
+      data[key].creator = data[key].creator.toLowerCase();
     }
     console.log(data);
     return data;
@@ -59,7 +65,9 @@ const InstanceCodes = ({ pushSign }) => {
 
   const getProfileInfo = async (address) => {
     try {
-      const info = await pushSign.profile.info(`${address.toLowerCase()}`);
+      const info = await pushSign.profile.info({
+        overrideAccount: `${address.toLowerCase()}`,
+      });
       console.log(info);
       return info;
     } catch (error) {
@@ -74,7 +82,7 @@ const InstanceCodes = ({ pushSign }) => {
         setFetched(!fetched);
       });
     }
-  }, [spaceID]);
+  }, [address, userAddress]);
 
   const handleNewClick = async () => {
     onOpen();
@@ -134,20 +142,6 @@ const InstanceCodes = ({ pushSign }) => {
             </>
           ) : (
             <div>
-              <Button
-                onClick={handleNewClick}
-                colorScheme="black"
-                ml="3"
-                className="bg-black/80 text-white"
-                my="4"
-              >
-                Create Code
-              </Button>
-              <CreateNewInstanceCode
-                onClose={onClose}
-                isOpen={isOpen}
-                spaceID={spaceID}
-              />
               <Flex justify="center">
                 <Grid
                   templateColumns={[
@@ -167,15 +161,13 @@ const InstanceCodes = ({ pushSign }) => {
                         px="2"
                         pt="2"
                         bg="#333333"
-                        // borderRadius="md"
+                        borderRadius="md"
+                        borderColor={"white"}
                         boxShadow="md"
-                        position="relative"
                         className="cursor-pointer border-1 border-white"
+                        position="relative"
                       >
-                        <Box
-                          height="100px"
-                          className="cursor-pointer border-1 border-white"
-                        >
+                        <Box height="100px">
                           <Box
                             display="flex"
                             justifyContent="flex-start"
@@ -209,14 +201,13 @@ const InstanceCodes = ({ pushSign }) => {
                               </MenuList>
                             </Menu>
                           </Box>
-                          <div className="flex flex-wrap items-center mb-2 rounded-md cursor-pointer border-1 border-white">
+                          <div className="flex flex-wrap items-center mb-2 rounded-md">
                             <Box
                               borderRadius="md"
                               boxSize="35px"
                               mr={2}
                               bg="#333333"
                               cursor={"pointer"}
-                              className="cursor-pointer border-1 border-white"
                             >
                               <Image
                                 className=" rounded-md"
@@ -287,4 +278,4 @@ const InstanceCodes = ({ pushSign }) => {
   );
 };
 
-export default InstanceCodes;
+export default UserCodes;

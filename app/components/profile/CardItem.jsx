@@ -40,15 +40,12 @@ const CardItem = ({ profileInfo, pushSign }) => {
   const fetchProfileInfo = async () => {
     try {
       let temp = [];
-      // for (let i = 0; i < profileInfo.members.length; i++) {
-      //   console.log("Fetching profile info for:", profileInfo.members[i]);
-      //   const response = await pushSign.profile.info(profileInfo.members[i]);
-      //   temp.push(response);
-      // }
       profileInfo?.members?.map(async (contributor, index) => {
         console.log("Fetching profile info for:", contributor);
         console.log("Fetching profile info for:", contributor);
-        const response = await pushSign.profile.info(contributor);
+        const response = await pushSign.profile.info({
+          overrideAccount: contributor,
+        });
         console.log("Response:", response);
         temp[index] = {
           name: response.name,
@@ -117,7 +114,7 @@ const CardItem = ({ profileInfo, pushSign }) => {
           <ModalHeader>Contributors</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Table variant="simple">
+            <Table variant="simple" colorScheme="black">
               <Thead>
                 <Tr>
                   <Th>Address</Th>
@@ -156,6 +153,7 @@ const CardItem = ({ profileInfo, pushSign }) => {
                             py="1"
                             mt="2"
                             fontSize="sm"
+                            cursor={"pointer"}
                             onClick={() => {
                               router.push({
                                 pathname: "",
@@ -174,7 +172,7 @@ const CardItem = ({ profileInfo, pushSign }) => {
             </Table>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleCloseModal}>
+            <Button className="bg-black text-white rounded-lg" mr={3} onClick={handleCloseModal}>
               Close
             </Button>
           </ModalFooter>

@@ -108,7 +108,7 @@ export default function Navbar(): JSX.Element {
             </button>
             <div className={isSidebarOpen ? "" : "hidden"}>
               <NavLinksResponsive
-                isOpen={true}
+                isConnected={true}
                 isSidebarOpen={isSidebarOpen}
                 setIsSidebarOpen={setIsSidebarOpen}
               />

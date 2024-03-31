@@ -26,7 +26,8 @@ const steps: Step[] = [
       </svg>
     ),
     title: "Create subspaces",
-    description: "Create Database Subspaces for your projects and teams .",
+    description:
+      "Create Database Subspaces to host your Instances and Enhanced exploring experience using the FNS protocol.",
   },
   {
     icon: (
@@ -48,8 +49,9 @@ const steps: Step[] = [
         <path d="M9 21v-6a2 2 0 0 1 2 -2h1.5" />
       </svg>
     ),
-    title: "Create dataset instances under a namespace",
-    description: "",
+    title: "Create dataset instances under your subspace field",
+    description:
+      "Host your datasets and AI models in a secure and decentralized way using the Filecoin Virtual Machine",
   },
   {
     icon: (
@@ -76,7 +78,7 @@ const steps: Step[] = [
     ),
     title: "Manage access control",
     description:
-      "Configure your instace from public - private - group-private - sell it to AI bots using subscriptions powered by unlock",
+      "Configure your instace from public - private - group-private - sell it to AI bots using subscriptions and supercharge your data monetization strategy.",
   },
   {
     icon: (
@@ -100,8 +102,9 @@ const steps: Step[] = [
         <path d="M6.907 4.579a8.954 8.954 0 0 1 3.093 -1.356" />
       </svg>
     ),
-    title: "x",
-    description: "x",
+    title: "Collaborate with your team",
+    description:
+      "Invite your team members to collaborate on your datasets and AI models and share the revenue generated from your datasets. Powered by the Push protocol.",
   },
   {
     icon: (
@@ -126,8 +129,9 @@ const steps: Step[] = [
         <path d="M9 12l2 2l4 -4" />
       </svg>
     ),
-    title: "x",
-    description: "x",
+    title: "Update your datasets and AI models",
+    description:
+      "Using token gated access to IPNS private keys, dynamic updates to your datasets and AI models are now possible. Powered by the Lighthouse protocol.",
   },
   {
     icon: (
@@ -148,8 +152,9 @@ const steps: Step[] = [
         <path d="M6 12l6 -3l6 3l-6 2z" />
       </svg>
     ),
-    title: "x",
-    description: "x",
+    title: "Get paid for engaging with DBNS",
+    description:
+      "Earn DBNS tokens for engaging with the DBNS ecosystem and use them to pay for services or exchange them for other cryptocurrencies.",
   },
 ];
 export function HowItWorks(): JSX.Element {

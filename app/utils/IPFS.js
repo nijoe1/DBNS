@@ -32,13 +32,12 @@ export const resolveIPNSName = async (IPNS) => {
   return revision.value;
 };
 
-
 export const UploadFileEncrypted = async (
   file,
   apiKey,
   address,
   jwt,
-  spaceID
+  spaceID,
 ) => {
   let cid = await uploadFileEncrypted(file, apiKey, address, jwt);
   cid = await applyAccessConditions(
@@ -47,7 +46,7 @@ export const UploadFileEncrypted = async (
     spaceID,
     address,
     jwt,
-    CONTRACT_ADDRESSES
+    CONTRACT_ADDRESSES,
   );
   return cid;
 };
@@ -58,7 +57,7 @@ export const createIPNSName = async (
   address,
   jwt,
   spaceID,
-  isEncrypted
+  isEncrypted,
 ) => {
   let cid;
   if (isEncrypted) {
@@ -69,7 +68,7 @@ export const createIPNSName = async (
       spaceID,
       address,
       jwt,
-      CONTRACT_ADDRESSES
+      CONTRACT_ADDRESSES,
     );
   } else {
     cid = (await uploadFile(file, apiKey)).Hash;
@@ -93,7 +92,7 @@ export const createIPNSName = async (
     instanceID,
     address,
     jwt,
-    "0x573Ddd3536cF4eF58d5386D6829c9e38cbe977e0"
+    "0x573Ddd3536cF4eF58d5386D6829c9e38cbe977e0",
   );
   return {
     instanceID: instanceID,
@@ -107,7 +106,7 @@ export const renewIPNSName = async (
   IPNS,
   EncryptedKeyCID,
   address,
-  jwt
+  jwt,
 ) => {
   const name = Name.parse(IPNS);
 
@@ -157,7 +156,7 @@ export const uploadFile = async (file, apiKey) => {
     false,
     null,
     null,
-    dealParams
+    dealParams,
   );
   await registerCIDtoRAAS(output.data.Hash);
 
@@ -186,7 +185,7 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
     jwt,
     null,
     null,
-    dealParams
+    dealParams,
   );
 
   const { masterKey, keyShards } = await generate();
@@ -195,7 +194,7 @@ export const encryptIPNSKey = async (IPNSPK, apiKey, address, jwt) => {
     address,
     output.data[0].cid,
     jwt,
-    keyShards
+    keyShards,
   );
 
   await registerCIDtoRAAS(output.data[0].cid);
@@ -212,7 +211,7 @@ export const uploadFileEncrypted = async (file, apiKey, address, jwt) => {
     jwt,
     null,
     null,
-    dealParams
+    dealParams,
   );
   console.log("output", output.data[0].Hash);
 
@@ -222,7 +221,7 @@ export const uploadFileEncrypted = async (file, apiKey, address, jwt) => {
     address,
     output.data[0].Hash,
     jwt,
-    keyShards
+    keyShards,
   );
 
   await registerCIDtoRAAS(output.data[0].Hash);

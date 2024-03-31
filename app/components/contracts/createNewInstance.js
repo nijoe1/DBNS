@@ -58,8 +58,7 @@ const CreateNewInstance = ({
   const { address } = useAccount();
   const [tags, setTags] = useState([]);
 
-  useEffect(() => {
-  }, [router]);
+  useEffect(() => {}, [router]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

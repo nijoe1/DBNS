@@ -236,10 +236,9 @@ const SpacesGraph = () => {
                     leafNodeClassName="node__leaf"
                     renderCustomNodeElement={renderCustomNodeElement}
                     translate={{
-                      x: (windowDimensions.width * 97) / 100 / 4.0,
+                      x: windowDimensions.width / 2.8,
                       y: windowDimensions.height / 7,
                     }}
-                    
                     zoom={1}
                     separation={{ siblings: 2, nonSiblings: 2 }}
                     initialDepth={1}

@@ -6,7 +6,7 @@ import usePush from "@/hooks/usePush";
 import UpdateProfile from "@/components/profile/UpdateProfile";
 import { FaEdit } from "react-icons/fa";
 import { useRouter } from "next/router";
-import {isAddress } from "viem"
+import { isAddress } from "viem";
 // Inside your component:
 const Profile = ({ onProfile }) => {
   const router = useRouter();
@@ -38,7 +38,10 @@ const Profile = ({ onProfile }) => {
 
   const fetchProfileInfo = async () => {
     try {
-      if (userAddress.toLowerCase() != address.toLowerCase() && isAddress(userAddress)) {
+      if (
+        userAddress.toLowerCase() != address.toLowerCase() &&
+        isAddress(userAddress)
+      ) {
         console.log("Fetching profile info for:", userAddress);
         const response = await pushSign.profile.info({
           overrideAccount: userAddress,
@@ -140,8 +143,9 @@ const Profile = ({ onProfile }) => {
             mt="2"
             fontSize="sm"
           >
-            {userAddress.toLowerCase() == address.toLowerCase() || !isAddress(userAddress)
-              ? `${address.slice(0, 6)}...${address.slice(-6)}`
+            {userAddress.toLowerCase() == address?.toLowerCase() ||
+            !isAddress(userAddress)
+              ? `${address?.slice(0, 6)}...${address?.slice(-6)}`
               : `${userAddress.slice(0, 6)}...${userAddress.slice(-6)}`}
           </Badge>
           <Text fontSize={["sm", "md"]} color="white" mt="2">

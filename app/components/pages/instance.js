@@ -104,33 +104,33 @@ const InstanceDetailsPage = () => {
                   }}
                   pushSign={pushSign}
                 />
-                {!hasAccess ||
-                  !(
-                    instanceMembers.find(
-                      (member) =>
-                        member.toLowerCase() === address?.toLowerCase()
-                    ) && (
-                      <div>
-                        <Button
-                          className="border-white border p-3 rounded-md "
-                          colorScheme="black"
-                          size="mb"
-                          mb={3}
-                          onClick={() => {
-                            onOpen();
-                          }}
-                        >
-                          Subscribe
-                        </Button>
-                        <Subscribe
-                          instanceID={instanceID}
-                          isOpen={isOpen}
-                          onClose={onClose}
-                          price={instance?.price || 0}
-                        />
-                      </div>
-                    )
-                  )}
+                {!(
+                  hasAccess ||
+                  instanceMembers.find(
+                    (member) =>
+                      member?.toLowerCase() === address?.toLowerCase(),
+                  )
+                ) && (
+                  <div>
+                    <Button
+                      className="border-white border p-3 rounded-md "
+                      colorScheme="black"
+                      size="mb"
+                      mb={3}
+                      onClick={() => {
+                        onOpen();
+                      }}
+                    >
+                      Subscribe
+                    </Button>
+                    <Subscribe
+                      instanceID={instanceID}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      price={instance?.price || 0}
+                    />
+                  </div>
+                )}
               </Box>
               <Box
                 bg="#333333"
@@ -142,7 +142,7 @@ const InstanceDetailsPage = () => {
               >
                 {(hasAccess ||
                   instanceMembers.find(
-                    (member) => member.toLowerCase() === address.toLowerCase()
+                    (member) => member.toLowerCase() === address.toLowerCase(),
                   )) && (
                   // <Tabs
                   //   isFitted

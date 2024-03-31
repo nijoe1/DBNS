@@ -157,7 +157,8 @@ const CardItem = ({ profileInfo, pushSign }) => {
                             onClick={() => {
                               router.push({
                                 pathname: "",
-                                hash: "/profile?address=" + contributor?.address,
+                                hash:
+                                  "/profile?address=" + contributor?.address,
                               });
                             }}
                           >
@@ -172,7 +173,11 @@ const CardItem = ({ profileInfo, pushSign }) => {
             </Table>
           </ModalBody>
           <ModalFooter>
-            <Button className="bg-black text-white rounded-lg" mr={3} onClick={handleCloseModal}>
+            <Button
+              className="bg-black text-white rounded-lg"
+              mr={3}
+              onClick={handleCloseModal}
+            >
               Close
             </Button>
           </ModalFooter>

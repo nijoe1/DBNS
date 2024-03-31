@@ -35,8 +35,8 @@ export function Benefits(): JSX.Element {
           Navigate through Databases easily
         </h2>
         <p className="text-base text-gray-700 md:text-lg">
-          Discover the tokenomics of the DBNS ecosystem and how it can benefit
-          the data industry
+          Create hierarchical namespaces under the root DBNS.fil, facilitating
+          organization and categorization of datasets and codebases.
         </p>
       </div>
       <div className="grid mx-auto space-y-6 lg:grid-cols-2 h-full mb-[18%] lg:space-y-0 lg:gap-x-5">
@@ -68,11 +68,12 @@ export function Benefits(): JSX.Element {
             </div>
             <div>
               <h6 className="mb-3 text-primary text-xl font-bold leading-5">
-                Enhanced Transparency
+                Access Control
               </h6>
               <p className="text-sm text-gray-900">
-                Blockchain technology ensures clear, real-time tracking of data
-                usage and progress in the AI field.
+                Fine-grained control over data access and curation. Datasets can
+                be designated as PUBLIC, GROUPED-PUBLIC, PAID-GROUPED, or
+                PAID-PRIVATE
               </p>
             </div>
           </div>
@@ -137,11 +138,12 @@ export function Benefits(): JSX.Element {
             </div>
             <div>
               <h6 className="mb-3 text-primary text-xl font-bold leading-5">
-                Increased Security
+                Increased Security and Colaboration
               </h6>
               <p className="text-sm text-gray-900">
-                Unlimited possibilities to host private - grouped - public
-                datasets and work all together to improve them.
+                Utilizes Lighthouse's encryption SDK to secure IPNS records,
+                ensuring that only authorized curators can decrypt and modify
+                dataset contents and associated code.
               </p>
             </div>
           </div>
@@ -175,8 +177,8 @@ export function Benefits(): JSX.Element {
                 Democratized Dataset Access
               </h6>
               <p className="text-sm text-gray-900">
-                Lowers entry barriers, allowing a broader audience to
-                participate in the data economy and AI industry.
+                All data and code are stored on the IPFS and Filecoin networks,
+                providing decentralized storage and immutable data integrity.
               </p>
             </div>
           </div>

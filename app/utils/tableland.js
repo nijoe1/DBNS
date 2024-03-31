@@ -163,7 +163,6 @@ FROM
   }
 };
 
-
 export const getInstance = async (instanceID) => {
   const query = `SELECT * FROM ${tables.spaceInstances} WHERE InstanceID = '${instanceID}'`;
   try {
@@ -204,7 +203,7 @@ export const getInstanceMembers = async (instanceID) => {
   const query = `SELECT ${tables.members}.member FROM ${tables.members} WHERE InstanceID = '${instanceID}'`;
   try {
     const result = await axios.get(
-      TablelandGateway + encodeURIComponent(query)
+      TablelandGateway + encodeURIComponent(query),
     );
     console.log(result.data);
     return result.data;
@@ -227,7 +226,7 @@ export const getInstanceCodes = async (instanceID) => {
   }
 };
 
-export const getUserCodes = async (address) => {  
+export const getUserCodes = async (address) => {
   const query = `SELECT * FROM ${tables.codes} WHERE creator = '${address?.toLowerCase()}'`;
   try {
     const result = await axios.get(
@@ -238,7 +237,7 @@ export const getUserCodes = async (address) => {
     console.error(err);
     return null;
   }
-}
+};
 
 // Function to recursively build children
 async function buildChildren(parentID, parentHierarchy, sampleSpacesData) {

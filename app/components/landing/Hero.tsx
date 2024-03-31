@@ -30,7 +30,7 @@ export function Hero(): JSX.Element {
         <div className="mx-auto text-gray-600 gap-x-5 items-center justify-between overflow md:flex md:px-4">
           <div className="flex-none space-y-5 px-4 sm:max-w-lg md:px-0 lg:max-w-xl motion-safe:animate-hero-text-sm md:motion-safe:animate-hero-text">
             <h1 className="text-4xl text-primary font-extrabold md:text-5xl">
-              DBNS the unified & decentralized namespace of datasets
+              DBNS the unified namespace of datasets and AI models
             </h1>
             <p>
               Creating the new era of storing datasets and perform transparent

@@ -28,7 +28,13 @@ import UpdateIPNS from "@/components/ui/UpdateIPNS";
 import { decrypt } from "@/utils/IPFS";
 import { useAccount } from "wagmi";
 
-const DatasetViewer = ({ cid, IPNS, EncryptedKeyCID, isEncrypted ,spaceID}) => {
+const DatasetViewer = ({
+  cid,
+  IPNS,
+  EncryptedKeyCID,
+  isEncrypted,
+  spaceID,
+}) => {
   const toast = useToast();
   const [csvData, setCsvData] = useState([]);
   const [csvText, setCsvText] = useState("");
@@ -56,7 +62,7 @@ const DatasetViewer = ({ cid, IPNS, EncryptedKeyCID, isEncrypted ,spaceID}) => {
     try {
       if (!isEncrypted) {
         const response = await fetch(
-          "https://gateway.lighthouse.storage/ipfs/" + cid
+          "https://gateway.lighthouse.storage/ipfs/" + cid,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch CSV file");
@@ -88,7 +94,7 @@ const DatasetViewer = ({ cid, IPNS, EncryptedKeyCID, isEncrypted ,spaceID}) => {
           // Now you can parse the decrypted CSV data
           const parsedData = customCsvParser(decryptedText);
           console.log("Parsed Data:", parsedData);
-          
+
           if (parsedData) {
             setCsvData(parsedData);
             setFetched(true);

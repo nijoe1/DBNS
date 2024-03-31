@@ -51,18 +51,18 @@ abstract contract FNS is IERC721Receiver {
     ) internal returns (bytes32 newSubNode) {
         bytes32 label = keccak256(bytes(subNode));
 
-        // REGISTRY.setSubnodeRecord(
-        //     // Gaming character subnode
-        //     parentNode,
-        //     // Character tokenID as sub.subdomain to the gaming character subdomain
-        //     label,
-        //     // Owner
-        //     address(this),
-        //     // Resolver
-        //     address(PUBLIC_RESOLVER),
-        //     // TTL
-        //     0
-        // );
+        REGISTRY.setSubnodeRecord(
+            // Gaming character subnode
+            parentNode,
+            // Character tokenID as sub.subdomain to the gaming character subdomain
+            label,
+            // Owner
+            address(this),
+            // Resolver
+            address(PUBLIC_RESOLVER),
+            // TTL
+            0
+        );
 
         newSubNode = _makeNode(parentNode, label);
     }

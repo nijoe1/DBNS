@@ -30,7 +30,7 @@ const StepperForm: React.FC<{
     if (!key) {
       const verificationMessage = (
         await axios.get(
-          `https://api.lighthouse.storage/api/auth/get_message?publicKey=${address}`
+          `https://api.lighthouse.storage/api/auth/get_message?publicKey=${address}`,
         )
       ).data;
       let signed;
@@ -47,7 +47,7 @@ const StepperForm: React.FC<{
       if (API_KEY.data.apiKey) {
         localStorage.setItem(
           `API_KEY_${address?.toLowerCase()}`,
-          API_KEY.data.apiKey
+          API_KEY.data.apiKey,
         );
         nextStep();
       } else {

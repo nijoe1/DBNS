@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 export default function Navbar(): JSX.Element {
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const { address,isConnected } = useAccount(); // Removed isOpen
+  const { address, isConnected } = useAccount(); // Removed isOpen
   const chainID = useChainId();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changeChain, setChangeChain] = useState(true);
@@ -31,8 +31,8 @@ export default function Navbar(): JSX.Element {
   useEffect(() => {
     const check = async () => {
       let prevAddress;
-      let JWT
-      let API_KEY
+      let JWT;
+      let API_KEY;
       try {
         prevAddress = localStorage.getItem("prevAddress");
       } catch {}
@@ -48,7 +48,7 @@ export default function Navbar(): JSX.Element {
         setChangeChain(false);
         setIsOpen(true);
         openModal();
-      }else if (!isOpen && isConnected) {
+      } else if (!isOpen && isConnected) {
         setIsOpen(true);
         openModal();
       }

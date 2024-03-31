@@ -116,9 +116,23 @@ const CodeViewer = ({ code, onClose }) => {
           <TabPanel>
             <div className="flex flex-col items-center text-center p-5">
               {/* Compute output */}
-              <Text>Compute output with Bacalhau</Text>
+              <Text
+                p={2}
+                mb={4}
+                background={"white"}
+                borderRadius="lg"
+                border="1"
+                textColor={"black"}
+              >
+                Compute output with Bacalhau
+              </Text>
               <Image src="/images/bacalhau.png" maxHeight="100" />{" "}
-              <Button onClick={handleToDo}>Compute Output</Button>
+              <Button
+                className="mt-4 bg-white border-1 rounded-lg text-black"
+                onClick={handleToDo}
+              >
+                Compute Output
+              </Button>
             </div>
           </TabPanel>
         </TabPanels>

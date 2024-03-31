@@ -141,7 +141,7 @@ const UserInstances = () => {
                           objectFit="cover"
                           onClick={() =>
                             navigateToHashRoute(
-                              "/instance?id=" + instance.InstanceID
+                              "/instance?id=" + instance.InstanceID,
                             )
                           }
                         />
@@ -211,7 +211,7 @@ const UserInstances = () => {
                       </Box>
                     </Box>
                   </GridItem>
-                ))
+                )),
               )}
             </Grid>
           </Flex>

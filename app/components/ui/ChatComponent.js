@@ -109,7 +109,7 @@ const ChatComponent = ({ pushSign, address, chatID }) => {
         </div>
       ) : (
         <Box
-        my={"auto"}
+          my={"auto"}
           overflowY="auto"
           p="4"
           borderRadius="md"

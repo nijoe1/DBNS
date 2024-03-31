@@ -115,7 +115,9 @@ abstract contract Core is FNS, Gated, Tableland {
         if (_instanceType == Types.PAID_INSTANCE) {
             access = instances[_instance].creator == _sender;
         } else if (_instanceType == Types.PAID_PRIVATE_INSTANCE) {
-            access = getAccess(_sender, _gatedAddress) || instances[_instance].creator;
+            access =
+                getAccess(_sender, _gatedAddress) ||
+                instances[_instance].creator;
         } else if (_instanceType == Types.OPEN_PRIVATE_INSTANCE) {
             access = getAccess(_sender, _gatedAddress);
         } else if (_instanceType == Types.OPEN_INSTANCE) {

@@ -34,6 +34,7 @@ const DatasetViewer = ({
   EncryptedKeyCID,
   isEncrypted,
   spaceID,
+  hasAccess,
 }) => {
   const toast = useToast();
   const [csvData, setCsvData] = useState([]);
@@ -62,7 +63,7 @@ const DatasetViewer = ({
     try {
       if (!isEncrypted) {
         const response = await fetch(
-          "https://gateway.lighthouse.storage/ipfs/" + cid,
+          "https://gateway.lighthouse.storage/ipfs/" + cid
         );
         if (!response.ok) {
           throw new Error("Failed to fetch CSV file");
@@ -176,63 +177,70 @@ const DatasetViewer = ({
         <>
           <Center>
             <Container>
-              <div className="flex flex-wrap items-center">
-                <Menu>
-                  <MenuButton
-                    as={IconButton}
-                    aria-label="Options"
-                    icon={<Icon as={MdMoreVert} />}
-                    colorScheme="black"
-                    className="bg-black/80 text-white"
-                    my={4}
-                    mr={5}
-                  />
-                  <MenuList
-                    colorScheme="black"
-                    className="bg-black/80 text-white"
-                  >
-                    <MenuItem
+              {hasAccess && (
+                <div className="flex flex-wrap items-center">
+                  <Menu colorScheme="black" className="bg-black text-black">
+                    <MenuButton
+                      as={IconButton}
+                      aria-label="Options"
+                      icon={<Icon as={MdMoreVert} />}
                       colorScheme="black"
-                      className="bg-black/80 text-white"
-                      onClick={handleDownload}
-                      icon={<Icon as={FiDownload} />}
-                    >
-                      Download
-                    </MenuItem>
-                    <MenuItem>
-                      <Select
-                        value={rowsPerPage}
-                        onChange={handleRowsPerPageChange}
-                        fontSize="sm"
+                      className="bg-black/80 text-black"
+                      my={4}
+                      mr={5}
+                    />
+                    <MenuList className="bg-black text-black">
+                      <MenuItem
+                        // colorScheme="black"
+                        className="text-black"
+                        onClick={handleDownload}
+                        icon={<Icon color={"black"} as={FiDownload} />}
                       >
-                        {[10, 20, 50, 100].map((value) => (
-                          <option key={value} value={value}>
-                            {value} Rows
-                          </option>
-                        ))}
-                      </Select>
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-                <Button
-                  colorScheme="black"
-                  ml="3"
-                  className="bg-black/80 text-white"
-                  onClick={handleUpdateClick}
-                >
-                  Update Dataset
-                </Button>
-                <UpdateIPNS
-                  isOpen={isUpdateOpen}
-                  onClose={onUpdateClose}
-                  isDataset={true}
-                  IPNS={IPNS}
-                  EncryptedKeyCID={EncryptedKeyCID}
-                  currentCSV={csvText}
-                  spaceID={spaceID}
-                  isEncrypted={isEncrypted}
-                />
-              </div>
+                        <p className="text-black">Download</p>
+                      </MenuItem>
+                      <MenuItem
+                        colorScheme="black"
+                        className="bg-black text-black"
+                      >
+                        <Select
+                          value={rowsPerPage}
+                          onChange={handleRowsPerPageChange}
+                          fontSize="sm"
+                          className="bg-black/80 text-black"
+                        >
+                          {[10, 20, 50, 100].map((value) => (
+                            <option
+                              className="text-black"
+                              key={value}
+                              value={value}
+                            >
+                              {value} Rows
+                            </option>
+                          ))}
+                        </Select>
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                  <Button
+                    colorScheme="black"
+                    ml="3"
+                    className="bg-black/80 text-white"
+                    onClick={handleUpdateClick}
+                  >
+                    Update Dataset
+                  </Button>
+                  <UpdateIPNS
+                    isOpen={isUpdateOpen}
+                    onClose={onUpdateClose}
+                    isDataset={true}
+                    IPNS={IPNS}
+                    EncryptedKeyCID={EncryptedKeyCID}
+                    currentCSV={csvText}
+                    spaceID={spaceID}
+                    isEncrypted={isEncrypted}
+                  />
+                </div>
+              )}
             </Container>
           </Center>
 

@@ -24,6 +24,13 @@ const Subscribe = ({
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+  const [isProcessingTransaction, setIsProcessingTransaction] = useState(false);
+  const getLoadingMessage = () => {
+    if (isProcessingTransaction) {
+      return "Processing transaction...";
+    }
+    return "";
+  };
 
   async function handleCreate() {
     await SUBSCRIBE();
@@ -31,6 +38,7 @@ const Subscribe = ({
   }
 
   const SUBSCRIBE = async () => {
+    setIsProcessingTransaction(true);
     try {
       const data = await publicClient?.simulateContract({
         account,
@@ -51,6 +59,7 @@ const Subscribe = ({
       const transaction = await publicClient.waitForTransactionReceipt({
         hash: hash,
       });
+      setIsProcessingTransaction(false);
       toast({
         title: "Subscription Created",
         description: "You Subscribed successfully",
@@ -79,6 +88,13 @@ const Subscribe = ({
             Cancel
           </Button>
         </ModalFooter>
+        {isProcessingTransaction ? (
+          <div className="my-3 mx-auto">
+            <span className="text-white" style={{ fontSize: "md" }}>
+              {getLoadingMessage()}
+            </span>
+          </div>
+        ) : null}
       </ModalContent>
     </Modal>
   );

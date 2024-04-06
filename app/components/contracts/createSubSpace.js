@@ -24,7 +24,13 @@ const CreateSubSpaceModal = ({
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   const [newNodeName, setNewNodeName] = useState("");
-
+  const [isProcessingTransaction, setIsProcessingTransaction] = useState(false);
+  const getLoadingMessage = () => {
+    if (isProcessingTransaction) {
+      return "Processing transaction...";
+    }
+    return "";
+  };
   async function handleCreate() {
     console.log("Creating new node with name: ", newNodeName);
     await createNewSubSpace();
@@ -33,6 +39,7 @@ const CreateSubSpaceModal = ({
 
   const createNewSubSpace = async () => {
     if (isRoot) {
+      setIsProcessingTransaction(true);
       try {
         const data = await publicClient?.simulateContract({
           account,
@@ -52,6 +59,7 @@ const CreateSubSpaceModal = ({
         const transaction = await publicClient.waitForTransactionReceipt({
           hash: hash,
         });
+        setIsProcessingTransaction(false);
         toast({
           title: "Subspace Created",
           description: "Subspace created successfully",
@@ -119,6 +127,13 @@ const CreateSubSpaceModal = ({
             Cancel
           </Button>
         </ModalFooter>
+        {isProcessingTransaction ? (
+          <div className="my-3 mx-auto">
+            <span className="text-white" style={{ fontSize: "md" }}>
+              {getLoadingMessage()}
+            </span>
+          </div>
+        ) : null}
       </ModalContent>
     </Modal>
   );

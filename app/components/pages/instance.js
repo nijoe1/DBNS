@@ -12,7 +12,7 @@ import {
 import DatasetViewer from "@/components/ui/DatasetViewer";
 import InstanceCodes from "@/components/ui/InstanceCodes";
 import { useAccount } from "wagmi";
-import ChatComponent from "@/components/ui/ChatComponent";
+import ForumComponent from "@/components/ui/ForumComponent";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { Container } from "@/components//ui/container";
@@ -51,17 +51,18 @@ const InstanceDetailsPage = () => {
     try {
       const data = await getInstance(instanceID);
       let members = await getInstanceMembers(instanceID);
-      let temp = [];
-      temp.push(data[0].creator);
+      let temp = new Set();
+      temp.add(data[0].creator.toLowerCase());
       members.forEach((member) => {
-        temp.push(member.member.toLowerCase());
+        temp.add(member.member.toLowerCase());
       });
-      setInstanceMembers(temp);
-      console.log("Members:", temp);
+      setInstanceMembers(Array.from(temp));
+
       const instanceData = await getInstanceMetadata(data[0]);
       console.log("Instance Data:", instanceData);
       const hasAccess = await getHasAccess(instanceID, address);
       setHasAccess(hasAccess);
+      console.log("creatorrrrrrrrr ", instanceData.creator);
       setInstance(instanceData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -101,14 +102,15 @@ const InstanceDetailsPage = () => {
                     picture:
                       instance?.metadata?.imageUrl || "/path/to/image.jpg",
                     members: instanceMembers || [],
+                    creator: instance?.creator,
                   }}
                   pushSign={pushSign}
+                  creator={instance?.creator}
                 />
                 {!(
                   hasAccess ||
                   instanceMembers.find(
-                    (member) =>
-                      member?.toLowerCase() === address?.toLowerCase(),
+                    (member) => member?.toLowerCase() === address?.toLowerCase()
                   )
                 ) && (
                   <div>
@@ -142,14 +144,8 @@ const InstanceDetailsPage = () => {
               >
                 {(hasAccess ||
                   instanceMembers.find(
-                    (member) => member.toLowerCase() === address.toLowerCase(),
+                    (member) => member.toLowerCase() === address.toLowerCase()
                   )) && (
-                  // <Tabs
-                  //   isFitted
-                  //   variant="soft-rounded"
-                  //   colorScheme="gray"
-                  //   minWidth={["150px", "200px"]}
-                  // >
                   <Tabs
                     isFitted
                     variant="enclosed"
@@ -161,7 +157,7 @@ const InstanceDetailsPage = () => {
                     <TabList mb="4">
                       <Tab>Dataset</Tab>
                       <Tab>Discussion</Tab>
-                      <Tab>Code (2)</Tab>
+                      <Tab>Codes</Tab>
                     </TabList>
                     <TabPanels>
                       <TabPanel>
@@ -171,17 +167,35 @@ const InstanceDetailsPage = () => {
                           EncryptedKeyCID={instance?.IPNSEncryptedKey}
                           isEncrypted={instance?.price > 0}
                           spaceID={instanceID}
+                          hasAccess={
+                            instance?.creator?.toLowerCase() ==
+                              address?.toLowerCase() ||
+                            instanceMembers.find(
+                              (member) =>
+                                member?.toLowerCase() === address?.toLowerCase()
+                            )
+                          }
                         />
                       </TabPanel>
                       <TabPanel>
-                        <ChatComponent
+                        <ForumComponent
                           pushSign={pushSign}
                           address={address}
                           chatID={instance?.chatID}
                         />
                       </TabPanel>
                       <TabPanel>
-                        <InstanceCodes pushSign={pushSign} />
+                        <InstanceCodes
+                          pushSign={pushSign}
+                          hasAccess={
+                            instance?.creator?.toLowerCase() ==
+                              address?.toLowerCase() ||
+                            instanceMembers.find(
+                              (member) =>
+                                member?.toLowerCase() === address?.toLowerCase()
+                            )
+                          }
+                        />
                       </TabPanel>
                     </TabPanels>
                   </Tabs>

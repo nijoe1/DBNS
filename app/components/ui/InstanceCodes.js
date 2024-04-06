@@ -27,7 +27,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import UpdateIPNS from "@/components/ui/UpdateIPNS";
 import makeBlockie from "ethereum-blockies-base64";
 
-const InstanceCodes = ({ pushSign }) => {
+const InstanceCodes = ({ pushSign, hasAccess }) => {
   const [code, setCode] = useState(null);
   const [viewAllCodes, setViewAllCodes] = useState(true);
 
@@ -104,31 +104,33 @@ const InstanceCodes = ({ pushSign }) => {
         <Container>
           {code ? (
             <>
-              <div className="flex flex-wrap">
-                <IconButton
-                  icon={<FaArrowLeft />}
-                  aria-label="Go back to All Codes"
-                  variant="outline"
-                  mb="4"
-                  ml={"6%"}
-                  onClick={handleBack}
-                />
-                <Button
-                  colorScheme="black"
-                  ml="3"
-                  className="bg-black/80 text-white"
-                  onClick={handleUpdateClick}
-                >
-                  Update Notebook
-                </Button>
-                <UpdateIPNS
-                  isOpen={isUpdateOpen}
-                  onClose={onUpdateClose}
-                  isDataset={false}
-                  IPNS={code.IPNS}
-                  EncryptedKeyCID={code.IPNSEncryptedKey}
-                />
-              </div>
+              {hasAccess && (
+                <div className="flex flex-wrap">
+                  <IconButton
+                    icon={<FaArrowLeft />}
+                    aria-label="Go back to All Codes"
+                    variant="outline"
+                    mb="4"
+                    ml={"6%"}
+                    onClick={handleBack}
+                  />
+                  <Button
+                    colorScheme="black"
+                    ml="3"
+                    className="bg-black/80 text-white"
+                    onClick={handleUpdateClick}
+                  >
+                    Update Notebook
+                  </Button>
+                  <UpdateIPNS
+                    isOpen={isUpdateOpen}
+                    onClose={onUpdateClose}
+                    isDataset={false}
+                    IPNS={code.IPNS}
+                    EncryptedKeyCID={code.IPNSEncryptedKey}
+                  />
+                </div>
+              )}
 
               <CodeViewer code={code} onClose={handleBack} />
             </>

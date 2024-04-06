@@ -85,7 +85,7 @@ const StepperForm: React.FC<{
       if (response && response.data && response.data.message) {
         let res = await generateLighthouseJWT(address, signed);
         if (res) {
-          localStorage.setItem(`lighthouse-jwt-${address}`, res);
+          localStorage.setItem(`lighthouse-jwt-${address.toLowerCase()}`, res);
           nextStep();
         } else {
           setTokenClicked(!tokenClicked);
@@ -95,9 +95,7 @@ const StepperForm: React.FC<{
   };
 
   const connectToPush = async () => {
-    if (Object.keys(pushSign).length === 0) {
-      await initializePush();
-    }
+    await initializePush();
 
     setInitializePush(!pushInitialized);
 

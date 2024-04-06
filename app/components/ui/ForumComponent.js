@@ -11,9 +11,14 @@ const ForumComponent = ({ pushSign, address, chatID }) => {
 
   const fetchForumPosts = async () => {
     try {
+      const groupPermissions = await pushSign.chat.group.permissions(chatID);
+      if (!groupPermissions.entry && !groupPermissions.chat) {
+        await pushSign.chat.group.join(chatID);
+      }
       const forumPosts = await pushSign.chat.history(chatID, {
         limit: "30",
       });
+      console.log("Forum posts:", forumPosts);
       setPosts(forumPosts);
       setFetched(true);
     } catch (error) {

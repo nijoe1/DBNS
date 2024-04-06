@@ -46,6 +46,21 @@ const CreateNewInstanceCode = ({ isOpen, onClose, spaceID }) => {
   const pushSign = useSelector((state) => state.push.pushSign);
   const { address } = useAccount();
   const [tags, setTags] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isProcessingTransaction, setIsProcessingTransaction] = useState(false);
+  const [isCreatingPushChat, setIsCreatingPushChat] = useState(false);
+  const getLoadingMessage = () => {
+    if (isUploading) {
+      return "Uploading On IPFS and pointing to IPNS...";
+    }
+    if (isProcessingTransaction) {
+      return "Processing transaction...";
+    }
+    if (isCreatingPushChat) {
+      return "Creating token gated push chat...";
+    }
+    return "";
+  };
 
   const handleFileChange = (e) => {
     console.log("File Change Event:", e);
@@ -88,7 +103,7 @@ const CreateNewInstanceCode = ({ isOpen, onClose, spaceID }) => {
       key,
       address,
       jwt,
-      spaceID,
+      spaceID
     );
     return response;
   };
@@ -101,8 +116,12 @@ const CreateNewInstanceCode = ({ isOpen, onClose, spaceID }) => {
   const handleCreate = async () => {
     try {
       console.log(formData);
+      setIsUploading(true);
       let res = await createIPNS();
+      setIsUploading(false);
+      setIsCreatingPushChat(true);
       let chatID = await createCode();
+      setIsCreatingPushChat(false);
       const data = await publicClient?.simulateContract({
         account,
         address: CONTRACT_ADDRESSES,
@@ -122,18 +141,19 @@ const CreateNewInstanceCode = ({ isOpen, onClose, spaceID }) => {
         console.log("Wallet client not found");
         return;
       }
-
+      setIsProcessingTransaction(true);
       const hash = await walletClient.writeContract(data.request);
 
       const transaction = await publicClient.waitForTransactionReceipt({
         hash,
       });
+      setIsProcessingTransaction(false);
 
       onClose();
 
       toast({
-        title: "Subspace Created",
-        description: "Subspace created successfully",
+        title: "Instance code created successfully",
+        description: "Your instance code has been created successfully!",
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -217,6 +237,13 @@ const CreateNewInstanceCode = ({ isOpen, onClose, spaceID }) => {
             Cancel
           </Button>
         </ModalFooter>
+        {isUploading || isProcessingTransaction || isCreatingPushChat ? (
+          <div className="my-3 mx-auto">
+            <span className="text-white" style={{ fontSize: "md" }}>
+              {getLoadingMessage()}
+            </span>
+          </div>
+        ) : null}
       </ModalContent>
     </Modal>
   );

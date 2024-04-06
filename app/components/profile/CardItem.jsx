@@ -23,12 +23,13 @@ import { useAccount } from "wagmi";
 import makeBlockie from "ethereum-blockies-base64";
 import { useRouter } from "next/router";
 
-const CardItem = ({ profileInfo, pushSign }) => {
+const CardItem = ({ profileInfo, pushSign, creator }) => {
   const router = useRouter();
   const { address } = useAccount();
   const [showModal, setShowModal] = useState(false);
   const [conributors, setContributors] = useState([]);
-
+  const getCreator = creator ? creator : address;
+  console.log("Creator:", creator);
   const handleShowModal = () => {
     setShowModal(true);
   };
@@ -65,7 +66,9 @@ const CardItem = ({ profileInfo, pushSign }) => {
       fetchProfileInfo();
     }
   }, [profileInfo]);
-
+  useEffect(() => {
+    console.log("Creator:", creator);
+  }, [creator]);
   return (
     <div className="mt-[5%] max-w-[1200px] mx-auto">
       <Box
@@ -96,7 +99,7 @@ const CardItem = ({ profileInfo, pushSign }) => {
             mt="2"
             fontSize="sm"
           >
-            {address?.slice(0, 6)}...{address?.slice(-6)}
+            {getCreator?.slice(0, 6)}...{getCreator?.slice(-6)}
           </Badge>
           <Text fontSize={["sm", "md"]} color="white" mt="2">
             {profileInfo?.desc || "User Description"}

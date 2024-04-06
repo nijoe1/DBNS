@@ -5,13 +5,14 @@ import UserInstances from "@/components/pages/UserInstances";
 import UserCodes from "@/components/ui/UserCodes";
 const ProfilePage = () => {
   return (
-    <div className="mt-2 max-w-[1200px] mx-auto">
+    <div className="mt-2 max-w-[1180px] mx-auto">
       <Box
-        p={["2", "4"]}
-        mx="[5%]"
         bg="#333333"
-        borderRadius="xl"
+        className="flex flex-col items-center "
+        borderRadius="md"
         boxShadow="md"
+        mb={4}
+        p={["2", "4"]}
       >
         <Profile onProfile={true} />
 
@@ -19,6 +20,7 @@ const ProfilePage = () => {
           isFitted
           variant="enclosed"
           className="text-white"
+          minWidth={["150px", "200px"]}
           colorScheme="white"
           mb="4"
         >

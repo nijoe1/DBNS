@@ -57,7 +57,21 @@ const CreateNewInstance = ({
   const pushSign = useSelector((state) => state.push.pushSign);
   const { address } = useAccount();
   const [tags, setTags] = useState([]);
-
+  const [isUploading, setIsUploading] = useState(false);
+  const [isProcessingTransaction, setIsProcessingTransaction] = useState(false);
+  const [isCreatingPushChat, setIsCreatingPushChat] = useState(false);
+  const getLoadingMessage = () => {
+    if (isUploading) {
+      return "Uploading On IPFS and pointing to IPNS...";
+    }
+    if (isProcessingTransaction) {
+      return "Processing transaction...";
+    }
+    if (isCreatingPushChat) {
+      return "Creating token gated push chat...";
+    }
+    return "";
+  };
   useEffect(() => {}, [router]);
 
   const handleFileChange = (e) => {
@@ -102,7 +116,7 @@ const CreateNewInstance = ({
     const createdGroup = await pushSign.chat.group.create(formData.name, {
       description: "Token gated web3 native chat example", // provide short description of group
       image: "data:image/png;base64,iVBORw0K...", // provide base64 encoded image
-      members: tags, // not needed, rules define this, can omit
+      members: [], // not needed, rules define this, can omit
       admins: [], // not needed as per problem statement, can omit
       private: true,
       // rules: rules,
@@ -113,7 +127,6 @@ const CreateNewInstance = ({
   const createIPNS = async () => {
     let key = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
     let jwt = localStorage.getItem(`lighthouse-jwt-${address}`);
-
     // cid, apiKey, address, jwt, spaceID
     const response = await createIPNSName(
       formData.file,
@@ -121,7 +134,7 @@ const CreateNewInstance = ({
       address,
       jwt,
       spaceID,
-      formData.price > 0,
+      formData.price > 0
     );
     return response;
   };
@@ -178,7 +191,7 @@ const CreateNewInstance = ({
 
       // Check if the new address is already in the tags array
       const count = lowercaseTags.filter(
-        (tag) => tag === value?.toLowerCase(),
+        (tag) => tag === value?.toLowerCase()
       ).length;
       if (count > 1) {
         toast({
@@ -197,13 +210,18 @@ const CreateNewInstance = ({
       // Update the state with distinct addresses
       setTags(distinctTags);
     },
-    [setTags],
+    [setTags]
   );
 
   const handleCreate = async () => {
+    setIsUploading(true);
+
     let metadataCID = await uploadMetadata();
     let res = await createIPNS();
+    setIsUploading(false);
+    setIsCreatingPushChat(true);
     let chatID = await createGroup();
+    setIsCreatingPushChat(false);
     try {
       // Create space instance
       const data = await publicClient?.simulateContract({
@@ -226,20 +244,20 @@ const CreateNewInstance = ({
         console.log("Wallet client not found");
         return;
       }
-
+      setIsProcessingTransaction(true);
       const hash = await walletClient.writeContract(data.request);
 
       // Wait for transaction receipt
       const transaction = await publicClient.waitForTransactionReceipt({
         hash,
       });
-
+      setIsProcessingTransaction(false);
       onClose();
 
       // Display success toast
       toast({
-        title: "Subspace Created",
-        description: "Subspace created successfully",
+        title: "Your dataset has been created successfully",
+        description: "Instance created successfully!",
         status: "success",
         duration: 9000,
         isClosable: true,
@@ -372,6 +390,13 @@ const CreateNewInstance = ({
             Cancel
           </Button>
         </ModalFooter>
+        {isUploading || isProcessingTransaction || isCreatingPushChat ? (
+          <div className="my-3 mx-auto">
+            <span className="text-white" style={{ fontSize: "md" }}>
+              {getLoadingMessage()}
+            </span>
+          </div>
+        ) : null}
       </ModalContent>
     </Modal>
   );

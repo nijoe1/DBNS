@@ -42,7 +42,7 @@ export default function Navbar(): JSX.Element {
       try {
         API_KEY = localStorage.getItem(`API_KEY_${address?.toLowerCase()}`);
       } catch {}
-      if (address && address != prevAddress) {
+      if (address && address != prevAddress && isConnected) {
         localStorage.setItem("prevAddress", address ? address : "".toString());
         localStorage.setItem("prevChain", chainID.toString());
         setChangeChain(false);

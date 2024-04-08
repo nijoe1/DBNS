@@ -13,8 +13,6 @@ const StepperForm: React.FC<{
 }> = ({ isOpen, onClose, address }) => {
   const { data: walletClient } = useWalletClient();
   const { initializePush } = usePush();
-  const pushSign = useSelector((state: any) => state.push.pushSign);
-
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [pushInitialized, setInitializePush] = useState(false);
   const [apiClicked, setApiClicked] = useState(false);
